@@ -16,6 +16,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         generate_statistics: true
+        session.events.log: false
 
 storage:
   cloudinary:
@@ -27,3 +28,6 @@ storage:
     upload:
       preset: ${CLOUDINARY_UPLOAD_PRESET:ml_default}
 
+logging:
+  level:
+    org.hibernate.engine.internal.StatisticalLoggingSessionEventListener: OFF
