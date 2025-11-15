@@ -1,21 +1,23 @@
 package com.kakaotechbootcamp.community.common.aop;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-@Slf4j
 @Aspect
 @Component
 public class LoggingAspect {
+
+    private static final Logger log = LoggerFactory.getLogger("community.aop.LoggingAspect");
 
     private static final AtomicLong REQUEST_ID_COUNTER = new AtomicLong(0);
 

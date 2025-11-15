@@ -1,16 +1,18 @@
 package com.kakaotechbootcamp.community.common.aop;
 
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Aspect
 @Component
 public class PerformanceAspect {
+
+    private static final Logger log = LoggerFactory.getLogger("community.aop.PerformanceAspect");
 
     @Pointcut("execution(* com.kakaotechbootcamp.community.application.*.service.*.*(..))")
     public void serviceMethods() {}

@@ -6,13 +6,20 @@
     <!-- Define color conversion rule -->
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
 
-    <!-- Console Appender -->
+    <!-- Console Appender (일반 로그용) -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5level){INFO=green, WARN=yellow, ERROR=red} %cyan([%-10thread]) %magenta(%-40logger{5}) : %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%-5level]){DEBUG=magenta, INFO=green, WARN=yellow, ERROR=red} %cyan([%-10thread]) %magenta(%-40logger{35}) : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- AOP 전용 Console Appender -->
+    <appender name="AOP_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %yellow([AOP:%-30logger{0}]) : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -31,6 +38,16 @@
             <pattern>%d[{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-10thread] %logger : %msg%n</pattern>
         </encoder>
     </appender>
+
+    <!-- AOP 전용 Logger -->
+    <logger name="community.aop" level="DEBUG" additivity="false">
+        <appender-ref ref="AOP_CONSOLE" />
+    </logger>
+
+    <!-- Hibernate SQL Logger (일반 로그로 출력) -->
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
 
     <!-- Root Logger -->
     <root level="DEBUG">

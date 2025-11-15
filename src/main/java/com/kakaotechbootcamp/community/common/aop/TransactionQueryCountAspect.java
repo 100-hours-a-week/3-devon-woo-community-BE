@@ -3,21 +3,23 @@ package com.kakaotechbootcamp.community.common.aop;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class TransactionQueryCountAspect {
+
+    private static final Logger log = LoggerFactory.getLogger("community.aop.TransactionQueryCountAspect");
 
     private final EntityManager entityManager;
 
