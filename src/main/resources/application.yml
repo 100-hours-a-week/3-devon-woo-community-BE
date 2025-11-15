@@ -1,9 +1,12 @@
+server:
+  port: 8080
+
 spring:
+  application:
+    name: api-app-server
+
   profiles:
     include: logging
-
-  application:
-    name: community
 
   output:
     ansi:
