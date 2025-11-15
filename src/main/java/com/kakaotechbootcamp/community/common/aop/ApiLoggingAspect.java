@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Aspect
 @Component
-public class LoggingAspect {
+public class ApiLoggingAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("community.aop.LoggingAspect");
+    private static final Logger log = LoggerFactory.getLogger("community.aop.API");
 
     private static final AtomicLong REQUEST_ID_COUNTER = new AtomicLong(0);
 
@@ -34,11 +34,12 @@ public class LoggingAspect {
 
         HttpServletRequest request = attributes.getRequest();
         long requestId = REQUEST_ID_COUNTER.incrementAndGet();
+        String id = String.format("%03d", requestId); // 3자리 ID
         long startTime = System.currentTimeMillis();
 
         // Request 로그
-        log.info("[REQ-{}] {} {} | IP: {}",
-                requestId,
+        log.info("ID={} | Endpoint={} {} | IP={}",
+                id,
                 request.getMethod(),
                 request.getRequestURI(),
                 request.getRemoteAddr());
@@ -47,23 +48,14 @@ public class LoggingAspect {
             Object result = joinPoint.proceed();
             long duration = System.currentTimeMillis() - startTime;
 
-            // Response 로그 (성공)
-            log.info("[RES-{}] {} | {}ms",
-                    requestId,
-                    result != null ? result.getClass().getSimpleName() : "void",
-                    duration);
+            // Response 로그
+            log.info("ID={} | Time={}ms", id, duration);
 
             return result;
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
 
-            // Response 로그 (실패)
-            log.error("[ERR-{}] {} | {}ms | {}",
-                    requestId,
-                    e.getClass().getSimpleName(),
-                    duration,
-                    e.getMessage());
-
+            log.error("ID={} | Time={}ms | Error={}", id, duration, e.getMessage());
             throw e;
         }
     }

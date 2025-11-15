@@ -8,17 +8,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 @Aspect
 @Component
-public class PerformanceAspect {
+public class ServicePerformanceAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("community.aop.PerformanceAspect");
+    private static final Logger log = LoggerFactory.getLogger("community.aop.Service");
+    private static final AtomicLong EXEC_ID_COUNTER = new AtomicLong(0);
 
     @Pointcut("execution(* com.kakaotechbootcamp.community.application.*.service.*.*(..))")
     public void serviceMethods() {}
 
     @Around("serviceMethods()")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        long execId = EXEC_ID_COUNTER.incrementAndGet();
+        String id = String.format("%03d", execId);
+
         String className = joinPoint.getSignature().getDeclaringType().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
 
@@ -29,15 +35,15 @@ public class PerformanceAspect {
             long executionTime = System.currentTimeMillis() - startTime;
 
             if (executionTime > 1000) {
-                log.warn("[SLOW] {}.{} | {}ms", className, methodName, executionTime);
+                log.warn("ID={} | Method={}.{} | Time={}ms | Status=SLOW", id, className, methodName, executionTime);
             } else {
-                log.info("[PERF] {}.{} | {}ms", className, methodName, executionTime);
+                log.info("ID={} | Method={}.{} | Time={}ms | Status=OK", id, className, methodName, executionTime);
             }
 
             return result;
         } catch (Throwable throwable) {
             long executionTime = System.currentTimeMillis() - startTime;
-            log.error("[PERF-ERR] {}.{} | {}ms", className, methodName, executionTime);
+            log.error("ID={} | Method={}.{} | Time={}ms | Status=ERROR | Message={}", id, className, methodName, executionTime, throwable.getMessage());
             throw throwable;
         }
     }
