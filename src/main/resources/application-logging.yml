@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        session.events.log: false
+
+logging:
+  level:
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF
+    org.hibernate.engine.internal.StatisticalLoggingSessionEventListener: OFF
