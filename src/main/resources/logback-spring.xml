@@ -12,14 +12,14 @@
             <level>INFO</level>
         </filter>
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%-5level]){DEBUG=magenta, INFO=green, WARN=yellow, ERROR=red} %cyan([%-10thread]) %magenta(%-40logger{35}) : %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%-5level]){DEBUG=magenta, INFO=green, WARN=yellow, ERROR=red} %cyan([%thread]) %magenta(%-40logger{35}) : %msg%n</pattern>
         </encoder>
     </appender>
 
     <!-- AOP 전용 Console Appender -->
     <appender name="AOP_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %yellow([AOP:%-30logger{0}]) : %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %cyan([AOP]) %magenta(%-20logger{0}) : %msg%n</pattern>
         </encoder>
     </appender>
 
