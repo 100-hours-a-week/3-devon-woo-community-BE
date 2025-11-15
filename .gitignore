@@ -48,3 +48,8 @@ thumbs.db
 *.log
 *.gz
 logs/
+
+
+### spring app env ###
+*application-local.yml
+*.env
