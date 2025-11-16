@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- src/main/resources/logback-spring.xml -->
+<configuration>
+    <property name="LOG_PATH" value="./logs" />
+
+    <!-- Define color conversion rule -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <!-- Console Appender (일반 로그용) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%-5level]){DEBUG=magenta, INFO=green, WARN=yellow, ERROR=red} %cyan([%thread]) %magenta(%-40logger{35}) : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- AOP 전용 Console Appender -->
+    <appender name="AOP_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %blue([LOG]) %cyan([%thread]) : %magenta(%11logger{0}) | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- File Appender -->
+    <appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <file>${LOG_PATH}/info.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/info_%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d[{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%-10thread] %logger : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- AOP 전용 Logger -->
+    <logger name="community.aop" level="DEBUG" additivity="false">
+        <appender-ref ref="AOP_CONSOLE" />
+    </logger>
+
+    <!-- Hibernate SQL Logger (일반 로그로 출력) -->
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <!-- Root Logger -->
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="INFO_LOG" />
+    </root>
+</configuration>

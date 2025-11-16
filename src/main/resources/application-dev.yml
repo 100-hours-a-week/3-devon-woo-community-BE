@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:mysql://dev-db-server:3306/kbt-community
+    username: dev_user
+    password: dev_password

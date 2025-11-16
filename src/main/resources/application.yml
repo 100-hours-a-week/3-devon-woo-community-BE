@@ -1,20 +1,31 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: community
+    name: api-app-server
+
+  profiles:
+    include: logging
+
+  output:
+    ansi:
+      enabled: always
 
   datasource:
     url: jdbc:mysql://localhost:3306/kbt-community?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      initialization-fail-timeout: 0
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+        generate_statistics: true
 
 storage:
   cloudinary:
@@ -25,4 +36,3 @@ storage:
       name: ${CLOUDINARY_CLOUD_NAME}
     upload:
       preset: ${CLOUDINARY_UPLOAD_PRESET:ml_default}
-

@@ -38,3 +38,18 @@ out/
 .claude/settings.local.json
 *.csv
 .env
+
+### Local Environment ###
+local.properties
+.DS_Store
+thumbs.db
+
+### Logs ###
+*.log
+*.gz
+logs/
+
+
+### spring app env ###
+*application-local.yml
+*.env
