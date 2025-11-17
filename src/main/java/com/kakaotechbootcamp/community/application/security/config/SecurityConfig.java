@@ -48,13 +48,19 @@ public class SecurityConfig {
 
                 /* 커스텀 로그인 필터 추가 */
                 .addFilterAt(
-                        new LoginAuthenticationFilter(authenticationManager(), loginSuccessHandler, loginFailureHandler),
-                        UsernamePasswordAuthenticationFilter.class
+                        loginAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class
                 )
 
         ;
 
         return http.build();
+    }
+
+    @Bean
+    public LoginAuthenticationFilter loginAuthenticationFilter(AuthenticationManager authManager) {
+        LoginAuthenticationFilter filter = new LoginAuthenticationFilter(authManager, loginSuccessHandler, loginFailureHandler);
+        filter.setFilterProcessesUrl(SecurityConstants.LOGIN_URL);
+        return filter;
     }
 
 

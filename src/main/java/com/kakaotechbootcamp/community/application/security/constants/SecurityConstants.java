@@ -1,9 +1,14 @@
 package com.kakaotechbootcamp.community.application.security.constants;
 
 public class SecurityConstants {
+
+    public static final String LOGIN_URL = "/auth/login";
+    public static final String LOGOUT_URL = "/auth/logout";
+    public static final String SIGNUP_URL = "/auth/signup";
+
     public static final String[] PUBLIC_URLS = {
-            "/", "/login",
-            "/auth/*/logout", "/auth/*/reissue",
+            "/",
+            LOGIN_URL, LOGOUT_URL, SIGNUP_URL,
             "/oauth2/**", "/api/*",
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/actuator/**"
     };
