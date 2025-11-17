@@ -28,6 +28,16 @@ public class SecurityConfig {
     private final LoginFailureHandler loginFailureHandler;
 
     @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 /* CSRF 보호 = 비활성화 (Why?: REST API stateless이므로 불필요) */
@@ -46,9 +56,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                /* 커스텀 로그인 필터 추가 */
+                /* 커스텀 로그인 필터 추가 (Bean으로 등록하지 않고 직접 생성) */
                 .addFilterAt(
-                        loginAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class
+                        createLoginAuthenticationFilter(authenticationManager()),
+                        UsernamePasswordAuthenticationFilter.class
                 )
 
         ;
@@ -56,21 +67,10 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public LoginAuthenticationFilter loginAuthenticationFilter(AuthenticationManager authManager) {
-        LoginAuthenticationFilter filter = new LoginAuthenticationFilter(authManager, loginSuccessHandler, loginFailureHandler);
+    private LoginAuthenticationFilter createLoginAuthenticationFilter(AuthenticationManager authenticationManager) {
+        LoginAuthenticationFilter filter = new LoginAuthenticationFilter(
+                authenticationManager, loginSuccessHandler, loginFailureHandler);
         filter.setFilterProcessesUrl(SecurityConstants.LOGIN_URL);
         return filter;
-    }
-
-
-    @Bean
-    public AuthenticationManager authenticationManager() throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
