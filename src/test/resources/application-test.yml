@@ -34,4 +34,4 @@ logging:
     org.hibernate.stat: INFO
     org.hibernate.engine.internal.StatisticalLoggingSessionEventListener: ERROR
     org.hibernate.tool.schema.internal.ExceptionHandlerLoggedImpl: ERROR
-    org.springframework.jdbc.datasource.init: WARN  # @Sql 스크립트 실행 로그 억제
+    org.springframework.jdbc.datasource.init: WARN
