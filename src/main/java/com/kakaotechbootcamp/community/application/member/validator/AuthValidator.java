@@ -1,6 +1,6 @@
-package com.kakaotechbootcamp.community.application.auth.validator;
+package com.kakaotechbootcamp.community.application.member.validator;
 
-import com.kakaotechbootcamp.community.application.auth.dto.SignupRequest;
+import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
@@ -19,15 +19,6 @@ public class AuthValidator {
     public void validateSignup(SignupRequest request) {
         validateEmailNotDuplicated(request.email());
         validateNicknameNotDuplicated(request.nickname());
-    }
-
-    /**
-     * 비밀번호 일치 여부 검증
-     */
-    public void validatePassword(String rawPassword, String storedPassword) {
-        if (!rawPassword.equals(storedPassword)) {
-            throw new CustomException(MemberErrorCode.INVALID_PASSWORD);
-        }
     }
 
     private void validateEmailNotDuplicated(String email) {

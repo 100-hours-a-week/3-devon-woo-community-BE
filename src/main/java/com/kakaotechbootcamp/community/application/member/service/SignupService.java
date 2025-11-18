@@ -1,12 +1,8 @@
-package com.kakaotechbootcamp.community.application.auth.service;
+package com.kakaotechbootcamp.community.application.member.service;
 
-import com.kakaotechbootcamp.community.application.auth.dto.LoginRequest;
-import com.kakaotechbootcamp.community.application.auth.dto.LoginResponse;
-import com.kakaotechbootcamp.community.application.auth.dto.SignupRequest;
-import com.kakaotechbootcamp.community.application.auth.dto.SignupResponse;
-import com.kakaotechbootcamp.community.application.auth.validator.AuthValidator;
-import com.kakaotechbootcamp.community.common.exception.CustomException;
-import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
+import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
+import com.kakaotechbootcamp.community.application.member.dto.response.SignupResponse;
+import com.kakaotechbootcamp.community.application.member.validator.AuthValidator;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class SignupService {
     private final MemberRepository memberRepository;
     private final AuthValidator authValidator;
 
@@ -35,15 +31,5 @@ public class AuthService {
 
         Member savedMember = memberRepository.save(member);
         return new SignupResponse(savedMember.getId());
-    }
-
-    @Transactional
-    public LoginResponse login(LoginRequest request){
-        Member member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
-
-        authValidator.validatePassword(request.password(), member.getPassword());
-
-        return new LoginResponse(member.getId());
     }
 }
