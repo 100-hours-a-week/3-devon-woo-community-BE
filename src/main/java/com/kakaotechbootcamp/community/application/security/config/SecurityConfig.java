@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +27,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -40,6 +42,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                /* CORS 설정 */
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+
                 /* CSRF 보호 = 비활성화 (Why?: REST API stateless이므로 불필요) */
                 .csrf(AbstractHttpConfigurer::disable)
 
@@ -50,6 +55,7 @@ public class SecurityConfig {
 
                 /* 요청 권한 설정 */
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(SecurityConstants.SECURE_URLS).hasRole("USER")
                         .requestMatchers(SecurityConstants.ADMIN_URLS).hasRole("ADMIN")
                         .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()

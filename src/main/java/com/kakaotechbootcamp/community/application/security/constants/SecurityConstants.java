@@ -7,7 +7,7 @@ public class SecurityConstants {
     public static final String SIGNUP_URL = "/auth/signup";
 
     public static final String[] PUBLIC_URLS = {
-            "/",
+            "/", "/**",
             LOGIN_URL, LOGOUT_URL, SIGNUP_URL,
             "/oauth2/**", "/api/*",
             "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**", "/actuator/**"

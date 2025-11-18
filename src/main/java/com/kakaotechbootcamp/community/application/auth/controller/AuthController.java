@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Auth", description = "인증 관련 API")
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -34,21 +34,4 @@ public class AuthController {
         return ApiResponse.success(response, "signup_success");
     }
 
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다.")
-    @CustomExceptionDescription(SwaggerResponseDescription.AUTH_LOGIN)
-    @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(
-            @RequestBody @Validated LoginRequest request
-    ){
-        LoginResponse response = authService.login(request);
-        return ApiResponse.success(response, "login_success");
-    }
-
-    @Operation(summary = "로그아웃", description = "로그아웃 처리를 합니다.")
-    @CustomExceptionDescription(SwaggerResponseDescription.AUTH_LOGOUT)
-    @PostMapping("/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(){
-        // 로그아웃 처리 (세션 무효화 등)
-    }
 }
