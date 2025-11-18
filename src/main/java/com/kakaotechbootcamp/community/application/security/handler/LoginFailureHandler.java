@@ -1,6 +1,7 @@
 package com.kakaotechbootcamp.community.application.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,5 +21,14 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
+
+        log.info("로그인 실패: {}", exception.getMessage());
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ApiResponse<Void> apiResponse = ApiResponse.failure("로그인이 실패했습니다");
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 }
