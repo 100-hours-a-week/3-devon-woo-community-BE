@@ -1,6 +1,7 @@
 package com.kakaotechbootcamp.community.application.security.config;
 
 import com.kakaotechbootcamp.community.application.security.constants.SecurityConstants;
+import com.kakaotechbootcamp.community.application.security.filter.FilterChainExceptionHandler;
 import com.kakaotechbootcamp.community.application.security.filter.LoginAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAccessDeniedHandler;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAuthenticationEntryPoint;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final FilterChainExceptionHandler filterChainExceptionHandler;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -77,10 +79,15 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
 
-                /* 예외 처리 핸들러 설정 */
+                /* Auth 예외 처리 핸들러 설정 : (401, 403) */
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
+                )
+
+                /* 필터 체인 전역 예외 처리 핸들러 : 모든 예외 (모든 필터보다 먼저 실행) */
+                .addFilterBefore(
+                        filterChainExceptionHandler, UsernamePasswordAuthenticationFilter.class
                 )
 
         ;
