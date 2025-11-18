@@ -2,6 +2,8 @@ package com.kakaotechbootcamp.community.application.security.config;
 
 import com.kakaotechbootcamp.community.application.security.constants.SecurityConstants;
 import com.kakaotechbootcamp.community.application.security.filter.LoginAuthenticationFilter;
+import com.kakaotechbootcamp.community.application.security.handler.CustomAccessDeniedHandler;
+import com.kakaotechbootcamp.community.application.security.handler.CustomAuthenticationEntryPoint;
 import com.kakaotechbootcamp.community.application.security.handler.LoginFailureHandler;
 import com.kakaotechbootcamp.community.application.security.handler.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -28,6 +31,8 @@ public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -55,10 +60,9 @@ public class SecurityConfig {
 
                 /* 요청 권한 설정 */
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()
                         .requestMatchers(SecurityConstants.SECURE_URLS).hasRole("USER")
                         .requestMatchers(SecurityConstants.ADMIN_URLS).hasRole("ADMIN")
-                        .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated()
                 )
 
@@ -66,6 +70,12 @@ public class SecurityConfig {
                 .addFilterAt(
                         createLoginAuthenticationFilter(authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class
+                )
+
+                /* 예외 처리 핸들러 설정 */
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
 
         ;
