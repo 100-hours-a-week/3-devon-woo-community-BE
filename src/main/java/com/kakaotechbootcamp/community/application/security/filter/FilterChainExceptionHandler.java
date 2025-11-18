@@ -8,6 +8,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.nio.file.AccessDeniedException;
+import javax.security.sasl.AuthenticationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -28,7 +30,8 @@ public class FilterChainExceptionHandler extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (CustomAuthenticationException | CustomAccessDeniedException e) {
+        } catch (AuthenticationException | AccessDeniedException |
+                CustomAuthenticationException | CustomAccessDeniedException e) {
             throw e;
         } catch (Exception e) {
             log.error("[FilterChain] Unexpected error: {}", e.getMessage(), e);
