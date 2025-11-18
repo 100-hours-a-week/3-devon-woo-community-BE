@@ -50,12 +50,17 @@ public class SecurityConfig {
                 /* CORS 설정 */
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
-                /* CSRF 보호 = 비활성화 (Why?: REST API stateless이므로 불필요) */
+                /* CSRF 보호 = 비활성화 (Why?: REST API + JWT stateless이므로 불필요) */
                 .csrf(AbstractHttpConfigurer::disable)
 
-                /* 세션 설정 = 비활성화 (Why?: JWT로 사용) */
+                /* 세션 설정 = 비활성화 (Why?: REST API + JWT stateless이므로 불필요) */
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                /* 요청 캐시 = 비황성화 (Wht?: REST API + JWT stateless이므로 불필요)*/
+                .requestCache(cache -> cache
+                        .requestCache(new NullRequestCache())
                 )
 
                 /* 요청 권한 설정 */
