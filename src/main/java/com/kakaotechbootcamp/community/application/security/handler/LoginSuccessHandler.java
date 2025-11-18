@@ -3,6 +3,7 @@ package com.kakaotechbootcamp.community.application.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.security.dto.CustomUserDetails;
 import com.kakaotechbootcamp.community.application.security.dto.LoginResponse;
+import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // LoginResponse 생성 및 반환
         LoginResponse loginResponse = new LoginResponse(userId);
-        response.getWriter().write(objectMapper.writeValueAsString(loginResponse));
+        ApiResponse<LoginResponse> apiResponse = ApiResponse.success(loginResponse, "로그인이 성공했습니다");
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 }
