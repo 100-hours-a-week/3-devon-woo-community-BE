@@ -64,9 +64,6 @@ public class Member {
 
     public void changePassword(String password) {
         Assert.hasText(password, "password required");
-        if (password.length() > 20) {
-            throw new IllegalArgumentException("password too long");
-        }
         this.password = password;
     }
 
@@ -86,9 +83,6 @@ public class Member {
         Assert.hasText(password, "password required");
         Assert.hasText(nickname, "nickname required");
 
-        if (password.length() > 20) {
-            throw new IllegalArgumentException("password too long");
-        }
         if (nickname.length() > 10) {
             throw new IllegalArgumentException("nickname too long");
         }
