@@ -30,8 +30,7 @@ public class FilterChainExceptionHandler extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (AuthenticationException | AccessDeniedException |
-                CustomAuthenticationException | CustomAccessDeniedException e) {
+        } catch (AuthenticationException | AccessDeniedException e) {
             throw e;
         } catch (Exception e) {
             log.error("[FilterChain] Unexpected error: {}", e.getMessage(), e);
