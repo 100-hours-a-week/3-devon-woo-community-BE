@@ -26,16 +26,13 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         log.info("로그인 성공: {}", authentication.getName());
 
-        // CustomUserDetails에서 userId 추출
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getMemberId();
 
-        // 응답 설정
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // LoginResponse 생성 및 반환
         LoginResponse loginResponse = new LoginResponse(userId);
         ApiResponse<LoginResponse> apiResponse = ApiResponse.success(loginResponse, "로그인이 성공했습니다");
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
