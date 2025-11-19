@@ -1,13 +1,12 @@
 package com.kakaotechbootcamp.community.application.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakaotechbootcamp.community.application.security.exception.CustomAccessDeniedException;
-import com.kakaotechbootcamp.community.application.security.exception.CustomAuthenticationException;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import javax.security.sasl.AuthenticationException;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
 
 @Slf4j
 @Component
