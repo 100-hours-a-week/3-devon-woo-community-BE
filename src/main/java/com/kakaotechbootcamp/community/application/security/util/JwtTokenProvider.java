@@ -5,8 +5,6 @@ import com.kakaotechbootcamp.community.application.security.constants.JwtConstan
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -81,6 +79,17 @@ public class JwtTokenProvider {
         Claims claims = validateToken(token);
         return claims.get(JwtConstants.CLAIM_TYPE, String.class);
     }
+
+    public Date getExpiration(String token){
+        Claims claims = validateToken(token);
+        return claims.getExpiration();
+    }
+
+    public long getExpiresIn(String token) {
+        Date expiration = validateToken(token).getExpiration();
+        return expiration.getTime() - System.currentTimeMillis();
+    }
+
 
     public boolean isAccessToken(String token) {
         return JwtConstants.TOKEN_TYPE_ACCESS.equals(getTokenType(token));
