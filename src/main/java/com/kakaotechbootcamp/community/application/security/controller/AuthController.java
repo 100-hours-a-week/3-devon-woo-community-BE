@@ -1,6 +1,7 @@
 package com.kakaotechbootcamp.community.application.security.controller;
 
 import com.kakaotechbootcamp.community.application.security.dto.RefreshTokenResponse;
+import com.kakaotechbootcamp.community.application.security.service.TokenBlacklistService;
 import com.kakaotechbootcamp.community.application.security.service.TokenRefreshService;
 import com.kakaotechbootcamp.community.application.security.util.CookieUtil;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
@@ -12,7 +13,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final TokenRefreshService tokenRefreshService;
+    private final TokenBlacklistService blacklistService;
     private final CookieUtil cookieUtil;
 
     @Operation(
@@ -39,5 +43,19 @@ public class AuthController {
 
         RefreshTokenResponse response = new RefreshTokenResponse(newAccessToken);
         return ResponseEntity.ok(ApiResponse.success(response, "토큰이 갱신되었습니다"));
+    }
+
+    @Operation(
+            summary = "관리자용 토큰 블랙리스트 등록",
+            description = "관리자가 특정 JWT 토큰을 블랙리스트에 등록합니다"
+    )
+    @PostMapping("/blacklist")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> addTokenToBlacklist(
+            @RequestBody String token
+    ) {
+        blacklistService.addToBlacklist(token);
+
+        return ResponseEntity.ok(ApiResponse.success(null, "토큰이 블랙리스트에 등록되었습니다"));
     }
 }
