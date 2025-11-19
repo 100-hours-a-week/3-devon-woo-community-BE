@@ -2,12 +2,11 @@ package com.kakaotechbootcamp.community.application.security.service;
 
 import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import com.kakaotechbootcamp.community.infra.redis.adapter.RedisService;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 @Slf4j
 @Service

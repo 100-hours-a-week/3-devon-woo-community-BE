@@ -1,9 +1,9 @@
 package com.kakaotechbootcamp.community.application.security.config;
 
 import com.kakaotechbootcamp.community.application.security.constants.SecurityConstants;
+import com.kakaotechbootcamp.community.application.security.filter.CustomLoginAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.filter.CustomLogoutFilter;
 import com.kakaotechbootcamp.community.application.security.filter.FilterChainExceptionHandler;
-import com.kakaotechbootcamp.community.application.security.filter.CustomLoginAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.filter.JwtAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAccessDeniedHandler;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAuthenticationEntryPoint;
