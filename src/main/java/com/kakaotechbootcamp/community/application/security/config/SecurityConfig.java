@@ -1,6 +1,7 @@
 package com.kakaotechbootcamp.community.application.security.config;
 
 import com.kakaotechbootcamp.community.application.security.constants.SecurityConstants;
+import com.kakaotechbootcamp.community.application.security.filter.CustomLogoutFilter;
 import com.kakaotechbootcamp.community.application.security.filter.FilterChainExceptionHandler;
 import com.kakaotechbootcamp.community.application.security.filter.LoginAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAccessDeniedHandler;
@@ -35,6 +36,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final FilterChainExceptionHandler filterChainExceptionHandler;
+    private final CustomLogoutFilter customLogoutFilter;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -49,23 +51,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                /* CORS 설정 */
+                /// [CORS 설정]
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
-                /* CSRF 보호 = 비활성화 (Why?: REST API + JWT stateless이므로 불필요) */
+                /// [CSRF 설정] : 비활성화 (Why?: REST API + JWT stateless이므로 불필요) */
                 .csrf(AbstractHttpConfigurer::disable)
 
-                /* 세션 설정 = 비활성화 (Why?: REST API + JWT stateless이므로 불필요) */
+                /// [Session 캐싱 설정] : 비활성화 (Why?: REST API + JWT stateless JWT access header / refresh cookie)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                /* 요청 캐시 = 비황성화 (Wht?: REST API + JWT stateless이므로 불필요)*/
+                /// [Request 캐시 설정] = 비황성화 (Wht?: REST API + JWT stateless이므로 불필요)
                 .requestCache(cache -> cache
                         .requestCache(new NullRequestCache())
                 )
 
-                /* 요청 권한 설정 */
+                /// [Request 권한 설정]
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()
                         .requestMatchers(SecurityConstants.SECURE_URLS).hasRole("USER")
@@ -73,21 +75,28 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                /* 커스텀 로그인 필터 추가 (Bean으로 등록하지 않고 직접 생성) */
+                /// [커스텀 로그인 필터]
                 .addFilterAt(
                         createLoginAuthenticationFilter(authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class
                 )
 
-                /* Auth 예외 처리 핸들러 설정 : (401, 403) */
+                /// [커스텀 로그아웃 필터]
+                .addFilterBefore(
+                        customLogoutFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
+                /// [필터 체인 전역 예외 헨들러] : 모든 예외
+                .addFilterBefore(
+                        filterChainExceptionHandler,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
+                /// [Auth 예외 처리 핸들러 설정] : (401, 403)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
-                )
-
-                /* 필터 체인 전역 예외 처리 핸들러 : 모든 예외 (모든 필터보다 먼저 실행) */
-                .addFilterBefore(
-                        filterChainExceptionHandler, UsernamePasswordAuthenticationFilter.class
                 )
 
         ;
