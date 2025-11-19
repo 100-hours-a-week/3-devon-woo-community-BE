@@ -1,5 +1,6 @@
 package com.kakaotechbootcamp.community.application.security.filter;
 
+import com.kakaotechbootcamp.community.application.security.dto.CustomUserDetails;
 import com.kakaotechbootcamp.community.application.security.service.LoginService;
 import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
@@ -37,16 +38,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String jwt = extractJwtFromRequest(request);
 
             if (jwt != null && jwtTokenProvider.isAccessToken(jwt) && !jwtTokenProvider.isTokenExpired(jwt)) {
-                String email = jwtTokenProvider.getEmailFromToken(jwt);
+                Long uid = jwtTokenProvider.getUidFromToken(jwt);
                 String role = jwtTokenProvider.getRoleFromToken(jwt);
 
-                UserDetails userDetails = loginService.loadUserByUsername(email);
+                UserDetails userDetails = new CustomUserDetails(uid, null , role);
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.debug("JWT 인증 성공 - 사용자: {}, 역할: {}", email, role);
             }
         } catch (JwtException e) {
             log.error("JWT 검증 실패: {}", e.getMessage());

@@ -1,6 +1,5 @@
 package com.kakaotechbootcamp.community.application.security.service;
 
-import com.kakaotechbootcamp.community.application.security.dto.CustomUserDetails;
 import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.AuthErrorCode;
@@ -30,7 +29,7 @@ public class TokenRefreshService {
             throw new CustomException(AuthErrorCode.REFRESH_TOKEN_EXPIRED);
         }
 
-        Long memberId = jwtTokenProvider.getMemberIdFromToken(refreshToken);
+        Long memberId = jwtTokenProvider.getUidFromToken(refreshToken);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
 
@@ -38,9 +37,6 @@ public class TokenRefreshService {
             throw new CustomException(MemberErrorCode.MEMBER_INACTIVE);
         }
 
-        CustomUserDetails userDetails = new CustomUserDetails(member);
-        String role = userDetails.getRole();
-
-        return jwtTokenProvider.generateAccessToken(memberId, member.getEmail(), role);
+        return jwtTokenProvider.generateAccessToken(memberId, member.getRole().name());
     }
 }

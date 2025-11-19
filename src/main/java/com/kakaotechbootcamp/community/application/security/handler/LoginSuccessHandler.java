@@ -31,11 +31,10 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("로그인 성공: {}", authentication.getName());
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getMemberId();
-        String email = userDetails.getUsername();
+        Long userId = userDetails.getUid();
         String role = userDetails.getRole();
 
-        String accessToken = jwtTokenProvider.generateAccessToken(userId, email, role);
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, role);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
 
         cookieUtil.addRefreshTokenCookie(response, refreshToken);

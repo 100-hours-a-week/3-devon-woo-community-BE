@@ -31,6 +31,6 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         }
 
         CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
-        return user.getMemberId();
+        return user.getUid();
     }
 }

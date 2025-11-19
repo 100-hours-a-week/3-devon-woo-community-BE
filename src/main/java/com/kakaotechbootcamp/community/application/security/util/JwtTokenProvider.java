@@ -24,13 +24,12 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(properties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateAccessToken(Long memberId, String email, String role) {
+    public String generateAccessToken(Long memberId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiration());
 
         return Jwts.builder()
                 .subject(String.valueOf(memberId))
-                .claim(JwtConstants.CLAIM_EMAIL, email)
                 .claim(JwtConstants.CLAIM_ROLE, role)
                 .claim(JwtConstants.CLAIM_TYPE, JwtConstants.TOKEN_TYPE_ACCESS)
                 .issuedAt(now)
@@ -60,14 +59,9 @@ public class JwtTokenProvider {
                 .getPayload();
     }
 
-    public Long getMemberIdFromToken(String token) {
+    public Long getUidFromToken(String token) {
         Claims claims = validateToken(token);
         return Long.parseLong(claims.getSubject());
-    }
-
-    public String getEmailFromToken(String token) {
-        Claims claims = validateToken(token);
-        return claims.get(JwtConstants.CLAIM_EMAIL, String.class);
     }
 
     public String getRoleFromToken(String token) {
