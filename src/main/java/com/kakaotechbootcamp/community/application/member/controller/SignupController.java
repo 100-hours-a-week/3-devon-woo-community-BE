@@ -1,0 +1,35 @@
+package com.kakaotechbootcamp.community.application.member.controller;
+
+import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
+import com.kakaotechbootcamp.community.application.member.dto.response.SignupResponse;
+import com.kakaotechbootcamp.community.application.member.service.SignupService;
+import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
+import com.kakaotechbootcamp.community.common.swagger.CustomExceptionDescription;
+import com.kakaotechbootcamp.community.common.swagger.SwaggerResponseDescription;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+@Tag(name = "Auth", description = "인증 관련 API")
+@RestController
+@RequestMapping("auth/signup")
+@RequiredArgsConstructor
+public class SignupController {
+
+    private final SignupService signupService;
+
+    @Operation(summary = "회원가입", description = "새로운 회원을 등록합니다.")
+    @CustomExceptionDescription(SwaggerResponseDescription.AUTH_SIGNUP)
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApiResponse<SignupResponse> signUp(
+            @RequestBody @Validated SignupRequest request
+    ){
+        SignupResponse response = signupService.signup(request);
+        return ApiResponse.success(response, "signup_success");
+    }
+
+}

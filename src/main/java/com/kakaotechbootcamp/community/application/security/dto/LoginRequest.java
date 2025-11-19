@@ -1,11 +1,11 @@
-package com.kakaotechbootcamp.community.application.auth.dto;
+package com.kakaotechbootcamp.community.application.security.dto;
+
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_EMAIL_FORMAT;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_FIELD;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-
-import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_EMAIL_FORMAT;
-import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_FIELD;
 
 @Schema(description = "로그인 요청 DTO")
 public record LoginRequest(
@@ -19,3 +19,4 @@ public record LoginRequest(
         @NotBlank(message = REQUIRED_FIELD)
         String password
 ) {}
+

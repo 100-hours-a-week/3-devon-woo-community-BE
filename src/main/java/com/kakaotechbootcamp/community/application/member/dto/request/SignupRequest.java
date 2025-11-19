@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.application.auth.dto;
+package com.kakaotechbootcamp.community.application.member.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
