@@ -60,6 +60,13 @@ public class CustomUserDetails implements UserDetails {
         return member.getNickname();
     }
 
+    public String getRole() {
+        return getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority().replace("ROLE_", ""))
+                .orElse("USER");
+    }
+
     public String getProfileImageUrl() {
         return member.getProfileImageUrl();
     }

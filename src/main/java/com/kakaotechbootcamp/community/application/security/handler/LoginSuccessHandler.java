@@ -33,10 +33,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long userId = userDetails.getMemberId();
         String email = userDetails.getUsername();
-        String role = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
-                .orElse("USER");
+        String role = userDetails.getRole();
 
         String accessToken = jwtTokenProvider.generateAccessToken(userId, email, role);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
