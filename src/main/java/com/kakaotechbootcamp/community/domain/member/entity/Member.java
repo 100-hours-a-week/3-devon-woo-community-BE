@@ -34,6 +34,10 @@ public class Member {
     @Column(name = "status", nullable = false)
     private MemberStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private MemberRole role;
+
     @Column(name = "last_login_at")
     private Instant lastLoginAt;
 
@@ -44,6 +48,7 @@ public class Member {
                 .password(password)
                 .nickname(nickname)
                 .status(MemberStatus.ACTIVE)
+                .role(MemberRole.USER)
                 .build();
     }
 
