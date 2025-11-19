@@ -3,6 +3,8 @@ package com.kakaotechbootcamp.community.application.security.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.security.dto.CustomUserDetails;
 import com.kakaotechbootcamp.community.application.security.dto.LoginResponse;
+import com.kakaotechbootcamp.community.application.security.util.CookieUtil;
+import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Component;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CookieUtil cookieUtil;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -27,13 +31,19 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("로그인 성공: {}", authentication.getName());
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getMemberId();
+        Long userId = userDetails.getUid();
+        String role = userDetails.getRole();
+
+        String accessToken = jwtTokenProvider.generateAccessToken(userId, role);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
+
+        cookieUtil.addRefreshTokenCookie(response, refreshToken);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        LoginResponse loginResponse = new LoginResponse(userId);
+        LoginResponse loginResponse = new LoginResponse(userId, accessToken);
         ApiResponse<LoginResponse> apiResponse = ApiResponse.success(loginResponse, "로그인이 성공했습니다");
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }

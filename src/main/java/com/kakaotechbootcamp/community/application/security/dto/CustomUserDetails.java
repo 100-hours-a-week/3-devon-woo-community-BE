@@ -1,35 +1,57 @@
 package com.kakaotechbootcamp.community.application.security.dto;
 
-import com.kakaotechbootcamp.community.domain.member.entity.Member;
+import com.kakaotechbootcamp.community.domain.member.entity.MemberRole;
 import java.util.Collection;
 import java.util.Collections;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
-@RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private final Member member;
+    private final Long uid;
+    private final String password;
+    private final String role;
+    private final boolean isActive;
+
+    public CustomUserDetails(Long uid, String password, MemberRole role){
+        this.uid = uid;
+        this.password = password;
+        this.role = role.name();
+        this.isActive = true;
+    }
+
+    public CustomUserDetails(Long uid, String password, String role){
+        this.uid = uid;
+        this.password = password;
+        this.role = role;
+        this.isActive = true;
+    }
+
+    public CustomUserDetails(Long uid, String password, MemberRole role, boolean isActive){
+        this.uid = uid;
+        this.password = password;
+        this.role = role.name();
+        this.isActive = isActive;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + member.getRole().name())
+                new SimpleGrantedAuthority("ROLE_" + role)
         );
     }
 
     @Override
-    public String getPassword() {
-        return member.getPassword();
+    public String getUsername() {
+        return uid.toString();
     }
 
     @Override
-    public String getUsername() {
-        return member.getEmail();
+    public String getPassword() {
+        return password;
     }
 
     @Override
@@ -49,18 +71,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return member.isActive();
+        return isActive;
     }
 
-    public Long getMemberId() {
-        return member.getId();
+    public Long getUid() {
+        return uid;
     }
 
-    public String getNickname() {
-        return member.getNickname();
-    }
-
-    public String getProfileImageUrl() {
-        return member.getProfileImageUrl();
+    public String getRole() {
+        return role;
     }
 }

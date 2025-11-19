@@ -29,6 +29,11 @@ public class LoginService implements UserDetailsService {
             throw new DisabledException("비활성화된 계정입니다");
         }
 
-        return new CustomUserDetails(member);
+        return new CustomUserDetails(
+                member.getId(),
+                member.getPassword(),
+                member.getRole(),
+                member.isActive()
+        );
     }
 }

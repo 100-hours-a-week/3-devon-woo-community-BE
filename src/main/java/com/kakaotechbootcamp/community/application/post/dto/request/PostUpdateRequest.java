@@ -10,10 +10,6 @@ import static com.kakaotechbootcamp.community.common.validation.ValidationPatter
 
 @Schema(description = "게시글 수정 요청 DTO")
 public record PostUpdateRequest(
-        @Schema(description = "작성자 ID", example = "1")
-        @NotNull(message = REQUIRED_MEMBER_ID)
-        Long memberId, // TODO: JWT 도입 후 제거 예정
-
         @Schema(description = "수정할 게시글 제목", example = "This is an updated title.")
         @NotBlank(message = REQUIRED_POST_TITLE)
         String title,

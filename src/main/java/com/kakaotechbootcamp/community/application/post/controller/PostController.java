@@ -10,6 +10,7 @@ import com.kakaotechbootcamp.community.application.post.dto.ViewContext;
 import com.kakaotechbootcamp.community.application.post.service.PostLikeService;
 import com.kakaotechbootcamp.community.application.post.service.PostService;
 import com.kakaotechbootcamp.community.application.post.service.PostViewService;
+import com.kakaotechbootcamp.community.application.security.annotation.CurrentUser;
 import jakarta.servlet.http.HttpServletRequest;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import com.kakaotechbootcamp.community.common.swagger.CustomExceptionDescription;
@@ -39,9 +40,9 @@ public class PostController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<PostResponse> createPost(
-            @RequestBody @Validated PostCreateRequest request
+            @RequestBody @Validated PostCreateRequest request,
+            @CurrentUser Long memberId
     ) {
-        Long memberId = request.memberId(); // TODO: JWT 도입 후 CurrentUser로 변경
         PostResponse response = postService.createPost(request, memberId);
         return ApiResponse.success(response, "post_created");
     }
@@ -51,9 +52,9 @@ public class PostController {
     @PatchMapping("/{postId}")
     public ApiResponse<PostResponse> updatePost(
             @Parameter(description = "게시글 ID") @PathVariable Long postId,
-            @RequestBody @Validated PostUpdateRequest request
+            @RequestBody @Validated PostUpdateRequest request,
+            @CurrentUser Long memberId
     ) {
-        Long memberId = request.memberId(); // TODO: JWT 도입 후 CurrentUser로 변경
         PostResponse response = postService.updatePost(postId, request, memberId);
         return ApiResponse.success(response, "post_updated");
     }
@@ -64,7 +65,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePost(
             @Parameter(description = "게시글 ID") @PathVariable Long postId,
-            @Parameter(description = "회원 ID") @RequestParam Long memberId // TODO: JWT 도입 후 CurrentUser로 변경
+            @CurrentUser Long memberId
     ) {
         postService.deletePost(postId, memberId);
     }
@@ -74,7 +75,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ApiResponse<PostResponse> getPost(
             @Parameter(description = "게시글 ID") @PathVariable Long postId,
-            @Parameter(description = "회원 ID") @RequestParam Long memberId, // TODO: JWT + Security 도입 후 CurrentUser에서 추출
+            @CurrentUser Long memberId,
             HttpServletRequest httpRequest
     ) {
         PostResponse response = postService.getPostDetails(postId, memberId);
@@ -109,7 +110,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void likePost(
             @Parameter(description = "게시글 ID") @PathVariable Long postId,
-            @Parameter(description = "회원 ID") @RequestParam Long memberId // TODO: JWT 도입 후 CurrentUser로 변경
+            @CurrentUser Long memberId
     ) {
         postLikeService.likePost(postId, memberId);
     }
@@ -120,7 +121,7 @@ public class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unlikePost(
             @Parameter(description = "게시글 ID") @PathVariable Long postId,
-            @Parameter(description = "회원 ID") @RequestParam Long memberId // TODO: JWT 도입 후 CurrentUser로 변경
+            @CurrentUser Long memberId
     ) {
         postLikeService.unlikePost(postId, memberId);
     }
