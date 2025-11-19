@@ -6,11 +6,11 @@ import com.kakaotechbootcamp.community.application.member.dto.response.MemberDet
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberResponse;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpdateResponse;
 import com.kakaotechbootcamp.community.application.member.service.MemberService;
+import com.kakaotechbootcamp.community.application.security.annotation.CurrentUser;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import com.kakaotechbootcamp.community.common.swagger.CustomExceptionDescription;
 import com.kakaotechbootcamp.community.common.swagger.SwaggerResponseDescription;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,9 +29,9 @@ public class MemberController {
     @CustomExceptionDescription(SwaggerResponseDescription.MEMBER_GET)
     @GetMapping("/{id}")
     public ApiResponse<MemberDetailsResponse> getMemberProfile(
-            @Parameter(description = "회원 ID") @PathVariable Long id
+            @CurrentUser Long memberId
     ) {
-        MemberDetailsResponse response = memberService.getMemberProfile(id);
+        MemberDetailsResponse response = memberService.getMemberProfile(memberId);
         return ApiResponse.success(response, "member_get_success");
     }
 
@@ -40,10 +40,10 @@ public class MemberController {
     @CustomExceptionDescription(SwaggerResponseDescription.MEMBER_UPDATE)
     @PatchMapping("/{id}")
     public ApiResponse<MemberUpdateResponse> updateMember(
-            @Parameter(description = "회원 ID") @PathVariable Long id,
-            @RequestBody @Validated MemberUpdateRequest request
+            @RequestBody @Validated MemberUpdateRequest request,
+            @CurrentUser Long memberId
     ) {
-        MemberUpdateResponse response = memberService.updateMember(id, request);
+        MemberUpdateResponse response = memberService.updateMember(memberId, request);
         return ApiResponse.success(response, "member_update_success");
     }
 
@@ -52,17 +52,19 @@ public class MemberController {
     @PatchMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updatePassword(
-            @Parameter(description = "회원 ID") @PathVariable Long id,
-            @RequestBody @Validated PasswordUpdateRequest request
+            @RequestBody @Validated PasswordUpdateRequest request,
+            @CurrentUser Long memberId
     ){
-        memberService.updatePassword(id, request);
+        memberService.updatePassword(memberId, request);
     }
 
     @Operation(summary = "회원 탈퇴", description = "회원을 탈퇴 처리합니다.")
     @CustomExceptionDescription(SwaggerResponseDescription.MEMBER_DELETE)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMember(@Parameter(description = "회원 ID") @PathVariable Long id) {
-        memberService.deleteMember(id);
+    public void deleteMember(
+            @CurrentUser Long memberId)
+    {
+        memberService.deleteMember(memberId);
     }
 }
