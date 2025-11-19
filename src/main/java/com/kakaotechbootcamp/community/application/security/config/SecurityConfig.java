@@ -4,6 +4,7 @@ import com.kakaotechbootcamp.community.application.security.constants.SecurityCo
 import com.kakaotechbootcamp.community.application.security.filter.CustomLogoutFilter;
 import com.kakaotechbootcamp.community.application.security.filter.FilterChainExceptionHandler;
 import com.kakaotechbootcamp.community.application.security.filter.CustomLoginAuthenticationFilter;
+import com.kakaotechbootcamp.community.application.security.filter.JwtAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAccessDeniedHandler;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAuthenticationEntryPoint;
 import com.kakaotechbootcamp.community.application.security.handler.LoginFailureHandler;
@@ -37,6 +38,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final FilterChainExceptionHandler filterChainExceptionHandler;
     private final CustomLogoutFilter customLogoutFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -78,6 +80,12 @@ public class SecurityConfig {
                 /// [커스텀 로그인 필터]
                 .addFilterAt(
                         createLoginAuthenticationFilter(authenticationManager()),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
+                /// JWT 인증 필터 추가
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
 
