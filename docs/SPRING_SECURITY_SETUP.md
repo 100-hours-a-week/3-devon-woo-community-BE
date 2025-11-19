@@ -8,6 +8,39 @@
 
 ---
 
+## 네이밍 컨벤션
+
+### Filter 및 Handler 네이밍 규칙
+
+Spring Security에서 기본 제공하는 필터나 핸들러를 **커스터마이징**하는 경우, 클래스명에 `Custom` 접두어를 붙입니다.
+
+**규칙:**
+- **기존 클래스 확장 시**: `Custom` + 원본 클래스명
+  - 예: `UsernamePasswordAuthenticationFilter` → `CustomLoginAuthenticationFilter`
+  - 예: `AuthenticationEntryPoint` → `CustomAuthenticationEntryPoint`
+  - 예: `AccessDeniedHandler` → `CustomAccessDeniedHandler`
+
+- **새로운 필터/핸들러 생성 시**: 기능 설명하는 이름 사용
+  - 예: `FilterChainExceptionHandler` (전역 예외 처리)
+  - 예: `LogoutHandler` (로그아웃 처리)
+  - 예: `LoginSuccessHandler`, `LoginFailureHandler`
+
+**적용 예시:**
+```java
+// Spring Security 기본 필터 확장 → Custom 접두어 사용
+public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter { }
+
+// Spring Security 인터페이스 구현 → Custom 접두어 사용
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint { }
+public class CustomAccessDeniedHandler implements AccessDeniedHandler { }
+
+// 새로운 핸들러 생성 → 기능 설명 이름
+public class LogoutHandler { }
+public class LoginSuccessHandler implements AuthenticationSuccessHandler { }
+```
+
+---
+
 ## Step 1: Spring Security 의존성 추가
 
 ### 1.1 의존성 추가
@@ -814,6 +847,152 @@ Spring Security에서 URL 패턴 매칭을 위해 `requestMatchers()`를 사용�
 
 ---
 
+## Step 11: 로그아웃 구현
+
+### 11.1 LogoutHandler 생성
+
+로그아웃 로직을 담당하는 핸들러를 작성합니다.
+
+**파일 위치**: `application/security/handler/LogoutHandler.java`
+
+```java
+@Component
+@RequiredArgsConstructor
+public class LogoutHandler {
+
+    private final ObjectMapper objectMapper;
+
+    public void onLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        SecurityContextHolder.clearContext();
+
+        // todo: 그 외 추가적인 로그아웃 동작 (ex. 세션 제거, Refresh 블랙리스트 등록)
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        ApiResponse<Object> result = ApiResponse.success("로그아웃되었습니다.");
+        response.getWriter().write(objectMapper.writeValueAsString(result));
+    }
+}
+```
+
+### 11.2 CustomLogoutFilter 생성
+
+`/auth/logout` 요청을 처리하는 필터를 작성합니다.
+
+**파일 위치**: `application/security/filter/CustomLogoutFilter.java`
+
+```java
+@Component
+@RequiredArgsConstructor
+public class CustomLogoutFilter extends OncePerRequestFilter {
+
+    private final LogoutHandler logoutHandler;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String requestURI = request.getRequestURI();
+        String method = request.getMethod();
+
+        if (!SecurityConstants.LOGOUT_URL.equals(requestURI) || !"POST".equals(method)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        logoutHandler.onLogout(request, response);
+    }
+}
+```
+
+### 11.3 SecurityConstants에 LOGOUT_URL 추가
+
+**파일 위치**: `application/security/constants/SecurityConstants.java`
+
+```java
+public class SecurityConstants {
+
+    public static final String LOGIN_URL = "/auth/login";
+    public static final String LOGOUT_URL = "/auth/logout";  // 추가
+
+    public static final String[] PUBLIC_URLS = {
+            "/auth/login",
+            "/auth/signup",
+            "/auth/logout",  // 추가
+            "/error",
+            // ...
+    };
+}
+```
+
+### 11.4 SecurityConfig에 필터 등록
+
+**파일 위치**: `application/security/config/SecurityConfig.java`
+
+```java
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final CustomLogoutFilter customLogoutFilter;  // 주입
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                /// [커스텀 로그인 필터]
+                .addFilterAt(
+                        createLoginAuthenticationFilter(authenticationManager()),
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
+                /// [커스텀 로그아웃 필터]
+                .addFilterBefore(
+                        customLogoutFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
+                /// [필터 체인 전역 예외 헨들러]
+                .addFilterBefore(
+                        filterChainExceptionHandler,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+                // ...
+        ;
+        return http.build();
+    }
+}
+```
+
+### 11.5 핵심 동작
+
+1. `POST /auth/logout` 요청 시 CustomLogoutFilter가 요청을 가로챔
+2. LogoutHandler의 `onLogout()` 메서드 호출
+3. `SecurityContextHolder.clearContext()`로 인증 정보 제거
+4. 200 OK와 함께 성공 메시지 JSON 응답 반환
+
+### 11.6 응답 예시
+
+**로그아웃 성공 (200 OK)**
+```json
+{
+  "status": "SUCCESS",
+  "data": "로그아웃되었습니다.",
+  "message": null
+}
+```
+
+### 11.7 추후 확장 가능 사항
+
+- 세션 invalidate 처리
+- Refresh Token 블랙리스트 등록 (JWT 기반 인증 사용 시)
+- 로그아웃 시각 기록 (Member 엔티티에 lastLogoutAt 추가)
+
+---
+
 ## 정리 및 컨벤션
 
 ### 프로젝트 패키지 구조
@@ -821,33 +1000,35 @@ Spring Security에서 URL 패턴 매칭을 위해 `requestMatchers()`를 사용�
 ```
 application/security/
 ├── config/
-│   ├── SecurityConfig.java           # 메인 보안 설정
-│   ├── CorsConfig.java                # CORS 설정
-│   └── CorsProperties.java            # CORS 프로퍼티
+│   ├── SecurityConfig.java                     # 메인 보안 설정
+│   ├── CorsConfig.java                          # CORS 설정
+│   └── CorsProperties.java                      # CORS 프로퍼티
 ├── filter/
-│   ├── LoginAuthenticationFilter.java # 로그인 필터
-│   └── FilterChainExceptionHandler.java # 전역 예외 처리
+│   ├── CustomLoginAuthenticationFilter.java    # 로그인 필터
+│   ├── CustomLogoutFilter.java                 # 로그아웃 필터
+│   └── FilterChainExceptionHandler.java        # 전역 예외 처리
 ├── handler/
-│   ├── LoginSuccessHandler.java       # 로그인 성공 핸들러
-│   ├── LoginFailureHandler.java       # 로그인 실패 핸들러
-│   ├── CustomAuthenticationEntryPoint.java # 401 핸들러
-│   └── CustomAccessDeniedHandler.java # 403 핸들러
+│   ├── LoginSuccessHandler.java                # 로그인 성공 핸들러
+│   ├── LoginFailureHandler.java                # 로그인 실패 핸들러
+│   ├── LogoutHandler.java                      # 로그아웃 핸들러
+│   ├── CustomAuthenticationEntryPoint.java     # 401 핸들러
+│   └── CustomAccessDeniedHandler.java          # 403 핸들러
 ├── constants/
-│   └── SecurityConstants.java         # 보안 상수
+│   └── SecurityConstants.java                  # 보안 상수
 └── dto/
-    ├── LoginRequest.java              # 로그인 요청 DTO
-    └── LoginResponse.java             # 로그인 응답 DTO
+    ├── LoginRequest.java                       # 로그인 요청 DTO
+    └── LoginResponse.java                      # 로그인 응답 DTO
 ```
 
 ### 핵심 설정 요약
 
-| 설정 항목 | 설정 값 | 이유 |
-|-----------|---------|------|
-| CSRF | 비활성화 | REST API는 CSRF 취약점 없음 |
-| 세션 정책 | IF_REQUIRED | 세션 기반 인증 사용 |
-| CORS | 활성화 | 프론트엔드 요청 허용 |
-| PasswordEncoder | BCrypt | 안전한 단방향 암호화 |
-| 예외 처리 | JSON 응답 | REST API 통일된 응답 포맷 |
+| 설정 항목       | 설정 값      | 이유                       |
+|----------------|-------------|----------------------------|
+| CSRF           | 비활성화    | REST API는 CSRF 취약점 없음 |
+| 세션 정책      | IF_REQUIRED | 세션 기반 인증 사용         |
+| CORS           | 활성화      | 프론트엔드 요청 허용        |
+| PasswordEncoder| BCrypt      | 안전한 단방향 암호화        |
+| 예외 처리      | JSON 응답   | REST API 통일된 응답 포맷   |
 
 ### 보안 체크리스트
 
