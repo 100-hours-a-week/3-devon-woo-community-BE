@@ -3,7 +3,7 @@ package com.kakaotechbootcamp.community.application.security.config;
 import com.kakaotechbootcamp.community.application.security.constants.SecurityConstants;
 import com.kakaotechbootcamp.community.application.security.filter.CustomLogoutFilter;
 import com.kakaotechbootcamp.community.application.security.filter.FilterChainExceptionHandler;
-import com.kakaotechbootcamp.community.application.security.filter.LoginAuthenticationFilter;
+import com.kakaotechbootcamp.community.application.security.filter.CustomLoginAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAccessDeniedHandler;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAuthenticationEntryPoint;
 import com.kakaotechbootcamp.community.application.security.handler.LoginFailureHandler;
@@ -104,8 +104,8 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private LoginAuthenticationFilter createLoginAuthenticationFilter(AuthenticationManager authenticationManager) {
-        LoginAuthenticationFilter filter = new LoginAuthenticationFilter(
+    private CustomLoginAuthenticationFilter createLoginAuthenticationFilter(AuthenticationManager authenticationManager) {
+        CustomLoginAuthenticationFilter filter = new CustomLoginAuthenticationFilter(
                 authenticationManager, loginSuccessHandler, loginFailureHandler);
         filter.setFilterProcessesUrl(SecurityConstants.LOGIN_URL);
         return filter;
