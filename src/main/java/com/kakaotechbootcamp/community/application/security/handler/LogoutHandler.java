@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.application.security.handler;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakaotechbootcamp.community.application.security.service.TokenBlacklistService;
 import com.kakaotechbootcamp.community.application.security.util.CookieUtil;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,12 +19,17 @@ public class LogoutHandler {
 
     private final ObjectMapper objectMapper;
     private final CookieUtil cookieUtil;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public void onLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         SecurityContextHolder.clearContext();
 
-        // todo: 그 외 추가적인 로그아웃 동작 (ex. 세션 제거, Refresh 블랙리스트 등록)
+        String refreshToken = String.valueOf(cookieUtil.getRefreshTokenFromCookie(request));
+        if (refreshToken != null) {
+            tokenBlacklistService.addToBlacklist(refreshToken);
+        }
+
         cookieUtil.deleteRefreshTokenCookie(response);
 
         response.setStatus(HttpServletResponse.SC_OK);
