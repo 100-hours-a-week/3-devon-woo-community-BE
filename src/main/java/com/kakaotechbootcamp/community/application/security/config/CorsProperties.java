@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "cors")
+@ConfigurationProperties(prefix = "spring.security.cors")
 public class CorsProperties {
 
     /**
