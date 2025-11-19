@@ -1,0 +1,43 @@
+package com.kakaotechbootcamp.community.application.security.controller;
+
+import com.kakaotechbootcamp.community.application.security.dto.RefreshTokenResponse;
+import com.kakaotechbootcamp.community.application.security.service.TokenRefreshService;
+import com.kakaotechbootcamp.community.application.security.util.CookieUtil;
+import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
+import com.kakaotechbootcamp.community.common.exception.CustomException;
+import com.kakaotechbootcamp.community.common.exception.code.AuthErrorCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Slf4j
+@Tag(name = "인증", description = "인증 관련 API")
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/auth")
+public class AuthController {
+
+    private final TokenRefreshService tokenRefreshService;
+    private final CookieUtil cookieUtil;
+
+    @Operation(
+            summary = "액세스 토큰 갱신",
+            description = "리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다"
+    )
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(HttpServletRequest request) {
+        String refreshToken = cookieUtil.getRefreshTokenFromCookie(request)
+                .orElseThrow(() -> new CustomException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
+
+        String newAccessToken = tokenRefreshService.refreshAccessToken(refreshToken);
+
+        RefreshTokenResponse response = new RefreshTokenResponse(newAccessToken);
+        return ResponseEntity.ok(ApiResponse.success(response, "토큰이 갱신되었습니다"));
+    }
+}
