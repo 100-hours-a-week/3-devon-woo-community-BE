@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.security.dto.LoginRequest;
 import com.kakaotechbootcamp.community.application.security.handler.LoginFailureHandler;
 import com.kakaotechbootcamp.community.application.security.handler.LoginSuccessHandler;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
-public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class CustomLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final LoginSuccessHandler successHandler;
