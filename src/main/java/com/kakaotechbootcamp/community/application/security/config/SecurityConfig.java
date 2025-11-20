@@ -9,6 +9,9 @@ import com.kakaotechbootcamp.community.application.security.handler.CustomAccess
 import com.kakaotechbootcamp.community.application.security.handler.CustomAuthenticationEntryPoint;
 import com.kakaotechbootcamp.community.application.security.handler.LoginFailureHandler;
 import com.kakaotechbootcamp.community.application.security.handler.LoginSuccessHandler;
+import com.kakaotechbootcamp.community.application.security.handler.OAuthLoginSuccessHandler;
+import com.kakaotechbootcamp.community.application.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.kakaotechbootcamp.community.application.security.service.OAuthLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +42,9 @@ public class SecurityConfig {
     private final FilterChainExceptionHandler filterChainExceptionHandler;
     private final CustomLogoutFilter customLogoutFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuthLoginSuccessHandler oAuthLoginSuccessHandler;
+    private final OAuthLoginService oAuthLoginService;
+    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {
@@ -77,7 +83,20 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                /// [커스텀 로그인 필터]
+                .formLogin(AbstractHttpConfigurer::disable)
+
+                ///  [OAuth 로그인 설정]
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(oAuthLoginService)
+                        )
+                        .authorizationEndpoint(auth -> auth
+                                .authorizationRequestRepository(authorizationRequestRepository)
+                        )
+                        .successHandler(oAuthLoginSuccessHandler)
+                )
+
+                /// -> 커스텀 일반 로그인 필터]
                 .addFilterAt(
                         createLoginAuthenticationFilter(authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class
