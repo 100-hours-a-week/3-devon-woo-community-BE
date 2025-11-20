@@ -1,7 +1,7 @@
 package com.kakaotechbootcamp.community.application.security.util;
 
+import com.kakaotechbootcamp.community.application.security.config.CorsProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -13,10 +13,8 @@ public class RedirectUriValidator {
 
     private final List<String> allowedOrigins;
 
-    public RedirectUriValidator(
-            @Value("${spring.security.cors.allowed-origins}") List<String> allowedOrigins
-    ) {
-        this.allowedOrigins = allowedOrigins;
+    public RedirectUriValidator(CorsProperties corsProperties) {
+        this.allowedOrigins = corsProperties.getAllowedOrigins();
     }
 
     public boolean isValidRedirectUri(String redirectUri) {
