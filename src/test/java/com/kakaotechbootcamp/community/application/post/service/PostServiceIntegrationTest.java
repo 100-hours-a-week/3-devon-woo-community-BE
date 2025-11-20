@@ -193,9 +193,11 @@ class PostServiceIntegrationTest {
         // when
         postService.deletePost(TEST_POST1_ID, TEST_MEMBER1_ID);
 
-        // then - DB 검증 (소프트 삭제가 아니라 실제 삭제되므로 존재하지 않아야 함)
-        boolean exists = postRepository.existsById(TEST_POST1_ID);
-        assertThat(exists).isFalse();
+        // then - DB 검증 (소프트 삭제이므로 deleted 상태여야 한다.
+        Post deletedPost = postRepository.findById(TEST_POST1_ID).orElse(null);
+
+        assertThat(deletedPost).isNotNull();
+        assertThat(deletedPost.isDeleted()).isTrue();
     }
 
     @Test
