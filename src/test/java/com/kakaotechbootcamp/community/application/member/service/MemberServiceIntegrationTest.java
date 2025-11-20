@@ -1,5 +1,8 @@
 package com.kakaotechbootcamp.community.application.member.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberDetailsResponse;
@@ -7,23 +10,16 @@ import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpd
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.config.EnableSqlLogging;
-import com.kakaotechbootcamp.community.config.TestConfig;
+import com.kakaotechbootcamp.community.config.IntegrationTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
-import static org.assertj.core.api.Assertions.*;
-
-@SpringBootTest
-@ActiveProfiles("test")
-@Import(TestConfig.class)
+@IntegrationTest
 @Sql(scripts = "/sql/member-service-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "/sql/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class MemberServiceIntegrationTest {
