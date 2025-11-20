@@ -3,12 +3,12 @@ package com.kakaotechbootcamp.community.application.member.service;
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberDetailsResponse;
-import com.kakaotechbootcamp.community.application.member.dto.response.MemberResponse;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpdateResponse;
 import com.kakaotechbootcamp.community.application.member.validator.MemberValidator;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
+import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -77,7 +77,7 @@ public class MemberService {
 
 
     private Member findMemberById(Long id) {
-        return memberRepository.findById(id)
+        return memberRepository.findByIdAndStatus(id, MemberStatus.ACTIVE)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
     }
 }

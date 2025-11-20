@@ -1,5 +1,8 @@
 package com.kakaotechbootcamp.community.application.post.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostCreateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRequest;
@@ -10,7 +13,7 @@ import com.kakaotechbootcamp.community.common.exception.code.CommonErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.PostErrorCode;
 import com.kakaotechbootcamp.community.config.EnableSqlLogging;
-import com.kakaotechbootcamp.community.config.TestConfig;
+import com.kakaotechbootcamp.community.config.IntegrationTest;
 import com.kakaotechbootcamp.community.domain.post.entity.Attachment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.AttachmentRepository;
@@ -18,20 +21,13 @@ import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
-
-@SpringBootTest
-@ActiveProfiles("test")
-@Import(TestConfig.class)
+@IntegrationTest
 @Sql(scripts = "/sql/post-service-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "/sql/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class PostServiceIntegrationTest {
@@ -69,8 +65,8 @@ class PostServiceIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.title()).isEqualTo("새로운 게시글");
         assertThat(response.content()).isEqualTo("게시글 내용입니다.");
-        assertThat(response.views()).isEqualTo(0L);
-        assertThat(response.likes()).isEqualTo(0L);
+        assertThat(response.viewCount()).isEqualTo(0L);
+        assertThat(response.likeCount()).isEqualTo(0L);
 
         // DB 검증
         Post savedPost = postRepository.findById(response.postId()).orElseThrow();
@@ -193,9 +189,11 @@ class PostServiceIntegrationTest {
         // when
         postService.deletePost(TEST_POST1_ID, TEST_MEMBER1_ID);
 
-        // then - DB 검증 (소프트 삭제가 아니라 실제 삭제되므로 존재하지 않아야 함)
-        boolean exists = postRepository.existsById(TEST_POST1_ID);
-        assertThat(exists).isFalse();
+        // then - DB 검증 (소프트 삭제이므로 deleted 상태여야 한다.
+        Post deletedPost = postRepository.findById(TEST_POST1_ID).orElse(null);
+
+        assertThat(deletedPost).isNotNull();
+        assertThat(deletedPost.isDeleted()).isTrue();
     }
 
     @Test
@@ -213,7 +211,7 @@ class PostServiceIntegrationTest {
     @DisplayName("게시글 상세 조회 성공")
     void getPostDetails_Success() {
         // when
-        PostResponse response = postService.getPostDetails(TEST_POST1_ID);
+        PostResponse response = postService.getPostDetails(TEST_POST1_ID, null);
 
         // then
         assertThat(response).isNotNull();
@@ -231,7 +229,7 @@ class PostServiceIntegrationTest {
         Long nonExistentPostId = 99999L;
 
         // when & then
-        assertThatThrownBy(() -> postService.getPostDetails(nonExistentPostId))
+        assertThatThrownBy(() -> postService.getPostDetails(nonExistentPostId, null))
                 .isInstanceOf(CustomException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PostErrorCode.POST_NOT_FOUND);
     }
@@ -244,7 +242,7 @@ class PostServiceIntegrationTest {
         postService.deletePost(TEST_POST1_ID, TEST_MEMBER1_ID);
 
         // when & then
-        assertThatThrownBy(() -> postService.getPostDetails(TEST_POST1_ID))
+        assertThatThrownBy(() -> postService.getPostDetails(TEST_POST1_ID, null))
                 .isInstanceOf(CustomException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PostErrorCode.POST_NOT_FOUND);
     }
@@ -341,7 +339,7 @@ class PostServiceIntegrationTest {
 
         // when
         PostResponse createdPost = postService.createPost(createRequest, TEST_MEMBER1_ID);
-        PostResponse retrievedPost = postService.getPostDetails(createdPost.postId());
+        PostResponse retrievedPost = postService.getPostDetails(createdPost.postId(), null);
 
         // then
         assertThat(retrievedPost.postId()).isEqualTo(createdPost.postId());

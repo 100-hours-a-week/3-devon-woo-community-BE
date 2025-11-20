@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostQueryRepository {
 
-    @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.id = :id")
+    @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.id = :id AND p.isDeleted = false")
     Optional<Post> findByIdWithMember(@Param("id") Long id);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)

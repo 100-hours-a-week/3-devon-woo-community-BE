@@ -27,6 +27,16 @@ spring:
       enabled: true
       path: /h2-console
 
+storage:
+  cloudinary:
+    api:
+      key: test-api-key
+      secret: test-api-secret
+    cloud:
+      name: test-cloud-name
+    upload:
+      preset: test-upload-preset
+
 logging:
   level:
     org.hibernate.SQL: INFO
