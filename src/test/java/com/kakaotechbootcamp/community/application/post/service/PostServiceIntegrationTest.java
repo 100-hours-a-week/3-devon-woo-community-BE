@@ -69,8 +69,8 @@ class PostServiceIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.title()).isEqualTo("새로운 게시글");
         assertThat(response.content()).isEqualTo("게시글 내용입니다.");
-        assertThat(response.views()).isEqualTo(0L);
-        assertThat(response.likes()).isEqualTo(0L);
+        assertThat(response.viewCount()).isEqualTo(0L);
+        assertThat(response.likeCount()).isEqualTo(0L);
 
         // DB 검증
         Post savedPost = postRepository.findById(response.postId()).orElseThrow();
@@ -213,7 +213,7 @@ class PostServiceIntegrationTest {
     @DisplayName("게시글 상세 조회 성공")
     void getPostDetails_Success() {
         // when
-        PostResponse response = postService.getPostDetails(TEST_POST1_ID);
+        PostResponse response = postService.getPostDetails(TEST_POST1_ID, null);
 
         // then
         assertThat(response).isNotNull();
@@ -231,7 +231,7 @@ class PostServiceIntegrationTest {
         Long nonExistentPostId = 99999L;
 
         // when & then
-        assertThatThrownBy(() -> postService.getPostDetails(nonExistentPostId))
+        assertThatThrownBy(() -> postService.getPostDetails(nonExistentPostId, null))
                 .isInstanceOf(CustomException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PostErrorCode.POST_NOT_FOUND);
     }
@@ -244,7 +244,7 @@ class PostServiceIntegrationTest {
         postService.deletePost(TEST_POST1_ID, TEST_MEMBER1_ID);
 
         // when & then
-        assertThatThrownBy(() -> postService.getPostDetails(TEST_POST1_ID))
+        assertThatThrownBy(() -> postService.getPostDetails(TEST_POST1_ID, null))
                 .isInstanceOf(CustomException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PostErrorCode.POST_NOT_FOUND);
     }
@@ -341,7 +341,7 @@ class PostServiceIntegrationTest {
 
         // when
         PostResponse createdPost = postService.createPost(createRequest, TEST_MEMBER1_ID);
-        PostResponse retrievedPost = postService.getPostDetails(createdPost.postId());
+        PostResponse retrievedPost = postService.getPostDetails(createdPost.postId(), null);
 
         // then
         assertThat(retrievedPost.postId()).isEqualTo(createdPost.postId());

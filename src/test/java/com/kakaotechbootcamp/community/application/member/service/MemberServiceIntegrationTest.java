@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.application.member.service;
 
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
+import com.kakaotechbootcamp.community.application.member.dto.response.MemberDetailsResponse;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberResponse;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpdateResponse;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
@@ -41,7 +42,7 @@ class MemberServiceIntegrationTest {
     @DisplayName("회원 프로필 조회 성공")
     void getMemberProfile_Success() {
         // when
-        MemberResponse response = memberService.getMemberProfile(TEST_MEMBER1_ID);
+        MemberDetailsResponse response = memberService.getMemberProfile(TEST_MEMBER1_ID);
 
         // then
         assertThat(response).isNotNull();
@@ -281,7 +282,7 @@ class MemberServiceIntegrationTest {
 
         // when
         memberService.updateMember(TEST_MEMBER1_ID, updateRequest);
-        MemberResponse response = memberService.getMemberProfile(TEST_MEMBER1_ID);
+        MemberDetailsResponse response = memberService.getMemberProfile(TEST_MEMBER1_ID);
 
         // then
         assertThat(response.nickname()).isEqualTo("ch_nick");
