@@ -1,25 +1,24 @@
-package com.kakaotechbootcamp.community.application.security.dto.oauth;
+package com.kakaotechbootcamp.community.application.security.dto.oauth.provider;
 
-import com.kakaotechbootcamp.community.application.security.dto.OAuthUserInfo;
+import com.kakaotechbootcamp.community.application.security.dto.oauth.OAuthUserInfo;
 import java.util.Map;
 
-public class GithubUserInfo implements OAuthUserInfo {
+public class GoogleUserInfo implements OAuthUserInfo {
     private final Map<String, Object> attributes;
 
-    public GithubUserInfo(Map<String, Object> attributes) {
+    public GoogleUserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
 
     @Override
     public String getProvider() {
-        return "github";
+        return "google";
     }
 
     @Override
     public String getId() {
-        return String.valueOf(attributes.get("id"));
+        return (String) attributes.get("sub");
     }
-
 
     @Override
     public String getEmail() {

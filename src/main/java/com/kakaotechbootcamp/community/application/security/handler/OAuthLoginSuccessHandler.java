@@ -1,6 +1,6 @@
 package com.kakaotechbootcamp.community.application.security.handler;
 
-import com.kakaotechbootcamp.community.application.security.dto.CustomOAuthUserDetails;
+import com.kakaotechbootcamp.community.application.security.dto.user.CustomOAuthUserDetails;
 import com.kakaotechbootcamp.community.application.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.kakaotechbootcamp.community.application.security.util.CookieProvider;
 import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;

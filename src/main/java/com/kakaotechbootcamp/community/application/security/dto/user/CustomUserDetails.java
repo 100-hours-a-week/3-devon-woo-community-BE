@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.application.security.dto;
+package com.kakaotechbootcamp.community.application.security.dto.user;
 
 import com.kakaotechbootcamp.community.domain.member.entity.MemberRole;
 import java.util.Collection;

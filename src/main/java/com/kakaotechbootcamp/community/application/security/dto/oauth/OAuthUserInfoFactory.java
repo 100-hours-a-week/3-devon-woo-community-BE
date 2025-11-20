@@ -1,7 +1,7 @@
-package com.kakaotechbootcamp.community.application.security.dto;
+package com.kakaotechbootcamp.community.application.security.dto.oauth;
 
-import com.kakaotechbootcamp.community.application.security.dto.oauth.GithubUserInfo;
-import com.kakaotechbootcamp.community.application.security.dto.oauth.GoogleUserInfo;
+import com.kakaotechbootcamp.community.application.security.dto.oauth.provider.GithubUserInfo;
+import com.kakaotechbootcamp.community.application.security.dto.oauth.provider.GoogleUserInfo;
 import java.util.Map;
 
 public class OAuthUserInfoFactory {

@@ -1,6 +1,6 @@
 package com.kakaotechbootcamp.community.application.security.controller;
 
-import com.kakaotechbootcamp.community.application.security.dto.RefreshTokenResponse;
+import com.kakaotechbootcamp.community.application.security.dto.response.RefreshTokenResponse;
 import com.kakaotechbootcamp.community.application.security.service.TokenBlacklistService;
 import com.kakaotechbootcamp.community.application.security.service.TokenRefreshService;
 import com.kakaotechbootcamp.community.application.security.util.CookieProvider;

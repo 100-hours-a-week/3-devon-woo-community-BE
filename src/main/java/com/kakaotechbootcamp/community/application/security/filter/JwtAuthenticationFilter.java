@@ -1,6 +1,6 @@
 package com.kakaotechbootcamp.community.application.security.filter;
 
-import com.kakaotechbootcamp.community.application.security.dto.CustomUserDetails;
+import com.kakaotechbootcamp.community.application.security.dto.user.CustomUserDetails;
 import com.kakaotechbootcamp.community.application.security.service.LoginService;
 import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;

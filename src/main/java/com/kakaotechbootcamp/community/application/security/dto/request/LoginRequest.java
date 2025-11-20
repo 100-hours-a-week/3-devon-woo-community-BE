@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.application.security.dto;
+package com.kakaotechbootcamp.community.application.security.dto.request;
 
 import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_EMAIL_FORMAT;
 import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_FIELD;
