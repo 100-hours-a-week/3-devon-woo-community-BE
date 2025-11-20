@@ -50,6 +50,10 @@ public class CookieProvider {
                   "/", CookieConstants.OAUTH2_COOKIE_EXPIRE_SECONDS);
     }
 
+    public static Optional<String> getRedirectUriCookie(HttpServletRequest request) {
+        return getCookie(request, CookieConstants.REDIRECT_URI_COOKIE_NAME);
+    }
+
     public static void deleteRedirectUriCookie(HttpServletResponse response) {
         deleteCookie(response, CookieConstants.REDIRECT_URI_COOKIE_NAME, "/");
     }
