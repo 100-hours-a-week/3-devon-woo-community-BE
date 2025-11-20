@@ -2,14 +2,13 @@ package com.kakaotechbootcamp.community.config;
 
 import com.kakaotechbootcamp.community.infra.image.ImageSignature;
 import com.kakaotechbootcamp.community.infra.image.ImageStorageService;
+import java.time.Instant;
+import java.util.Optional;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-
-import java.time.Instant;
-import java.util.Optional;
 
 @TestConfiguration
 @EnableJpaAuditing(dateTimeProviderRef = "testDateTimeProvider")
