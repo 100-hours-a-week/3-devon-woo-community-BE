@@ -3,7 +3,7 @@ package com.kakaotechbootcamp.community.application.security.controller;
 import com.kakaotechbootcamp.community.application.security.dto.RefreshTokenResponse;
 import com.kakaotechbootcamp.community.application.security.service.TokenBlacklistService;
 import com.kakaotechbootcamp.community.application.security.service.TokenRefreshService;
-import com.kakaotechbootcamp.community.application.security.util.CookieUtil;
+import com.kakaotechbootcamp.community.application.security.util.CookieProvider;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.AuthErrorCode;
@@ -28,7 +28,7 @@ public class AuthController {
 
     private final TokenRefreshService tokenRefreshService;
     private final TokenBlacklistService blacklistService;
-    private final CookieUtil cookieUtil;
+    private final CookieProvider cookieProvider;
 
     @Operation(
             summary = "액세스 토큰 갱신",
@@ -36,7 +36,7 @@ public class AuthController {
     )
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<RefreshTokenResponse>> refreshToken(HttpServletRequest request) {
-        String refreshToken = cookieUtil.getRefreshTokenFromCookie(request)
+        String refreshToken = cookieProvider.getRefreshTokenFromCookie(request)
                 .orElseThrow(() -> new CustomException(AuthErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         String newAccessToken = tokenRefreshService.refreshAccessToken(refreshToken);
