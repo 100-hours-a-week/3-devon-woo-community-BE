@@ -10,7 +10,6 @@ import com.kakaotechbootcamp.community.application.post.dto.response.PostRespons
 import com.kakaotechbootcamp.community.application.post.dto.response.PostSummaryResponse;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.CommonErrorCode;
-import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.PostErrorCode;
 import com.kakaotechbootcamp.community.config.EnableSqlLogging;
 import com.kakaotechbootcamp.community.config.IntegrationTest;
@@ -52,7 +51,6 @@ class PostServiceIntegrationTest {
     void createPost_WithoutAttachment_Success() {
         // given
         PostCreateRequest request = new PostCreateRequest(
-                TEST_MEMBER1_ID,
                 "새로운 게시글",
                 "게시글 내용입니다.",
                 null
@@ -81,7 +79,6 @@ class PostServiceIntegrationTest {
         // given
         String imageUrl = "https://example.com/image.jpg";
         PostCreateRequest request = new PostCreateRequest(
-                TEST_MEMBER1_ID,
                 "이미지가 있는 게시글",
                 "이미지 포함 내용",
                 imageUrl
@@ -100,24 +97,6 @@ class PostServiceIntegrationTest {
         assertThat(attachment.getAttachmentUrl()).isEqualTo(imageUrl);
     }
 
-    @Test
-    @EnableSqlLogging
-    @DisplayName("게시글 생성 실패 - 존재하지 않는 회원")
-    void createPost_MemberNotFound_ThrowsException() {
-        // given
-        Long nonExistentMemberId = 99999L;
-        PostCreateRequest request = new PostCreateRequest(
-                nonExistentMemberId,
-                "제목",
-                "내용",
-                null
-        );
-
-        // when & then
-        assertThatThrownBy(() -> postService.createPost(request, nonExistentMemberId))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.USER_NOT_FOUND);
-    }
 
     @Test
     @EnableSqlLogging
@@ -125,7 +104,6 @@ class PostServiceIntegrationTest {
     void updatePost_Success() {
         // given
         PostUpdateRequest request = new PostUpdateRequest(
-                TEST_MEMBER1_ID,
                 "수정된 제목",
                 "수정된 내용",
                 null
@@ -151,7 +129,6 @@ class PostServiceIntegrationTest {
     void updatePost_NotOwner_ThrowsException() {
         // given
         PostUpdateRequest request = new PostUpdateRequest(
-                TEST_MEMBER2_ID,
                 "수정된 제목",
                 "수정된 내용",
                 null
@@ -170,7 +147,7 @@ class PostServiceIntegrationTest {
         // given
         Long nonExistentPostId = 99999L;
         PostUpdateRequest request = new PostUpdateRequest(
-                TEST_MEMBER1_ID,
+
                 "수정된 제목",
                 "수정된 내용",
                 null
@@ -293,7 +270,7 @@ class PostServiceIntegrationTest {
         // given
         String newImageUrl = "https://example.com/new-image.jpg";
         PostUpdateRequest request = new PostUpdateRequest(
-                TEST_MEMBER1_ID,
+
                 "수정된 제목",
                 "수정된 내용",
                 newImageUrl
@@ -331,7 +308,6 @@ class PostServiceIntegrationTest {
     void createPost_ThenRetrieve_Success() {
         // given
         PostCreateRequest createRequest = new PostCreateRequest(
-                TEST_MEMBER1_ID,
                 "즉시 조회 테스트",
                 "생성 후 바로 조회",
                 null
@@ -355,7 +331,7 @@ class PostServiceIntegrationTest {
         // given - 3개의 게시글 추가 생성
         for (int i = 0; i < 3; i++) {
             PostCreateRequest request = new PostCreateRequest(
-                    TEST_MEMBER1_ID,
+    
                     "추가 게시글 " + i,
                     "추가 내용 " + i,
                     null

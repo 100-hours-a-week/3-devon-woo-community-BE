@@ -59,7 +59,6 @@ class CommentServiceIntegrationTest {
     void createComment_Success() {
         // given
         CommentCreateRequest request = new CommentCreateRequest(
-                TEST_MEMBER1_ID,
                 "새로운 댓글입니다."
         );
 
@@ -86,7 +85,6 @@ class CommentServiceIntegrationTest {
         // given
         Long nonExistentPostId = 99999L;
         CommentCreateRequest request = new CommentCreateRequest(
-                TEST_MEMBER1_ID,
                 "댓글 내용"
         );
 
@@ -103,7 +101,6 @@ class CommentServiceIntegrationTest {
         // given
         Long nonExistentMemberId = 99999L;
         CommentCreateRequest request = new CommentCreateRequest(
-                nonExistentMemberId,
                 "댓글 내용"
         );
 
@@ -119,7 +116,7 @@ class CommentServiceIntegrationTest {
     void updateComment_Success() {
         // given
         CommentUpdateRequest request = new CommentUpdateRequest(
-                TEST_MEMBER1_ID,
+
                 "수정된 댓글 내용"
         );
 
@@ -142,7 +139,6 @@ class CommentServiceIntegrationTest {
     void updateComment_NotOwner_ThrowsException() {
         // given
         CommentUpdateRequest request = new CommentUpdateRequest(
-                TEST_MEMBER2_ID,
                 "수정된 댓글 내용"
         );
 
@@ -159,7 +155,6 @@ class CommentServiceIntegrationTest {
         // given
         Long nonExistentCommentId = 99999L;
         CommentUpdateRequest request = new CommentUpdateRequest(
-                TEST_MEMBER1_ID,
                 "수정된 댓글 내용"
         );
 
@@ -291,7 +286,7 @@ class CommentServiceIntegrationTest {
     void createComment_ThenRetrieve_Success() {
         // given
         CommentCreateRequest createRequest = new CommentCreateRequest(
-                TEST_MEMBER1_ID,
+
                 "즉시 조회 테스트 댓글"
         );
 
@@ -312,7 +307,6 @@ class CommentServiceIntegrationTest {
         // given - 3개의 댓글 추가 생성
         for (int i = 0; i < 3; i++) {
             CommentCreateRequest request = new CommentCreateRequest(
-                    TEST_MEMBER1_ID,
                     "추가 댓글 " + i
             );
             commentService.createComment(TEST_POST1_ID, request, TEST_MEMBER1_ID);
@@ -364,7 +358,7 @@ class CommentServiceIntegrationTest {
         Long initialCommentCount = post.getCommentCount();
 
         CommentCreateRequest request = new CommentCreateRequest(
-                TEST_MEMBER1_ID,
+
                 "새 댓글입니다"
         );
 
@@ -405,7 +399,7 @@ class CommentServiceIntegrationTest {
         // when - 3개의 댓글 추가
         for (int i = 0; i < 3; i++) {
             CommentCreateRequest request = new CommentCreateRequest(
-                    TEST_MEMBER1_ID,
+    
                     "댓글 " + i
             );
             commentService.createComment(TEST_POST1_ID, request, TEST_MEMBER1_ID);
@@ -427,7 +421,7 @@ class CommentServiceIntegrationTest {
 
         // when - 댓글 추가
         CommentCreateRequest request = new CommentCreateRequest(
-                TEST_MEMBER1_ID,
+
                 "임시 댓글"
         );
         CommentResponse createdComment = commentService.createComment(TEST_POST1_ID, request, TEST_MEMBER1_ID);
@@ -455,7 +449,7 @@ class CommentServiceIntegrationTest {
 
         // 댓글 하나 추가
         CommentCreateRequest request = new CommentCreateRequest(
-                TEST_MEMBER1_ID,
+
                 "새 댓글"
         );
         CommentResponse createdComment = commentService.createComment(TEST_POST2_ID, request, TEST_MEMBER1_ID);
@@ -481,7 +475,7 @@ class CommentServiceIntegrationTest {
 
         // when - POST1에만 댓글 추가
         CommentCreateRequest request = new CommentCreateRequest(
-                TEST_MEMBER1_ID,
+
                 "POST1의 댓글"
         );
         commentService.createComment(TEST_POST1_ID, request, TEST_MEMBER1_ID);
@@ -514,7 +508,7 @@ class CommentServiceIntegrationTest {
             executorService.submit(() -> {
                 try {
                     CommentCreateRequest request = new CommentCreateRequest(
-                            TEST_MEMBER1_ID,
+            
                             "동시성 테스트 댓글 " + index
                     );
                     commentService.createComment(TEST_POST1_ID, request, TEST_MEMBER1_ID);
@@ -563,7 +557,7 @@ class CommentServiceIntegrationTest {
         Long[] commentIds = new Long[10];
         for (int i = 0; i < 10; i++) {
             CommentCreateRequest request = new CommentCreateRequest(
-                    TEST_MEMBER1_ID,
+    
                     "삭제용 댓글 " + i
             );
             CommentResponse response = commentService.createComment(TEST_POST1_ID, request, TEST_MEMBER1_ID);
@@ -586,7 +580,7 @@ class CommentServiceIntegrationTest {
             executorService.submit(() -> {
                 try {
                     CommentCreateRequest request = new CommentCreateRequest(
-                            TEST_MEMBER1_ID,
+            
                             "동시성 추가 댓글 " + index
                     );
                     commentService.createComment(TEST_POST1_ID, request, TEST_MEMBER1_ID);

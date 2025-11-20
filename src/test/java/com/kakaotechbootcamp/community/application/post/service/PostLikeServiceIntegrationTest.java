@@ -127,13 +127,14 @@ class PostLikeServiceIntegrationTest {
         for (int i = 0; i < numberOfThreads; i++) {
             long memberId = 100L + i;
             jdbcTemplate.update(
-                "INSERT INTO member (id, email, password, nickname, profile_image_url, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO member (id, email, password, nickname, profile_image_url, role, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 memberId,
                 "concurrent" + i + "@example.com",
                 "password123!",
                 "concur" + i,
                 "https://example.com/profile.jpg",
+                "USER",
                 "ACTIVE"
             );
         }
@@ -176,13 +177,14 @@ class PostLikeServiceIntegrationTest {
             long memberId = 200L + i;
             // 회원 생성
             jdbcTemplate.update(
-                "INSERT INTO member (id, email, password, nickname, profile_image_url, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO member (id, email, password, nickname, profile_image_url, role, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 memberId,
                 "mixed" + i + "@example.com",
                 "password123!",
                 "mixed" + i,
                 "https://example.com/profile.jpg",
+                "USER",
                 "ACTIVE"
             );
 

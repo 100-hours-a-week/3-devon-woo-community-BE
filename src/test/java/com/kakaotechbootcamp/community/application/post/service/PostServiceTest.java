@@ -56,7 +56,6 @@ class PostServiceTest {
     void createPost_WithoutAttachment_Success() {
         Long memberId = 1L;
         PostCreateRequest request = new PostCreateRequest(
-                memberId,
                 "테스트 제목",
                 "테스트 내용",
                 null
@@ -84,7 +83,6 @@ class PostServiceTest {
         Long memberId = 1L;
         String imageUrl = "https://example.com/image.jpg";
         PostCreateRequest request = new PostCreateRequest(
-                memberId,
                 "테스트 제목",
                 "테스트 내용",
                 imageUrl
@@ -112,7 +110,6 @@ class PostServiceTest {
     void createPost_MemberNotFound_ThrowsException() {
         Long memberId = 999L;
         PostCreateRequest request = new PostCreateRequest(
-                memberId,
                 "테스트 제목",
                 "테스트 내용",
                 null
@@ -134,7 +131,6 @@ class PostServiceTest {
         Long postId = 1L;
         Long memberId = 1L;
         PostUpdateRequest request = new PostUpdateRequest(
-                memberId,
                 "수정된 제목",
                 "수정된 내용",
                 null
@@ -166,7 +162,6 @@ class PostServiceTest {
         Long postId = 999L;
         Long memberId = 1L;
         PostUpdateRequest request = new PostUpdateRequest(
-                memberId,
                 "수정된 제목",
                 "수정된 내용",
                 null
