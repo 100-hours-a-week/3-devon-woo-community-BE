@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.application.security.dto;
+package com.kakaotechbootcamp.community.application.security.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

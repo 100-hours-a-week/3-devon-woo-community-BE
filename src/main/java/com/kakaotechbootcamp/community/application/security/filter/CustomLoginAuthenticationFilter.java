@@ -1,7 +1,7 @@
 package com.kakaotechbootcamp.community.application.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakaotechbootcamp.community.application.security.dto.LoginRequest;
+import com.kakaotechbootcamp.community.application.security.dto.request.LoginRequest;
 import com.kakaotechbootcamp.community.application.security.handler.LoginFailureHandler;
 import com.kakaotechbootcamp.community.application.security.handler.LoginSuccessHandler;
 import jakarta.servlet.FilterChain;

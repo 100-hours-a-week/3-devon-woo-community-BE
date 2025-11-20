@@ -3,7 +3,7 @@ package com.kakaotechbootcamp.community.application.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.security.service.TokenBlacklistService;
-import com.kakaotechbootcamp.community.application.security.util.CookieUtil;
+import com.kakaotechbootcamp.community.application.security.util.CookieProvider;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,19 +18,19 @@ import org.springframework.stereotype.Component;
 public class LogoutHandler {
 
     private final ObjectMapper objectMapper;
-    private final CookieUtil cookieUtil;
+    private final CookieProvider cookieProvider;
     private final TokenBlacklistService tokenBlacklistService;
 
     public void onLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         SecurityContextHolder.clearContext();
 
-        String refreshToken = String.valueOf(cookieUtil.getRefreshTokenFromCookie(request));
+        String refreshToken = String.valueOf(cookieProvider.getRefreshTokenFromCookie(request));
         if (refreshToken != null) {
             tokenBlacklistService.addToBlacklist(refreshToken);
         }
 
-        cookieUtil.deleteRefreshTokenCookie(response);
+        cookieProvider.deleteRefreshTokenCookie(response);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

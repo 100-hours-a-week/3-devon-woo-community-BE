@@ -1,9 +1,9 @@
 package com.kakaotechbootcamp.community.application.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakaotechbootcamp.community.application.security.dto.CustomUserDetails;
-import com.kakaotechbootcamp.community.application.security.dto.LoginResponse;
-import com.kakaotechbootcamp.community.application.security.util.CookieUtil;
+import com.kakaotechbootcamp.community.application.security.dto.user.CustomUserDetails;
+import com.kakaotechbootcamp.community.application.security.dto.response.LoginResponse;
+import com.kakaotechbootcamp.community.application.security.util.CookieProvider;
 import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
-    private final CookieUtil cookieUtil;
+    private final CookieProvider cookieProvider;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -37,7 +37,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtTokenProvider.generateAccessToken(userId, role);
         String refreshToken = jwtTokenProvider.generateRefreshToken(userId);
 
-        cookieUtil.addRefreshTokenCookie(response, refreshToken);
+        cookieProvider.addRefreshTokenCookie(response, refreshToken);
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");

@@ -1,6 +1,6 @@
 package com.kakaotechbootcamp.community.application.security.service;
 
-import com.kakaotechbootcamp.community.application.security.dto.CustomUserDetails;
+import com.kakaotechbootcamp.community.application.security.dto.user.CustomUserDetails;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

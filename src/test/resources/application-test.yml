@@ -27,6 +27,46 @@ spring:
       enabled: true
       path: /h2-console
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  security:
+    jwt:
+      secret: testSecretKeyForJwtTokenGenerationAndValidation1234567890
+      access-token-expiration: 3600000
+      refresh-token-expiration: 604800000
+
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
+            scope:
+              - email
+              - profile
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+
+    cors:
+      allowed-origins:
+        - http://localhost:3000
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - PATCH
+        - OPTIONS
+      allowed-headers:
+        - "*"
+      allow-credentials: true
+      max-age: 3600
+      exposed-headers:
+        - Set-Cookie
+        - Authorization
+
 storage:
   cloudinary:
     api:
