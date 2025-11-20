@@ -18,7 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FilterChainExceptionHandler extends OncePerRequestFilter {
+public class FilterChainExceptionFilter extends OncePerRequestFilter {
 
     private final ObjectMapper objectMapper;
 

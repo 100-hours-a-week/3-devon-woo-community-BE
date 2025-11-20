@@ -3,7 +3,7 @@ package com.kakaotechbootcamp.community.application.security.config;
 import com.kakaotechbootcamp.community.application.security.constants.SecurityConstants;
 import com.kakaotechbootcamp.community.application.security.filter.CustomLoginAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.filter.CustomLogoutFilter;
-import com.kakaotechbootcamp.community.application.security.filter.FilterChainExceptionHandler;
+import com.kakaotechbootcamp.community.application.security.filter.FilterChainExceptionFilter;
 import com.kakaotechbootcamp.community.application.security.filter.JwtAuthenticationFilter;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAccessDeniedHandler;
 import com.kakaotechbootcamp.community.application.security.handler.CustomAuthenticationEntryPoint;
@@ -37,7 +37,7 @@ public class SecurityConfig {
     private final CorsConfigurationSource corsConfigurationSource;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final CustomAccessDeniedHandler accessDeniedHandler;
-    private final FilterChainExceptionHandler filterChainExceptionHandler;
+    private final FilterChainExceptionFilter filterChainExceptionFilter;
     private final CustomLogoutFilter customLogoutFilter;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuthLoginSuccessHandler oAuthLoginSuccessHandler;
@@ -109,7 +109,7 @@ public class SecurityConfig {
 
                 /// [필터 체인 전역 예외 헨들러] : 모든 예외
                 .addFilterBefore(
-                        filterChainExceptionHandler,
+                        filterChainExceptionFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
 
