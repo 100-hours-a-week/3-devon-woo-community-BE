@@ -17,6 +17,10 @@ public class CustomOAuthUserDetails implements OAuth2User {
         this.role = role;
     }
 
+    public Long getUid() {
+        return uid;
+    }
+
     @Override
     public Map<String, Object> getAttributes() {
         Map<String, Object> auth = new HashMap<>();
