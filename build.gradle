@@ -82,3 +82,17 @@ clean {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task unitTest(type: Test) {
+	useJUnitPlatform {
+		includeTags 'unit'
+	}
+	outputs.upToDateWhen { false }
+}
+
+task integrationTest(type: Test) {
+	useJUnitPlatform {
+		includeTags 'integration'
+	}
+	outputs.upToDateWhen { false }
+}
