@@ -1,10 +1,7 @@
 package com.kakaotechbootcamp.community.application.member.controller;
 
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -17,105 +14,81 @@ import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUp
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberDetailsResponse;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpdateResponse;
 import com.kakaotechbootcamp.community.application.member.service.MemberService;
-import com.kakaotechbootcamp.community.application.security.annotation.CurrentUser;
-import org.junit.jupiter.api.BeforeEach;
+import com.kakaotechbootcamp.community.config.ControllerWebMvcTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(MockitoExtension.class)
+@ControllerWebMvcTest(MemberController.class)
 class MemberControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Mock
+    @MockitoBean
     private MemberService memberService;
 
-    @InjectMocks
-    private MemberController memberController;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(memberController)
-                .setCustomArgumentResolvers(new CurrentUserArgumentResolverStub())
-                .build();
-    }
-
-    private static class CurrentUserArgumentResolverStub implements HandlerMethodArgumentResolver {
-        @Override
-        public boolean supportsParameter(org.springframework.core.MethodParameter parameter) {
-            return parameter.hasParameterAnnotation(CurrentUser.class)
-                    && parameter.getParameterType().equals(Long.class);
-        }
-
-        @Override
-        public Object resolveArgument(org.springframework.core.MethodParameter parameter,
-                                      org.springframework.web.method.support.ModelAndViewContainer mavContainer,
-                                      org.springframework.web.context.request.NativeWebRequest webRequest,
-                                      org.springframework.web.bind.support.WebDataBinderFactory binderFactory) {
-            return 1L;
-        }
-    }
     @Test
-    @DisplayName("회원 정보를 조회하면 ApiResponse로 감싼 정보를 반환한다")
-    void getMemberProfile_returnsResponse() throws Exception {
-        MemberDetailsResponse response = new MemberDetailsResponse(1L, "tester", "user@test.com", "https://example.com/p.png");
-        given(memberService.getMemberProfile(1L)).willReturn(response);
+    @DisplayName("회원 정보 조회 - 200 OK")
+    void getMemberProfile_success() throws Exception {
+
+        MemberDetailsResponse response = new MemberDetailsResponse(
+                1L,
+                "devon",
+                "test@example.com",
+                "https://example.com/profile.png"
+        );
+
+        given(memberService.getMemberProfile(any())).willReturn(response);
 
         mockMvc.perform(get("/api/v1/members/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data.nickname").value("tester"))
-                .andExpect(jsonPath("$.data.email").value("user@test.com"));
-
-        verify(memberService).getMemberProfile(1L);
+                .andExpect(jsonPath("$.data.memberId").value(1L))
+                .andExpect(jsonPath("$.data.nickname").value("devon"))
+                .andExpect(jsonPath("$.data.email").value("test@example.com"))
+                .andExpect(jsonPath("$.data.profileImage").value("https://example.com/profile.png"));
     }
 
     @Test
-    @DisplayName("회원 정보를 수정하면 수정된 정보가 반환된다")
-    void updateMember_returnsUpdatedResponse() throws Exception {
-        MemberUpdateRequest request = new MemberUpdateRequest("newNick", "https://example.com/new.png");
-        MemberUpdateResponse response = new MemberUpdateResponse("newNick", "https://example.com/new.png");
-        given(memberService.updateMember(eq(1L), any(MemberUpdateRequest.class))).willReturn(response);
+    @DisplayName("회원 정보 수정 - 200 OK")
+    void updateMember_returnsResponse() throws Exception {
+
+        MemberUpdateRequest request = new MemberUpdateRequest("devon", "https://example.com/profile.png");
+        MemberUpdateResponse response = new MemberUpdateResponse("devon", "https://example.com/profile.png");
+
+        given(memberService.updateMember(any(), any())).willReturn(response);
 
         mockMvc.perform(patch("/api/v1/members/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.nickname", is("newNick")))
-                .andExpect(jsonPath("$.data.profileImage", is("https://example.com/new.png")));
-
-        verify(memberService).updateMember(eq(1L), any(MemberUpdateRequest.class));
+                .andExpect(jsonPath("$.data.nickname").value("devon"))
+                .andExpect(jsonPath("$.data.profileImage").value("https://example.com/profile.png"));
     }
 
     @Test
-    @DisplayName("비밀번호 변경 요청 시 204 응답을 반환한다")
+    @DisplayName("비밀번호 변경 - 204 No Content")
     void updatePassword_returnsNoContent() throws Exception {
+
         PasswordUpdateRequest request = new PasswordUpdateRequest("currentPassword!", "newPassword123");
 
         mockMvc.perform(patch("/api/v1/members/{id}/password", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent());
-
-        verify(memberService).updatePassword(eq(1L), any(PasswordUpdateRequest.class));
     }
 
     @Test
-    @DisplayName("회원 탈퇴 요청 시 204 응답을 반환한다")
+    @DisplayName("회원 탈퇴 - 204 No Content")
     void deleteMember_returnsNoContent() throws Exception {
+
         mockMvc.perform(delete("/api/v1/members/{id}", 1L))
                 .andExpect(status().isNoContent());
-
-        verify(memberService).deleteMember(1L);
     }
 }

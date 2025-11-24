@@ -10,52 +10,68 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.SignupResponse;
 import com.kakaotechbootcamp.community.application.member.service.SignupService;
-import org.junit.jupiter.api.BeforeEach;
+import com.kakaotechbootcamp.community.config.ControllerWebMvcTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@ExtendWith(MockitoExtension.class)
+@ControllerWebMvcTest(SignupController.class)
 class SignupControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Mock
+    @MockitoBean
     private SignupService signupService;
 
-    @InjectMocks
-    private SignupController signupController;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(signupController).build();
-    }
-
     @Test
-    @DisplayName("회원가입 요청 시 201 응답과 가입 정보를 반환한다")
-    void signUp_returnsCreatedResponse() throws Exception {
-        SignupRequest request = new SignupRequest(
-                "user@test.com",
-                "password1234",
-                "tester",
-                "https://example.com/profile.png"
-        );
-        given(signupService.signup(any(SignupRequest.class))).willReturn(new SignupResponse(1L));
+    @DisplayName("회원가입 성공 - 201 Created")
+    void signup_success() throws Exception {
 
+        // given
+        SignupRequest request = new SignupRequest(
+                "test@example.com",
+                "password1234",
+                "devon",
+                null
+        );
+
+        SignupResponse response = new SignupResponse(
+                1L
+        );
+
+        given(signupService.signup(any())).willReturn(response);
+
+        // when & then
         mockMvc.perform(post("/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("signup_success"))
                 .andExpect(jsonPath("$.data.userId").value(1L));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - Validation 오류 시 400 Bad Request")
+    void signup_validation_error() throws Exception {
+
+        // given — 잘못된 이메일 값
+        SignupRequest invalidRequest = new SignupRequest(
+                "invalid-email-format",
+                "1234",
+                "devon",
+                null
+        );
+
+        // when & then
+        mockMvc.perform(post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
     }
 }

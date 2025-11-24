@@ -1,7 +1,9 @@
 package com.kakaotechbootcamp.community.config;
 
-import com.kakaotechbootcamp.community.application.security.resolver.CurrentUserArgumentResolver;
 import com.kakaotechbootcamp.community.application.security.handler.LogoutHandler;
+import com.kakaotechbootcamp.community.application.security.resolver.CurrentUserArgumentResolver;
+import com.kakaotechbootcamp.community.application.security.service.LoginService;
+import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -51,6 +53,24 @@ public class TestSecurityConfig {
     @ConditionalOnMissingBean
     public LogoutHandler logoutHandler() {
         return Mockito.mock(LogoutHandler.class);
+    }
+
+    /**
+     * Jwt 인증 필터의 의존성을 모두 Mock으로 제공한다.
+     * -> JwtTokenProvider와 LoginService를 빈으로 등록해 실제 구현체를 로드하지 않아도 된다.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @Primary
+    public JwtTokenProvider jwtTokenProvider() {
+        return Mockito.mock(JwtTokenProvider.class);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @Primary
+    public LoginService loginService() {
+        return Mockito.mock(LoginService.class);
     }
 
     /**
