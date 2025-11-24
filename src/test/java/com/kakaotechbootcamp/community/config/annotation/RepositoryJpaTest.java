@@ -1,5 +1,6 @@
 package com.kakaotechbootcamp.community.config.annotation;
 
+import com.kakaotechbootcamp.community.config.JpaAuditingTestConfig;
 import com.kakaotechbootcamp.community.domain.config.QueryDslConfig;
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -13,13 +14,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 
-/**
- * JPA(Repository) 계층을 빠르게 검증하기 위한 슬라이스 테스트 설정.
- */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
-@Import(QueryDslConfig.class)
+@Import({QueryDslConfig.class, JpaAuditingTestConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 @Tag("repository")
