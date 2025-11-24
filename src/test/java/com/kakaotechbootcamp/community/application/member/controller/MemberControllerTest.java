@@ -18,57 +18,53 @@ import com.kakaotechbootcamp.community.application.member.dto.response.MemberDet
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpdateResponse;
 import com.kakaotechbootcamp.community.application.member.service.MemberService;
 import com.kakaotechbootcamp.community.application.security.annotation.CurrentUser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(MemberController.class)
-@AutoConfigureMockMvc(addFilters = false)
-@Import(MemberControllerTest.CurrentUserResolverConfig.class)
+@ExtendWith(MockitoExtension.class)
 class MemberControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @MockBean
+    @Mock
     private MemberService memberService;
 
-    @TestConfiguration
-    static class CurrentUserResolverConfig implements WebMvcConfigurer {
+    @InjectMocks
+    private MemberController memberController;
 
-        @Bean
-        public HandlerMethodArgumentResolver currentUserHandlerMethodArgumentResolver() {
-            return new HandlerMethodArgumentResolver() {
-                @Override
-                public boolean supportsParameter(org.springframework.core.MethodParameter parameter) {
-                    return parameter.hasParameterAnnotation(CurrentUser.class)
-                            && parameter.getParameterType().equals(Long.class);
-                }
-
-                @Override
-                public Object resolveArgument(org.springframework.core.MethodParameter parameter,
-                                              org.springframework.web.method.support.ModelAndViewContainer mavContainer,
-                                              org.springframework.web.context.request.NativeWebRequest webRequest,
-                                              org.springframework.web.bind.support.WebDataBinderFactory binderFactory) {
-                    return 1L;
-                }
-            };
-        }
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(memberController)
+                .setCustomArgumentResolvers(new CurrentUserArgumentResolverStub())
+                .build();
     }
 
+    private static class CurrentUserArgumentResolverStub implements HandlerMethodArgumentResolver {
+        @Override
+        public boolean supportsParameter(org.springframework.core.MethodParameter parameter) {
+            return parameter.hasParameterAnnotation(CurrentUser.class)
+                    && parameter.getParameterType().equals(Long.class);
+        }
+
+        @Override
+        public Object resolveArgument(org.springframework.core.MethodParameter parameter,
+                                      org.springframework.web.method.support.ModelAndViewContainer mavContainer,
+                                      org.springframework.web.context.request.NativeWebRequest webRequest,
+                                      org.springframework.web.bind.support.WebDataBinderFactory binderFactory) {
+            return 1L;
+        }
+    }
     @Test
     @DisplayName("회원 정보를 조회하면 ApiResponse로 감싼 정보를 반환한다")
     void getMemberProfile_returnsResponse() throws Exception {
