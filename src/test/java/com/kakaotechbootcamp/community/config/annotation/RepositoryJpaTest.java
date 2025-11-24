@@ -1,6 +1,6 @@
 package com.kakaotechbootcamp.community.config.annotation;
 
-import com.kakaotechbootcamp.community.config.TestConfig;
+import com.kakaotechbootcamp.community.domain.config.QueryDslConfig;
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
-@Import(TestConfig.class)
+@Import(QueryDslConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 @Tag("repository")
