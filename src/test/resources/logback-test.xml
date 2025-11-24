@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %clr([%-5level]){DEBUG=magenta, INFO=green, WARN=yellow, ERROR=red} %cyan([%thread]) %magenta(%-40logger{35}) : %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AOP_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %blue([LOG]) %cyan([%thread]) : %magenta(%11logger{0}) | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="community.aop" level="DEBUG" additivity="false">
+        <appender-ref ref="AOP_CONSOLE" />
+    </logger>
+
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
