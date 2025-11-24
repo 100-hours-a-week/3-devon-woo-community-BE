@@ -6,7 +6,7 @@ import static org.mockito.BDDMockito.given;
 
 import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
-import com.kakaotechbootcamp.community.config.UnitTest;
+import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -13,7 +13,7 @@ import com.kakaotechbootcamp.community.application.member.dto.response.MemberDet
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpdateResponse;
 import com.kakaotechbootcamp.community.application.member.validator.MemberValidator;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
-import com.kakaotechbootcamp.community.config.UnitTest;
+import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;

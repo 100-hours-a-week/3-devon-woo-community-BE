@@ -1,5 +1,6 @@
-package com.kakaotechbootcamp.community.config;
+package com.kakaotechbootcamp.community.config.annotation;
 
+import com.kakaotechbootcamp.community.config.TestConfig;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

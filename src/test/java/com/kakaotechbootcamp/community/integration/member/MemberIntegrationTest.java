@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
-import com.kakaotechbootcamp.community.config.IntegrationTest;
+import com.kakaotechbootcamp.community.config.annotation.IntegrationTest;
 import com.kakaotechbootcamp.community.config.TestSecurityConfig;
 import com.kakaotechbootcamp.community.config.TestSecurityConfig.TestCurrentUserContext;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;

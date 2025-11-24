@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.config;
+package com.kakaotechbootcamp.community.config.annotation;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;

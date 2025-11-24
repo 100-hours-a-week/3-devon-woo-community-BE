@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.SignupResponse;
 import com.kakaotechbootcamp.community.application.member.service.SignupService;
-import com.kakaotechbootcamp.community.config.ControllerWebMvcTest;
+import com.kakaotechbootcamp.community.config.annotation.ControllerWebMvcTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

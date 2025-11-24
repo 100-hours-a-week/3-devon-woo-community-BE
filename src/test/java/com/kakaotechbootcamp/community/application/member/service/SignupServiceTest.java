@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.SignupResponse;
 import com.kakaotechbootcamp.community.application.member.validator.AuthValidator;
-import com.kakaotechbootcamp.community.config.UnitTest;
+import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,5 +1,6 @@
-package com.kakaotechbootcamp.community.config;
+package com.kakaotechbootcamp.community.config.annotation;
 
+import com.kakaotechbootcamp.community.config.TestSecurityConfig;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;

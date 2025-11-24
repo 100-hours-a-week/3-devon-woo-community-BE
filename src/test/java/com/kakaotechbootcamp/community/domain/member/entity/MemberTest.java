@@ -3,9 +3,7 @@ package com.kakaotechbootcamp.community.domain.member.entity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.kakaotechbootcamp.community.config.UnitTest;
-import com.kakaotechbootcamp.community.domain.member.entity.MemberRole;
-import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
+import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

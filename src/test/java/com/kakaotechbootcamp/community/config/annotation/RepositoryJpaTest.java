@@ -1,5 +1,6 @@
-package com.kakaotechbootcamp.community.config;
+package com.kakaotechbootcamp.community.config.annotation;
 
+import com.kakaotechbootcamp.community.config.TestConfig;
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
