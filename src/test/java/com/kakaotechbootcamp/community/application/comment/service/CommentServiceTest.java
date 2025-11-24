@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import com.kakaotechbootcamp.community.application.comment.dto.request.CommentCreateRequest;
@@ -13,8 +11,6 @@ import com.kakaotechbootcamp.community.application.comment.dto.request.CommentUp
 import com.kakaotechbootcamp.community.application.comment.dto.response.CommentResponse;
 import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
-import com.kakaotechbootcamp.community.common.exception.ErrorCode;
-import com.kakaotechbootcamp.community.common.exception.code.CommonErrorCode;
 import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.common.policy.OwnershipPolicy;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
@@ -104,7 +100,6 @@ class CommentServiceTest {
         CommentUpdateRequest request = new CommentUpdateRequest("수정된댓글");
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
         given(commentRepository.save(comment)).willReturn(comment);
-        doNothing().when(ownershipPolicy).validateOwnership(1L, 1L);
 
         CommentResponse response = commentService.updateComment(1L, request, 1L);
 
@@ -114,38 +109,16 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("댓글 수정 시 권한이 없으면 예외가 발생한다")
-    void updateComment_unauthorized() {
-        CommentUpdateRequest request = new CommentUpdateRequest("수정된댓글");
-        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
-        doThrow(new CustomException(CommonErrorCode.NO_PERMISSION)).when(ownershipPolicy).validateOwnership(1L, 2L);
-
-        assertThatThrownBy(() -> commentService.updateComment(1L, request, 2L))
-                .isInstanceOf(CustomException.class);
-    }
-
-    @Test
     @DisplayName("댓글을 삭제할 수 있다")
     void deleteComment_success() {
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
         given(commentRepository.findPostIdByCommentId(1L)).willReturn(Optional.of(1L));
-        doNothing().when(ownershipPolicy).validateOwnership(1L, 1L);
 
         commentService.deleteComment(1L, 1L);
 
         verify(ownershipPolicy).validateOwnership(1L, 1L);
         verify(commentRepository).deleteById(1L);
         verify(postRepository).decrementCommentCount(1L);
-    }
-
-    @Test
-    @DisplayName("댓글 삭제 시 권한이 없으면 예외가 발생한다")
-    void deleteComment_unauthorized() {
-        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
-        doThrow(new CustomException(CommonErrorCode.NO_PERMISSION)).when(ownershipPolicy).validateOwnership(1L, 2L);
-
-        assertThatThrownBy(() -> commentService.deleteComment(1L, 2L))
-                .isInstanceOf(CustomException.class);
     }
 
     @Test

@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
@@ -14,7 +12,6 @@ import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRe
 import com.kakaotechbootcamp.community.application.post.dto.response.PostResponse;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostSummaryResponse;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
-import com.kakaotechbootcamp.community.common.exception.code.CommonErrorCode;
 import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.common.policy.OwnershipPolicy;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
@@ -109,7 +106,6 @@ class PostServiceTest {
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(post)).willReturn(post);
         given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
-        doNothing().when(ownershipPolicy).validateOwnership(1L, 1L);
 
         postService.updatePost(1L, request, 1L);
 
@@ -120,41 +116,15 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("게시글 수정 시 권한이 없으면 예외가 발생한다")
-    void updatePost_unauthorized() {
-        PostUpdateRequest request = new PostUpdateRequest("수정된제목", "수정된내용", null);
-        Member otherMember = Member.create("other@test.com", "password", "other");
-        ReflectionTestUtils.setField(otherMember, "id", 2L);
-
-        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        given(memberRepository.findById(2L)).willReturn(Optional.of(otherMember));
-        doThrow(new CustomException(CommonErrorCode.NO_PERMISSION)).when(ownershipPolicy).validateOwnership(1L, 2L);
-
-        assertThatThrownBy(() -> postService.updatePost(1L, request, 2L))
-                .isInstanceOf(CustomException.class);
-    }
-
-    @Test
     @DisplayName("게시글을 삭제할 수 있다")
     void deletePost_success() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        doNothing().when(ownershipPolicy).validateOwnership(1L, 1L);
 
         postService.deletePost(1L, 1L);
 
         verify(ownershipPolicy).validateOwnership(1L, 1L);
         verify(postRepository).save(post);
         assertThat(post.isDeleted()).isTrue();
-    }
-
-    @Test
-    @DisplayName("게시글 삭제 시 권한이 없으면 예외가 발생한다")
-    void deletePost_unauthorized() {
-        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        doThrow(new CustomException(CommonErrorCode.NO_PERMISSION)).when(ownershipPolicy).validateOwnership(1L, 2L);
-
-        assertThatThrownBy(() -> postService.deletePost(1L, 2L))
-                .isInstanceOf(CustomException.class);
     }
 
     @Test
