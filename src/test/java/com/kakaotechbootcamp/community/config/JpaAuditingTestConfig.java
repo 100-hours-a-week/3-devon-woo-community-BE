@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing(dateTimeProviderRef = "testDateTimeProvider")
 public class JpaAuditingTestConfig {
 
+    private static final Instant FIXED_TEST_TIME = Instant.parse("2025-01-01T00:00:00Z");
+
     @Bean
     public TestClock testClock() {
         return new TestClock();
@@ -18,11 +20,11 @@ public class JpaAuditingTestConfig {
 
     @Bean
     public DateTimeProvider testDateTimeProvider(TestClock testClock) {
-        return () -> Optional.of(testClock.getFixedInstant());
+        return () -> Optional.of(FIXED_TEST_TIME);
     }
 
     public static class TestClock {
-        private Instant fixedInstant = Instant.parse("2025-01-01T00:00:00Z");
+        private Instant fixedInstant = FIXED_TEST_TIME;
 
         public Instant getFixedInstant() {
             return fixedInstant;
@@ -33,7 +35,7 @@ public class JpaAuditingTestConfig {
         }
 
         public void reset() {
-            this.fixedInstant = Instant.parse("2025-01-01T00:00:00Z");
+            this.fixedInstant = FIXED_TEST_TIME;
         }
     }
 }
