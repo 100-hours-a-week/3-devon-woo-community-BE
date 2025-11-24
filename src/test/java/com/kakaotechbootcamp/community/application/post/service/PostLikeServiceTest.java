@@ -17,13 +17,14 @@ import com.kakaotechbootcamp.community.domain.post.entity.PostLike;
 import com.kakaotechbootcamp.community.domain.post.policy.PostLikePolicy;
 import com.kakaotechbootcamp.community.domain.post.repository.PostLikeRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
+import com.kakaotechbootcamp.community.fixture.MemberFixture;
+import com.kakaotechbootcamp.community.fixture.PostFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @UnitTest
 class PostLikeServiceTest {
@@ -48,11 +49,8 @@ class PostLikeServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = Member.create("user@test.com", "password123", "tester");
-        ReflectionTestUtils.setField(member, "id", 1L);
-
-        post = Post.create(member, "제목", "내용");
-        ReflectionTestUtils.setField(post, "id", 1L);
+        member = MemberFixture.createMember();
+        post = PostFixture.createPost(member);
     }
 
     @Test

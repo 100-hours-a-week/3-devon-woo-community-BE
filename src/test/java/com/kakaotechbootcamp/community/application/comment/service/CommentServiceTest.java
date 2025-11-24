@@ -20,6 +20,9 @@ import com.kakaotechbootcamp.community.domain.post.entity.Comment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.CommentRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
+import com.kakaotechbootcamp.community.fixture.CommentFixture;
+import com.kakaotechbootcamp.community.fixture.MemberFixture;
+import com.kakaotechbootcamp.community.fixture.PostFixture;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +35,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @UnitTest
 class CommentServiceTest {
@@ -58,20 +60,15 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = Member.create("user@test.com", "password123", "tester");
-        ReflectionTestUtils.setField(member, "id", 1L);
-
-        post = Post.create(member, "제목", "내용");
-        ReflectionTestUtils.setField(post, "id", 1L);
-
-        comment = Comment.create(member, post, "댓글내용");
-        ReflectionTestUtils.setField(comment, "id", 1L);
+        member = MemberFixture.createMember();
+        post = PostFixture.createPost(member);
+        comment = CommentFixture.createComment(member, post);
     }
 
     @Test
     @DisplayName("댓글을 작성할 수 있다")
     void createComment_success() {
-        CommentCreateRequest request = new CommentCreateRequest("댓글내용");
+        CommentCreateRequest request = new CommentCreateRequest(CommentFixture.DEFAULT_CONTENT);
         given(postRepository.existsById(1L)).willReturn(true);
         given(postRepository.getReferenceById(1L)).willReturn(post);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
@@ -79,7 +76,7 @@ class CommentServiceTest {
 
         CommentResponse response = commentService.createComment(1L, request, 1L);
 
-        assertThat(response.content()).isEqualTo("댓글내용");
+        assertThat(response.content()).isEqualTo(CommentFixture.DEFAULT_CONTENT);
         verify(commentRepository).save(any(Comment.class));
         verify(postRepository).incrementCommentCount(1L);
     }
@@ -87,7 +84,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("존재하지 않는 게시글에 댓글 작성 시 예외가 발생한다")
     void createComment_postNotFound() {
-        CommentCreateRequest request = new CommentCreateRequest("댓글내용");
+        CommentCreateRequest request = new CommentCreateRequest(CommentFixture.DEFAULT_CONTENT);
         given(postRepository.existsById(1L)).willReturn(false);
 
         assertThatThrownBy(() -> commentService.createComment(1L, request, 1L))
@@ -97,7 +94,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글을 수정할 수 있다")
     void updateComment_success() {
-        CommentUpdateRequest request = new CommentUpdateRequest("수정된댓글");
+        CommentUpdateRequest request = new CommentUpdateRequest(CommentFixture.UPDATED_CONTENT);
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
         given(commentRepository.save(comment)).willReturn(comment);
 
@@ -105,7 +102,7 @@ class CommentServiceTest {
 
         verify(ownershipPolicy).validateOwnership(1L, 1L);
         verify(commentRepository).save(comment);
-        assertThat(comment.getContent()).isEqualTo("수정된댓글");
+        assertThat(comment.getContent()).isEqualTo(CommentFixture.UPDATED_CONTENT);
     }
 
     @Test
@@ -129,7 +126,7 @@ class CommentServiceTest {
         CommentResponse response = commentService.getCommentsDetails(1L);
 
         assertThat(response.commentId()).isEqualTo(1L);
-        assertThat(response.content()).isEqualTo("댓글내용");
+        assertThat(response.content()).isEqualTo(CommentFixture.DEFAULT_CONTENT);
     }
 
     @Test
@@ -145,7 +142,7 @@ class CommentServiceTest {
     @DisplayName("게시글의 댓글 목록을 페이지로 조회할 수 있다")
     void getCommentPageByPostId_success() {
         Pageable pageable = PageRequest.of(0, 10);
-        CommentQueryDto dto = new CommentQueryDto(1L, 1L, "댓글내용", Instant.now(), Instant.now(), 1L, "tester", null);
+        CommentQueryDto dto = new CommentQueryDto(1L, 1L, CommentFixture.DEFAULT_CONTENT, Instant.now(), Instant.now(), 1L, "tester", null);
         Page<CommentQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
         given(postRepository.existsById(1L)).willReturn(true);

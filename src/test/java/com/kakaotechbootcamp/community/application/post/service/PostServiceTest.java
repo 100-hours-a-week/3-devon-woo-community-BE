@@ -22,6 +22,8 @@ import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.AttachmentRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostLikeRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
+import com.kakaotechbootcamp.community.fixture.MemberFixture;
+import com.kakaotechbootcamp.community.fixture.PostFixture;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +36,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @UnitTest
 class PostServiceTest {
@@ -62,32 +63,29 @@ class PostServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = Member.create("user@test.com", "password123", "tester");
-        ReflectionTestUtils.setField(member, "id", 1L);
-
-        post = Post.create(member, "제목", "내용");
-        ReflectionTestUtils.setField(post, "id", 1L);
+        member = MemberFixture.createMember();
+        post = PostFixture.createPost(member);
     }
 
     @Test
     @DisplayName("게시글을 생성할 수 있다")
     void createPost_success() {
-        PostCreateRequest request = new PostCreateRequest("제목", "내용", null);
+        PostCreateRequest request = new PostCreateRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, null);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(any(Post.class))).willReturn(post);
 
         PostResponse response = postService.createPost(request, 1L);
 
-        assertThat(response.title()).isEqualTo("제목");
-        assertThat(response.content()).isEqualTo("내용");
+        assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
+        assertThat(response.content()).isEqualTo(PostFixture.DEFAULT_CONTENT);
         verify(postRepository).save(any(Post.class));
     }
 
     @Test
     @DisplayName("게시글 생성 시 이미지가 있으면 저장된다")
     void createPost_withImage() {
-        PostCreateRequest request = new PostCreateRequest("제목", "내용", "https://example.com/image.jpg");
-        Attachment attachment = Attachment.create(post, "https://example.com/image.jpg");
+        PostCreateRequest request = new PostCreateRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, PostFixture.DEFAULT_IMAGE_URL);
+        Attachment attachment = Attachment.create(post, PostFixture.DEFAULT_IMAGE_URL);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(any(Post.class))).willReturn(post);
         given(attachmentRepository.save(any(Attachment.class))).willReturn(attachment);
@@ -95,13 +93,13 @@ class PostServiceTest {
         PostResponse response = postService.createPost(request, 1L);
 
         verify(attachmentRepository).save(any(Attachment.class));
-        assertThat(response.title()).isEqualTo("제목");
+        assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
     }
 
     @Test
     @DisplayName("게시글을 수정할 수 있다")
     void updatePost_success() {
-        PostUpdateRequest request = new PostUpdateRequest("수정된제목", "수정된내용", null);
+        PostUpdateRequest request = new PostUpdateRequest(PostFixture.UPDATED_TITLE, PostFixture.UPDATED_CONTENT, null);
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(post)).willReturn(post);
@@ -111,8 +109,8 @@ class PostServiceTest {
 
         verify(ownershipPolicy).validateOwnership(1L, 1L);
         verify(postRepository).save(post);
-        assertThat(post.getTitle()).isEqualTo("수정된제목");
-        assertThat(post.getContent()).isEqualTo("수정된내용");
+        assertThat(post.getTitle()).isEqualTo(PostFixture.UPDATED_TITLE);
+        assertThat(post.getContent()).isEqualTo(PostFixture.UPDATED_CONTENT);
     }
 
     @Test
@@ -137,7 +135,7 @@ class PostServiceTest {
         PostResponse response = postService.getPostDetails(1L, 1L);
 
         assertThat(response.postId()).isEqualTo(1L);
-        assertThat(response.title()).isEqualTo("제목");
+        assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
     }
 
     @Test

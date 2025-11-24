@@ -17,13 +17,13 @@ import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
+import com.kakaotechbootcamp.community.fixture.MemberFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @UnitTest
 class MemberServiceTest {
@@ -41,9 +41,8 @@ class MemberServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = Member.create("user@test.com", "password1234", "tester");
+        member = MemberFixture.createMember(1L, "user@test.com", "password1234", "tester");
         member.updateProfileImage("https://example.com/profile.png");
-        ReflectionTestUtils.setField(member, "id", 1L);
     }
 
     @Test
