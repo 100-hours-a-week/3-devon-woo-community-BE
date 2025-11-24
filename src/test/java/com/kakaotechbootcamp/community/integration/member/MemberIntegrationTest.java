@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.api.member;
+package com.kakaotechbootcamp.community.integration.member;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -30,7 +30,7 @@ import org.assertj.core.api.Assertions;
 @IntegrationTest
 @AutoConfigureMockMvc(addFilters = false)
 @Import(TestSecurityConfig.class)
-class MemberControllerIntegrationTest {
+class MemberIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
