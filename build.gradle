@@ -83,8 +83,8 @@ sourceSets {
 	main.java.srcDirs += [querydslDir]
 }
 
-tasks.withType(JavaCompile) {
-	options.generatedSourceOutputDirectory = file(querydslDir)
+tasks.withType(JavaCompile).configureEach {
+    options.generatedSourceOutputDirectory = file(querydslDir)
 }
 
 clean {
@@ -95,18 +95,18 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-task unitTest(type: Test) {
-	useJUnitPlatform {
-		includeTags 'unit'
-	}
-	outputs.upToDateWhen { false }
+tasks.register('unitTest', Test) {
+    useJUnitPlatform {
+        includeTags 'unit'
+    }
+    outputs.upToDateWhen { false }
 }
 
-task integrationTest(type: Test) {
-	useJUnitPlatform {
-		includeTags 'integration'
-	}
-	outputs.upToDateWhen { false }
+tasks.register('integrationTest', Test) {
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+    outputs.upToDateWhen { false }
 }
 
 jacoco {
