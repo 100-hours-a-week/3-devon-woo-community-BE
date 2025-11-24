@@ -1,4 +1,4 @@
-package com.kakaotechbootcamp.community.application.common.controller;
+package com.kakaotechbootcamp.community.application.media.controller;
 
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import com.kakaotechbootcamp.community.infra.image.ImageSignature;
