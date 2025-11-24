@@ -10,34 +10,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.member.dto.request.SignupRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.SignupResponse;
 import com.kakaotechbootcamp.community.application.member.service.SignupService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(SignupController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class SignupControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @Mock
+    @MockBean
     private SignupService signupService;
-
-    @InjectMocks
-    private SignupController signupController;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(signupController).build();
-    }
 
     @Test
     @DisplayName("회원가입 요청 시 201 응답과 가입 정보를 반환한다")
