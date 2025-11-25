@@ -8,11 +8,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakaotechbootcamp.community.application.member.MemberRequestFixture;
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
 import com.kakaotechbootcamp.community.config.annotation.IntegrationTest;
 import com.kakaotechbootcamp.community.config.TestSecurityConfig;
 import com.kakaotechbootcamp.community.config.TestSecurityConfig.TestCurrentUserContext;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
@@ -49,7 +51,7 @@ class MemberIntegrationTest {
     @BeforeEach
     void setUp() {
         memberRepository.deleteAll();
-        savedMember = memberRepository.save(Member.create(
+        savedMember = memberRepository.save(MemberFixture.create(
                 "tester@example.com",
                 "currentPassword!",
                 "tester"
@@ -77,8 +79,7 @@ class MemberIntegrationTest {
     @Test
     @DisplayName("통합 테스트 - 회원 정보 수정 시 수정된 정보가 반환된다")
     void updateMember_returnsUpdatedResponse_integration() throws Exception {
-        MemberUpdateRequest request =
-                new MemberUpdateRequest("newNick", "https://example.com/new.png");
+        MemberUpdateRequest request = MemberRequestFixture.updateRequest();
 
         mockMvc.perform(patch("/api/v1/members/{id}", savedMember.getId())
                         .contentType(MediaType.APPLICATION_JSON)
