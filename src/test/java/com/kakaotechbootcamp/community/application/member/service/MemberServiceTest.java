@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.kakaotechbootcamp.community.application.member.MemberRequestFixture;
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberDetailsResponse;
@@ -68,7 +69,7 @@ class MemberServiceTest {
     @Test
     @DisplayName("회원 정보를 수정하면 닉네임 검증 후 저장된다")
     void updateMember_success() {
-        MemberUpdateRequest request = new MemberUpdateRequest("newNick", "https://example.com/new.png");
+        MemberUpdateRequest request = MemberRequestFixture.updateRequest();
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
         given(memberRepository.save(member)).willReturn(member);
 

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
+import com.kakaotechbootcamp.community.application.comment.CommentRequestFixture;
 import com.kakaotechbootcamp.community.application.comment.dto.request.CommentCreateRequest;
 import com.kakaotechbootcamp.community.application.comment.dto.request.CommentUpdateRequest;
 import com.kakaotechbootcamp.community.application.comment.dto.response.CommentResponse;
@@ -68,7 +69,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글을 작성할 수 있다")
     void createComment_success() {
-        CommentCreateRequest request = new CommentCreateRequest(CommentFixture.DEFAULT_CONTENT);
+        CommentCreateRequest request = CommentRequestFixture.createRequest();
         given(postRepository.existsById(1L)).willReturn(true);
         given(postRepository.getReferenceById(1L)).willReturn(post);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
@@ -84,7 +85,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("존재하지 않는 게시글에 댓글 작성 시 예외가 발생한다")
     void createComment_postNotFound() {
-        CommentCreateRequest request = new CommentCreateRequest(CommentFixture.DEFAULT_CONTENT);
+        CommentCreateRequest request = CommentRequestFixture.createRequest();
         given(postRepository.existsById(1L)).willReturn(false);
 
         assertThatThrownBy(() -> commentService.createComment(1L, request, 1L))
@@ -94,7 +95,7 @@ class CommentServiceTest {
     @Test
     @DisplayName("댓글을 수정할 수 있다")
     void updateComment_success() {
-        CommentUpdateRequest request = new CommentUpdateRequest(CommentFixture.UPDATED_CONTENT);
+        CommentUpdateRequest request = CommentRequestFixture.updateRequest();
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
         given(commentRepository.save(comment)).willReturn(comment);
 

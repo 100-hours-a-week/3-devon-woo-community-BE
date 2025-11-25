@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
+import com.kakaotechbootcamp.community.application.post.PostRequestFixture;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostCreateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostResponse;
@@ -70,7 +71,7 @@ class PostServiceTest {
     @Test
     @DisplayName("게시글을 생성할 수 있다")
     void createPost_success() {
-        PostCreateRequest request = new PostCreateRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, null);
+        PostCreateRequest request = PostRequestFixture.createRequest();
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(any(Post.class))).willReturn(post);
 
@@ -84,7 +85,7 @@ class PostServiceTest {
     @Test
     @DisplayName("게시글 생성 시 이미지가 있으면 저장된다")
     void createPost_withImage() {
-        PostCreateRequest request = new PostCreateRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, PostFixture.DEFAULT_IMAGE_URL);
+        PostCreateRequest request = PostRequestFixture.createRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, PostFixture.DEFAULT_IMAGE_URL);
         Attachment attachment = Attachment.create(post, PostFixture.DEFAULT_IMAGE_URL);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(any(Post.class))).willReturn(post);
@@ -99,7 +100,7 @@ class PostServiceTest {
     @Test
     @DisplayName("게시글을 수정할 수 있다")
     void updatePost_success() {
-        PostUpdateRequest request = new PostUpdateRequest(PostFixture.UPDATED_TITLE, PostFixture.UPDATED_CONTENT, null);
+        PostUpdateRequest request = PostRequestFixture.updateRequest();
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(post)).willReturn(post);
