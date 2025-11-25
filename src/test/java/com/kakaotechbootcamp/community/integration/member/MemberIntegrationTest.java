@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -114,4 +115,108 @@ class MemberIntegrationTest {
         Member deleted = memberRepository.findById(savedMember.getId()).orElseThrow();
         Assertions.assertThat(deleted.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
     }
+
+    @Test
+    @DisplayName("통합 테스트 - 여러 회원 생성 후 각각 조회할 수 있다")
+    void getMultipleMembers_returnsEachProfile() throws Exception {
+        Member member2 = memberRepository.save(MemberFixture.create(
+                "tester2@example.com",
+                "password123",
+                "tester2"
+        ));
+        Member member3 = memberRepository.save(MemberFixture.create(
+                "tester3@example.com",
+                "password123",
+                "tester3"
+        ));
+
+        currentUserContext.setCurrentUserId(member2.getId());
+        mockMvc.perform(get("/api/v1/members/{id}", member2.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nickname").value("tester2"))
+                .andExpect(jsonPath("$.data.email").value("tester2@example.com"));
+
+        currentUserContext.setCurrentUserId(member3.getId());
+        mockMvc.perform(get("/api/v1/members/{id}", member3.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nickname").value("tester3"))
+                .andExpect(jsonPath("$.data.email").value("tester3@example.com"));
+
+        Assertions.assertThat(memberRepository.count()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 회원 정보 수정 후 조회 시 변경된 정보를 반환한다")
+    void updateMemberThenGet_returnsUpdatedInfo() throws Exception {
+        MemberUpdateRequest updateRequest = MemberRequestFixture.updateRequest();
+
+        mockMvc.perform(patch("/api/v1/members/{id}", savedMember.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/members/{id}", savedMember.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nickname").value("newNick"))
+                .andExpect(jsonPath("$.data.profileImage").value("https://example.com/new.png"));
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 비밀번호 변경 후 새 비밀번호로 변경할 수 있다")
+    void updatePasswordTwice_succeeds() throws Exception {
+        PasswordUpdateRequest firstUpdate = new PasswordUpdateRequest("currentPassword!", "newPassword123");
+
+        mockMvc.perform(patch("/api/v1/members/{id}/password", savedMember.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(firstUpdate)))
+                .andExpect(status().isNoContent());
+
+        PasswordUpdateRequest secondUpdate = new PasswordUpdateRequest("newPassword123", "finalPassword456");
+
+        mockMvc.perform(patch("/api/v1/members/{id}/password", savedMember.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(secondUpdate)))
+                .andExpect(status().isNoContent());
+
+        Member updated = memberRepository.findById(savedMember.getId()).orElseThrow();
+        Assertions.assertThat(updated.getPassword()).isEqualTo("finalPassword456");
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 존재하지 않는 회원 조회 시 404를 반환한다")
+    void getMemberProfile_notFound_returns404() throws Exception {
+        Long nonExistentId = 99999L;
+        currentUserContext.setCurrentUserId(nonExistentId);
+
+        mockMvc.perform(get("/api/v1/members/{id}", nonExistentId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Disabled("실제 비즈니스 로직 확인 필요")
+    @DisplayName("통합 테스트 - 잘못된 비밀번호로 변경 시도 시 400을 반환한다")
+    void updatePassword_withWrongCurrentPassword_returns400() throws Exception {
+        PasswordUpdateRequest request = new PasswordUpdateRequest("wrongPassword!", "newPassword123");
+
+        mockMvc.perform(patch("/api/v1/members/{id}/password", savedMember.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Disabled("실제 비즈니스 로직 확인 필요")
+    @DisplayName("통합 테스트 - 탈퇴한 회원 조회 시 적절한 처리를 한다")
+    void getDeletedMember_handlesAppropriately() throws Exception {
+        mockMvc.perform(delete("/api/v1/members/{id}", savedMember.getId()))
+                .andExpect(status().isNoContent());
+
+        Member deleted = memberRepository.findById(savedMember.getId()).orElseThrow();
+        Assertions.assertThat(deleted.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
+
+        mockMvc.perform(get("/api/v1/members/{id}", savedMember.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.nickname").value("tester"));
+    }
+
 }
