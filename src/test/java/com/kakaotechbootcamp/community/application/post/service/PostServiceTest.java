@@ -22,8 +22,8 @@ import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.AttachmentRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostLikeRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
-import com.kakaotechbootcamp.community.fixture.MemberFixture;
-import com.kakaotechbootcamp.community.fixture.PostFixture;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
+import com.kakaotechbootcamp.community.domain.post.PostFixture;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -63,8 +63,8 @@ class PostServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = MemberFixture.createMember();
-        post = PostFixture.createPost(member);
+        member = MemberFixture.createWithId(1L);
+        post = PostFixture.createWithId(1L, member);
     }
 
     @Test

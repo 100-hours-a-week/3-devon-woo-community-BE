@@ -20,9 +20,9 @@ import com.kakaotechbootcamp.community.domain.post.entity.Comment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.CommentRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
-import com.kakaotechbootcamp.community.fixture.CommentFixture;
-import com.kakaotechbootcamp.community.fixture.MemberFixture;
-import com.kakaotechbootcamp.community.fixture.PostFixture;
+import com.kakaotechbootcamp.community.domain.post.CommentFixture;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
+import com.kakaotechbootcamp.community.domain.post.PostFixture;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -60,9 +60,9 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = MemberFixture.createMember();
-        post = PostFixture.createPost(member);
-        comment = CommentFixture.createComment(member, post);
+        member = MemberFixture.createWithId(1L);
+        post = PostFixture.createWithId(1L, member);
+        comment = CommentFixture.createWithId(1L, member, post);
     }
 
     @Test

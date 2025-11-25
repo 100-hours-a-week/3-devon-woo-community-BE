@@ -17,7 +17,7 @@ import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
-import com.kakaotechbootcamp.community.fixture.MemberFixture;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +41,7 @@ class MemberServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = MemberFixture.createMember(1L, "user@test.com", "password1234", "tester");
+        member = MemberFixture.createWithId(1L, "user@test.com", "password1234", "tester");
         member.updateProfileImage("https://example.com/profile.png");
     }
 

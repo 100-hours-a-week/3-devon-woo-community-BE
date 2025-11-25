@@ -17,8 +17,8 @@ import com.kakaotechbootcamp.community.domain.post.entity.PostLike;
 import com.kakaotechbootcamp.community.domain.post.policy.PostLikePolicy;
 import com.kakaotechbootcamp.community.domain.post.repository.PostLikeRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
-import com.kakaotechbootcamp.community.fixture.MemberFixture;
-import com.kakaotechbootcamp.community.fixture.PostFixture;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
+import com.kakaotechbootcamp.community.domain.post.PostFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,8 +49,8 @@ class PostLikeServiceTest {
 
     @BeforeEach
     void setUp() {
-        member = MemberFixture.createMember();
-        post = PostFixture.createPost(member);
+        member = MemberFixture.createWithId(1L);
+        post = PostFixture.createWithId(1L, member);
     }
 
     @Test

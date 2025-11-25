@@ -6,7 +6,7 @@ import com.kakaotechbootcamp.community.config.annotation.RepositoryJpaTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
-import com.kakaotechbootcamp.community.fixture.PostFixture;
+import com.kakaotechbootcamp.community.domain.post.PostFixture;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
