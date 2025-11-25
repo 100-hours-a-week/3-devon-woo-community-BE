@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.post.PostRequestFixture;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostCreateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRequest;
-import com.kakaotechbootcamp.community.config.TestSecurityConfig.TestCurrentUserContext;
+import com.kakaotechbootcamp.community.config.TestCurrentUserContext;
 import com.kakaotechbootcamp.community.config.annotation.IntegrationTest;
 import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;

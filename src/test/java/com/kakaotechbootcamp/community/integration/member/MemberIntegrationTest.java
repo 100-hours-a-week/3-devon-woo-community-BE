@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.member.MemberRequestFixture;
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
-import com.kakaotechbootcamp.community.config.TestSecurityConfig.TestCurrentUserContext;
+import com.kakaotechbootcamp.community.config.TestCurrentUserContext;
 import com.kakaotechbootcamp.community.config.annotation.IntegrationTest;
 import com.kakaotechbootcamp.community.config.TestSecurityConfig;
 import com.kakaotechbootcamp.community.domain.member.MemberFixture;

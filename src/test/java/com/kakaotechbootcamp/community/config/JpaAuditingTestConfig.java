@@ -7,6 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+/**
+ * 테스트에서 JPA Auditing(@CreatedDate, @LastModifiedDate 등)에
+ * 고정된 시간을 주입하기 위한 설정
+ * - 항상 동일한 Instant를 반환하는 DateTimeProvider를 등록해
+ *   감사 필드에 대한 테스트를 안정적으로 수행할 수 있다.
+ */
 @TestConfiguration
 @EnableJpaAuditing(dateTimeProviderRef = "testDateTimeProvider")
 public class JpaAuditingTestConfig {

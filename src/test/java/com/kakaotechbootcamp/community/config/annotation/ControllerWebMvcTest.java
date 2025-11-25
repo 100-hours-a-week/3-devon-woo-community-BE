@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * WebMvc 슬라이스 테스트에서 반복되는 보안 관련 설정을 묶어둔 메타 어노테이션.
+ * WebMvc 슬라이스 테스트에서 반복되는 보안 관련 설정을 묶어둔 메타 어노테이션
  * - @WebMvcTest : 지정한 컨트롤러만 로드
  * - @AutoConfigureMockMvc(addFilters = false) : 스프링 시큐리티 필터 비활성화
  * - @Import(TestSecurityConfig.class) : 테스트용 모의 보안 빈 주입

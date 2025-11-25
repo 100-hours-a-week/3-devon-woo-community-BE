@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 테스트 메서드에서 SQL 로깅을 활성화하는 어노테이션
- * 테스트 실행 중에만 SQL 로그가 출력되고, @Sql 스크립트 실행 시에는 로그가 억제됩니다.
+ * 테스트 실행 중에만 SQL 로그가 출력되고, @Sql 스크립트 실행 시에는 로그가 억제된다.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

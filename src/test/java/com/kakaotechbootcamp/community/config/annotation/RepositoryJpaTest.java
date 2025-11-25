@@ -13,7 +13,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
+/**
+ * JPA 리포지토리 슬라이스 테스트를 위한 메타 어노테이션입니다.
+ * - @DataJpaTest : JPA 관련 빈만 로드하는 슬라이스 테스트
+ * - @ActiveProfiles(\"test\") : 테스트 프로필 활성화
+ * - @Import(QueryDslConfig, JpaAuditingTestConfig) : QueryDSL 설정과 테스트용 JPA Auditing 설정 주입
+ * - @AutoConfigureTestDatabase(replace = NONE) : 실제 설정된 DB(H2, Testcontainers 등)를 그대로 사용
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
