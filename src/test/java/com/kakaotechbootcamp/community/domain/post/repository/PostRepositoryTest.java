@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.kakaotechbootcamp.community.config.annotation.RepositoryJpaTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.PostFixture;
@@ -28,7 +29,7 @@ class PostRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        member = memberRepository.save(Member.create("user@test.com", "password123", "tester"));
+        member = memberRepository.save(MemberFixture.create());
     }
 
     @AfterEach
@@ -40,7 +41,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("게시글을 저장하고 조회할 수 있다")
     void saveAndFind() {
-        Post post = Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT);
+        Post post = PostFixture.create(member);
         Post saved = postRepository.save(post);
 
         assertThat(saved.getId()).isNotNull();
@@ -51,7 +52,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("회원 정보와 함께 게시글을 조회할 수 있다")
     void findByIdWithMember() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
 
         Post found = postRepository.findByIdWithMember(post.getId()).orElseThrow();
 
@@ -63,7 +64,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("삭제된 게시글은 findByIdWithMember로 조회되지 않는다")
     void findByIdWithMember_deletedPost() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         post.delete();
         postRepository.save(post);
 
@@ -73,7 +74,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("좋아요 수를 증가시킬 수 있다")
     void incrementLikeCount() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         Long postId = post.getId();
 
         int updated = postRepository.incrementLikeCount(postId);
@@ -87,7 +88,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("좋아요 수를 감소시킬 수 있다")
     void decrementLikeCount() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         Long postId = post.getId();
         postRepository.incrementLikeCount(postId);
         postRepository.flush();
@@ -103,7 +104,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("좋아요 수가 0일 때 감소시키면 0을 유지한다")
     void decrementLikeCount_whenZero() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         Long postId = post.getId();
 
         postRepository.decrementLikeCount(postId);
@@ -116,7 +117,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("조회수를 증가시킬 수 있다")
     void incrementViewCount() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         Long postId = post.getId();
 
         int updated = postRepository.incrementViewCount(postId);
@@ -130,7 +131,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("댓글 수를 증가시킬 수 있다")
     void incrementCommentCount() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         Long postId = post.getId();
 
         int updated = postRepository.incrementCommentCount(postId);
@@ -144,7 +145,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("댓글 수를 감소시킬 수 있다")
     void decrementCommentCount() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         Long postId = post.getId();
         postRepository.incrementCommentCount(postId);
         postRepository.flush();
@@ -160,7 +161,7 @@ class PostRepositoryTest {
     @Test
     @DisplayName("댓글 수가 0일 때 감소시키면 0을 유지한다")
     void decrementCommentCount_whenZero() {
-        Post post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        Post post = postRepository.save(PostFixture.create(member));
         Long postId = post.getId();
 
         postRepository.decrementCommentCount(postId);

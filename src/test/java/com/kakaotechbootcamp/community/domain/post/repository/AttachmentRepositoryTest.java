@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.kakaotechbootcamp.community.config.annotation.RepositoryJpaTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import com.kakaotechbootcamp.community.domain.post.entity.Attachment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
@@ -33,8 +34,8 @@ class AttachmentRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        member = memberRepository.save(Member.create("user@test.com", "password123", "tester"));
-        post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        member = memberRepository.save(MemberFixture.create());
+        post = postRepository.save(PostFixture.create(member));
     }
 
     @AfterEach

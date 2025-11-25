@@ -3,12 +3,14 @@ package com.kakaotechbootcamp.community.domain.post.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.kakaotechbootcamp.community.config.annotation.RepositoryJpaTest;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
-import com.kakaotechbootcamp.community.domain.post.entity.Comment;
-import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.CommentFixture;
 import com.kakaotechbootcamp.community.domain.post.PostFixture;
+import com.kakaotechbootcamp.community.domain.post.entity.Comment;
+import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -35,8 +37,8 @@ class CommentRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        member = memberRepository.save(Member.create("user@test.com", "password123", "tester"));
-        post = postRepository.save(Post.create(member, PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT));
+        member = memberRepository.save(MemberFixture.create());
+        post = postRepository.save(PostFixture.create(member));
     }
 
     @AfterEach
@@ -49,7 +51,7 @@ class CommentRepositoryTest {
     @Test
     @DisplayName("댓글을 저장하고 조회할 수 있다")
     void saveAndFind() {
-        Comment comment = Comment.create(member, post, CommentFixture.DEFAULT_CONTENT);
+        Comment comment = CommentFixture.create(member, post);
         Comment saved = commentRepository.save(comment);
 
         assertThat(saved.getId()).isNotNull();
@@ -61,7 +63,7 @@ class CommentRepositoryTest {
     @Test
     @DisplayName("회원 정보와 함께 댓글을 조회할 수 있다")
     void findByIdWithMember() {
-        Comment comment = commentRepository.save(Comment.create(member, post, CommentFixture.DEFAULT_CONTENT));
+        Comment comment = commentRepository.save(CommentFixture.create(member, post));
 
         Comment found = commentRepository.findByIdWithMember(comment.getId()).orElseThrow();
 
@@ -73,7 +75,7 @@ class CommentRepositoryTest {
     @Test
     @DisplayName("댓글 ID로 게시글 ID를 조회할 수 있다")
     void findPostIdByCommentId() {
-        Comment comment = commentRepository.save(Comment.create(member, post, CommentFixture.DEFAULT_CONTENT));
+        Comment comment = commentRepository.save(CommentFixture.create(member, post));
 
         Long postId = commentRepository.findPostIdByCommentId(comment.getId()).orElseThrow();
 
@@ -89,8 +91,8 @@ class CommentRepositoryTest {
     @Test
     @DisplayName("회원 ID로 게시글 정보와 함께 댓글을 조회할 수 있다")
     void findByMemberIdWithPost() {
-        commentRepository.save(Comment.create(member, post, "첫 번째 댓글"));
-        commentRepository.save(Comment.create(member, post, "두 번째 댓글"));
+        commentRepository.save(CommentFixture.create(member, post, "첫 번째 댓글"));
+        commentRepository.save(CommentFixture.create(member, post, "두 번째 댓글"));
 
         List<Comment> comments = commentRepository.findByMemberIdWithPost(member.getId());
 
@@ -100,8 +102,8 @@ class CommentRepositoryTest {
     @Test
     @DisplayName("회원 ID로 댓글 조회 시 생성일 역순으로 정렬된다")
     void findByMemberIdWithPost_orderedByCreatedAtDesc() {
-        commentRepository.save(Comment.create(member, post, "오래된 댓글"));
-        commentRepository.save(Comment.create(member, post, "최신 댓글"));
+        commentRepository.save(CommentFixture.create(member, post, "오래된 댓글"));
+        commentRepository.save(CommentFixture.create(member, post, "최신 댓글"));
 
         List<Comment> comments = commentRepository.findByMemberIdWithPost(member.getId());
 
@@ -111,9 +113,9 @@ class CommentRepositoryTest {
     @Test
     @DisplayName("다른 회원의 댓글은 조회되지 않는다")
     void findByMemberIdWithPost_onlyOwnComments() {
-        Member otherMember = memberRepository.save(Member.create("other@test.com", "password", "other"));
-        commentRepository.save(Comment.create(member, post, "내 댓글"));
-        commentRepository.save(Comment.create(otherMember, post, "다른 사람 댓글"));
+        Member otherMember = memberRepository.save(MemberFixture.create("other@test.com", "password", "other"));
+        commentRepository.save(CommentFixture.create(member, post, "내 댓글"));
+        commentRepository.save(CommentFixture.create(otherMember, post, "다른 사람 댓글"));
 
         List<Comment> comments = commentRepository.findByMemberIdWithPost(member.getId());
 
