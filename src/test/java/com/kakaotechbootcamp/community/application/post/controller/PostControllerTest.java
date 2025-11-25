@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberResponse;
+import com.kakaotechbootcamp.community.application.post.PostRequestFixture;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostCreateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostResponse;
@@ -51,7 +52,7 @@ class PostControllerTest {
     @Test
     @DisplayName("게시글 생성 - 201 Created")
     void createPost_success() throws Exception {
-        PostCreateRequest request = new PostCreateRequest("제목", "내용", null);
+        PostCreateRequest request = PostRequestFixture.createRequest();
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
         PostResponse response = new PostResponse(1L, memberResponse, "제목", "내용", null, Instant.now(), Instant.now(), 0L, 0L, false);
 
@@ -69,7 +70,7 @@ class PostControllerTest {
     @Test
     @DisplayName("게시글 수정 - 200 OK")
     void updatePost_success() throws Exception {
-        PostUpdateRequest request = new PostUpdateRequest("수정된제목", "수정된내용", null);
+        PostUpdateRequest request = PostRequestFixture.updateRequest();
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
         PostResponse response = new PostResponse(1L, memberResponse, "수정된제목", "수정된내용", null, Instant.now(), Instant.now(), 0L, 0L, false);
 

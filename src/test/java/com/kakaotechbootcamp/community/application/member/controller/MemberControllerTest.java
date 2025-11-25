@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakaotechbootcamp.community.application.member.MemberRequestFixture;
 import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberDetailsResponse;
@@ -59,7 +60,7 @@ class MemberControllerTest {
     @DisplayName("회원 정보 수정 - 200 OK")
     void updateMember_returnsResponse() throws Exception {
 
-        MemberUpdateRequest request = new MemberUpdateRequest("devon", "https://example.com/profile.png");
+        MemberUpdateRequest request = MemberRequestFixture.updateRequest("devon", "https://example.com/profile.png");
         MemberUpdateResponse response = new MemberUpdateResponse("devon", "https://example.com/profile.png");
 
         given(memberService.updateMember(any(), any())).willReturn(response);

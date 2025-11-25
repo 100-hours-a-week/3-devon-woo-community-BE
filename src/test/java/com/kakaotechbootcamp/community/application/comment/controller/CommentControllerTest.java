@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kakaotechbootcamp.community.application.comment.CommentRequestFixture;
 import com.kakaotechbootcamp.community.application.comment.dto.request.CommentCreateRequest;
 import com.kakaotechbootcamp.community.application.comment.dto.request.CommentUpdateRequest;
 import com.kakaotechbootcamp.community.application.comment.dto.response.CommentResponse;
@@ -42,7 +43,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("댓글 생성 - 201 Created")
     void createComment_success() throws Exception {
-        CommentCreateRequest request = new CommentCreateRequest("댓글내용");
+        CommentCreateRequest request = CommentRequestFixture.createRequest();
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
         CommentResponse response = new CommentResponse(1L, 1L, "댓글내용", memberResponse, Instant.now(), Instant.now());
 
@@ -90,7 +91,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("댓글 수정 - 200 OK")
     void updateComment_success() throws Exception {
-        CommentUpdateRequest request = new CommentUpdateRequest("수정된댓글");
+        CommentUpdateRequest request = CommentRequestFixture.updateRequest();
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
         CommentResponse response = new CommentResponse(1L, 1L, "수정된댓글", memberResponse, Instant.now(), Instant.now());
 
