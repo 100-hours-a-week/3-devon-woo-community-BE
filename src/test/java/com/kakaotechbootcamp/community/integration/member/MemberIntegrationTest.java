@@ -193,7 +193,6 @@ class MemberIntegrationTest {
     }
 
     @Test
-    @Disabled("실제 비즈니스 로직 확인 필요")
     @DisplayName("통합 테스트 - 잘못된 비밀번호로 변경 시도 시 400을 반환한다")
     void updatePassword_withWrongCurrentPassword_returns400() throws Exception {
         PasswordUpdateRequest request = new PasswordUpdateRequest("wrongPassword!", "newPassword123");
@@ -204,9 +203,10 @@ class MemberIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
+
+    // Todo: 예외보다는 다른 처리 방법이 있을까?
     @Test
-    @Disabled("실제 비즈니스 로직 확인 필요")
-    @DisplayName("통합 테스트 - 탈퇴한 회원 조회 시 적절한 처리를 한다")
+    @DisplayName("통합 테스트 - 탈퇴한 회원 조회 시 404 예외를 던진다")
     void getDeletedMember_handlesAppropriately() throws Exception {
         mockMvc.perform(delete("/api/v1/members/{id}", savedMember.getId()))
                 .andExpect(status().isNoContent());
@@ -215,8 +215,8 @@ class MemberIntegrationTest {
         Assertions.assertThat(deleted.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
 
         mockMvc.perform(get("/api/v1/members/{id}", savedMember.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.nickname").value("tester"));
+                .andExpect(status().isNotFound());
+        // todo : 예외 설명도 넣으면 더 좋지 않을까?
     }
 
 }
