@@ -73,6 +73,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'com.h2database:h2'
+
+	// 테스트 픽스처
+	testFixturesImplementation 'org.springframework:spring-test'
 }
 
 
