@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Profile("!test")
 @Configuration
-@EnableRedisRepositories(basePackages = "com.kakaotechbootcamp.community.infra.redis.repository")
+@EnableRedisRepositories(basePackages = "com.devon.techblog.infra.redis.repository")
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")

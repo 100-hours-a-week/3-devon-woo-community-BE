@@ -16,7 +16,7 @@ public class ServicePerformanceAspect {
     private static final Logger log = LoggerFactory.getLogger("community.aop.Service");
     private static final AtomicLong EXEC_ID_COUNTER = new AtomicLong(0);
 
-    @Pointcut("execution(* com.kakaotechbootcamp.community.application.*.service.*.*(..))")
+    @Pointcut("execution(* com.devon.techblog.application.*.service.*.*(..))")
     public void serviceMethods() {}
 
     @Around("serviceMethods()")

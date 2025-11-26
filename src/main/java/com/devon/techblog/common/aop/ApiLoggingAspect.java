@@ -20,7 +20,7 @@ public class ApiLoggingAspect {
 
     private static final AtomicLong REQUEST_ID_COUNTER = new AtomicLong(0);
 
-    @Pointcut("execution(* com.kakaotechbootcamp.community.application.*.controller.*.*(..))")
+    @Pointcut("execution(* com.devon.techblog.application.*.controller.*.*(..))")
     public void controllerMethods() {}
 
     @Around("controllerMethods()")
