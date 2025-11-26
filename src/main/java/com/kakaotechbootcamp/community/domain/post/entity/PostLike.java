@@ -1,11 +1,12 @@
 package com.kakaotechbootcamp.community.domain.post.entity;
 
-import com.kakaotechbootcamp.community.domain.common.entity.BaseTimeEntity;
 import com.kakaotechbootcamp.community.domain.common.entity.CreatedOnlyEntity;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.post.entity.id.PostLikeId;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.domain.Persistable;
 import org.springframework.util.Assert;
 
@@ -23,11 +24,13 @@ public class PostLike extends CreatedOnlyEntity implements Persistable<PostLikeI
     @MapsId("postId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
     @MapsId("memberId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
     public static PostLike create(Post post, Member member) {
