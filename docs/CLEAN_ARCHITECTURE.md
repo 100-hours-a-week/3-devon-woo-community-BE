@@ -461,7 +461,7 @@ public class Member {
 
 ```java
 // common/exception/GlobalExceptionHandler.java
-import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
+import repository.member.domain.com.devon.techblog.MemberRepository;
 
 // ❌ Common이 Domain 레이어를 참조
 @RestControllerAdvice
@@ -474,9 +474,9 @@ public class GlobalExceptionHandler {
 
 ```java
 // application/member/service/MemberService.java
-import com.kakaotechbootcamp.community.domain.member.entity.Member;
-import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
-import com.kakaotechbootcamp.community.common.exception.CustomException;
+import entity.member.domain.com.devon.techblog.Member;
+import repository.member.domain.com.devon.techblog.MemberRepository;
+import exception.common.com.devon.techblog.CustomException;
 
 // ✅ Application이 Domain, Common 참조
 @Service

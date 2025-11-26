@@ -40,7 +40,7 @@ External Library (Cloudinary) + Config
 spring:
   autoconfigure:
     exclude:
-      - com.kakaotechbootcamp.community.config.CloudinaryConfig
+      - config.com.devon.techblog.CloudinaryConfig
 ```
 
 **결과**: `@Configuration` 클래스는 자동 설정이 아니므로 제외 불가
