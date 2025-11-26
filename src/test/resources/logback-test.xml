@@ -17,7 +17,7 @@
         </encoder>
     </appender>
 
-    <logger name="techblog.aop" level="DEBUG" additivity="false">
+    <logger name="techblog.aop" level="OFF" additivity="false">
         <appender-ref ref="AOP_CONSOLE" />
     </logger>
 
