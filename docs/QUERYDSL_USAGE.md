@@ -19,7 +19,7 @@ annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 - 빌드 시 자동 생성됨
 
 ### 3. QueryDSL Configuration
-- [QueryDslConfig.java](../src/main/java/com/kakaotechbootcamp/community/common/config/QueryDslConfig.java)
+- [QueryDslConfig.java](../src/main/java/com/devon/techblog/common/config/QueryDslConfig.java)
 - JPAQueryFactory 빈 등록
 
 ## 구현된 Custom Repository

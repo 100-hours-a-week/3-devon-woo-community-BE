@@ -99,7 +99,7 @@ application/security/
 
 REST API 서버에 맞는 기본 보안 설정을 구성합니다.
 
-**파일 위치**: `src/main/java/com/kakaotechbootcamp/community/application/security/config/SecurityConfig.java`
+**파일 위치**: `src/main/java/com/devon/techblog/application/security/config/SecurityConfig.java`
 
 ```java
 @Configuration

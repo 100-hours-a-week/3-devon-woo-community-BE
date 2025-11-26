@@ -305,7 +305,7 @@ Application Layer
 ## 패키지 구조 예시
 
 ```
-src/main/java/com/kakaotechbootcamp/community/
+src/main/java/com/devon/techblog/
 ├── config/                          # 전역 설정
 │   ├── WebMvcConfig.java
 │   └── CloudinaryConfig.java

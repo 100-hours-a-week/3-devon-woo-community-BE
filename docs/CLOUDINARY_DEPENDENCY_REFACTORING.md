@@ -78,7 +78,7 @@ cloudinary:
 
 **ImageStorageService 인터페이스**
 ```java
-// src/main/java/com/kakaotechbootcamp/community/infrastructure/image/
+// src/main/java/com/devon/techblog/infrastructure/image/
 public interface ImageStorageService {
     ImageSignature generateUploadSignature(String type);
 }
@@ -391,7 +391,7 @@ class CommunityApplicationTests {
 src/
 ├── main/
 │   └── java/
-│       └── com/kakaotechbootcamp/community/
+│       └── com/devon/techblog/
 │           ├── application/
 │           │   └── common/
 │           │       └── controller/
@@ -406,7 +406,7 @@ src/
 │                       └── CloudinaryImageStorageService.java (신규)
 └── test/
     ├── java/
-    │   └── com/kakaotechbootcamp/community/
+    │   └── com/devon/techblog/
     │       ├── CommunityApplicationTests.java (프로파일 추가)
     │       └── config/
     │           └── TestConfig.java (Mock 구현체 추가)

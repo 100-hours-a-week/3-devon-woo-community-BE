@@ -284,7 +284,7 @@ docs/
 ### 생성된 Q-class 확인
 
 ```bash
-ls build/generated/querydsl/com/kakaotechbootcamp/community/domain/*/entity/
+ls build/generated/querydsl/com/devon/techblog/domain/*/entity/
 ```
 
 출력:
