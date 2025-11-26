@@ -233,7 +233,7 @@ Map<Long, Long> commentCount =
 
 ```
 src/main/java/
-└── com.kakaotechbootcamp.community/
+└── com.devon.techblog/
     ├── common/
     │   ├── config/
     │   │   └── QueryDslConfig.java          # JPAQueryFactory 빈 등록
@@ -251,7 +251,7 @@ src/main/java/
                 └── CommentRepositoryImpl.java       # Custom 구현체
 
 build/generated/querydsl/                   # Q-class 자동 생성
-└── com.kakaotechbootcamp.community/
+└── com.devon.techblog/
     └── domain/
         ├── post/entity/
         │   ├── QPost.java
