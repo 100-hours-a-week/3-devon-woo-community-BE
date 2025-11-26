@@ -9,16 +9,18 @@ import com.kakaotechbootcamp.community.config.annotation.IntegrationTest;
 import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
+import com.kakaotechbootcamp.community.fake.FakeJwtTokenProvider;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 @IntegrationTest
+@Import(FakeJwtTokenProvider.class)
 class AuthIntegrationTest {
 
     @Autowired
@@ -32,6 +34,7 @@ class AuthIntegrationTest {
 
     private Member savedMember;
     private String refreshToken;
+    private FakeJwtTokenProvider fakeJwtTokenProvider;
 
     @BeforeEach
     void setUp() {
@@ -42,6 +45,7 @@ class AuthIntegrationTest {
                 "tester"
         ));
         refreshToken = jwtTokenProvider.generateRefreshToken(savedMember.getId());
+        fakeJwtTokenProvider = new FakeJwtTokenProvider();
     }
 
     @AfterEach
@@ -83,5 +87,16 @@ class AuthIntegrationTest {
                         .cookie(refreshCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.accessToken").isString());
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 만료된 리프레시 토큰으로 요청 시 예외를 반환한다")
+    void refreshToken_withExpiredToken_throwsException() throws Exception {
+        String expiredToken = fakeJwtTokenProvider.generateExpiredRefreshToken(savedMember.getId());
+        Cookie expiredCookie = new Cookie("refreshToken", expiredToken);
+
+        mockMvc.perform(post("/auth/refresh")
+                        .cookie(expiredCookie))
+                .andExpect(status().isUnauthorized());
     }
 }
