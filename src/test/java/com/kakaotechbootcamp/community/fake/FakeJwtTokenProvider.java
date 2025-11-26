@@ -29,6 +29,20 @@ public class FakeJwtTokenProvider {
                 .compact();
     }
 
+    public String generateInvalidRefreshToken(Long memberId) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() - 1000);
+
+        SecretKey invalidKey =  Keys.hmacShaKeyFor("invalid_jwt_key-for-jwt-token-generation-must-be-long-enough".getBytes(StandardCharsets.UTF_8));
+        return Jwts.builder()
+                .subject(String.valueOf(memberId))
+                .claim(JwtConstants.CLAIM_TYPE, JwtConstants.TOKEN_TYPE_REFRESH)
+                .issuedAt(new Date(now.getTime() - 2000))
+                .expiration(expiryDate)
+                .signWith(invalidKey, Jwts.SIG.HS256)
+                .compact();
+    }
+
     public String generateExpiredAccessToken(Long memberId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() - 1000);

@@ -99,4 +99,15 @@ class AuthIntegrationTest {
                         .cookie(expiredCookie))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @DisplayName("통합 테스트 - 유효하지 않은 리프레시 토큰으로 요청 시 예외를 반환한다 ")
+    void refreshToken_withInvalidToken_throwsException() throws Exception {
+        String invalidToken = fakeJwtTokenProvider.generateInvalidRefreshToken(savedMember.getId());
+        Cookie invaliedCookie = new Cookie("refreshToken", invalidToken);
+
+        mockMvc.perform(post("/auth/refresh")
+                    .cookie(invaliedCookie))
+                .andExpect(status().isUnauthorized());
+    }
 }
