@@ -1,5 +1,5 @@
 spring:
   datasource:
-    url: jdbc:mysql://dev-db-server:3306/kbt-community
+    url: jdbc:mysql://dev-db-server:3306/techblog
     username: dev_user
     password: dev_password

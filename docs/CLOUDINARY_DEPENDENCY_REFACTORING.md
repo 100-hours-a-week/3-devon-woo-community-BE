@@ -40,7 +40,7 @@ External Library (Cloudinary) + Config
 spring:
   autoconfigure:
     exclude:
-      - com.kakaotechbootcamp.community.config.CloudinaryConfig
+      - config.com.devon.techblog.CloudinaryConfig
 ```
 
 **결과**: `@Configuration` 클래스는 자동 설정이 아니므로 제외 불가
@@ -78,7 +78,7 @@ cloudinary:
 
 **ImageStorageService 인터페이스**
 ```java
-// src/main/java/com/kakaotechbootcamp/community/infrastructure/image/
+// src/main/java/com/devon/techblog/infrastructure/image/
 public interface ImageStorageService {
     ImageSignature generateUploadSignature(String type);
 }
@@ -322,11 +322,11 @@ storage:
       preset: test-upload-preset
 ```
 
-**CommunityApplicationTests 수정**:
+**TechblogApplicationTests 수정**:
 ```java
 @SpringBootTest
 @ActiveProfiles("test")
-class CommunityApplicationTests {
+class TechblogApplicationTests {
 
     @Test
     void contextLoads() {
@@ -391,7 +391,7 @@ class CommunityApplicationTests {
 src/
 ├── main/
 │   └── java/
-│       └── com/kakaotechbootcamp/community/
+│       └── com/devon/techblog/
 │           ├── application/
 │           │   └── common/
 │           │       └── controller/
@@ -406,8 +406,8 @@ src/
 │                       └── CloudinaryImageStorageService.java (신규)
 └── test/
     ├── java/
-    │   └── com/kakaotechbootcamp/community/
-    │       ├── CommunityApplicationTests.java (프로파일 추가)
+    │   └── com/devon/techblog/
+    │       ├── TechblogApplicationTests.java (프로파일 추가)
     │       └── config/
     │           └── TestConfig.java (Mock 구현체 추가)
     └── resources/

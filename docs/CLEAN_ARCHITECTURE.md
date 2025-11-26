@@ -53,7 +53,7 @@ graph TB
 
 ### 1. Common Module
 
-**패키지**: `com.kakaotechbootcamp.community.common`
+**패키지**: `com.devon.techblog.common`
 
 #### 역할
 - 모든 레이어에서 공통적으로 사용되는 유틸리티 및 기반 기능 제공
@@ -105,7 +105,7 @@ public record ApiResponse<T>(
 
 ### 2. Domain Layer
 
-**패키지**: `com.kakaotechbootcamp.community.domain`
+**패키지**: `com.devon.techblog.domain`
 
 #### 역할
 - 핵심 비즈니스 로직과 도메인 규칙 포함
@@ -160,7 +160,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 ### 3. Infra Layer
 
-**패키지**: `com.kakaotechbootcamp.community.infra`
+**패키지**: `com.devon.techblog.infra`
 
 #### 역할
 - 외부 시스템과의 통합 및 인프라 관련 구현
@@ -193,7 +193,7 @@ public class CustomJpaRepositoryImpl<T, ID>
 
 ### 4. Application Layer
 
-**패키지**: `com.kakaotechbootcamp.community.application`
+**패키지**: `com.devon.techblog.application`
 
 #### 역할
 - 사용자 요청 처리 및 응답
@@ -251,7 +251,7 @@ public class LoginService {
 
 ### 5. Config Layer
 
-**패키지**: `com.kakaotechbootcamp.community.config`
+**패키지**: `com.devon.techblog.config`
 
 #### 역할
 - 프레임워크 및 라이브러리 전역 설정
@@ -305,7 +305,7 @@ Application Layer
 ## 패키지 구조 예시
 
 ```
-src/main/java/com/kakaotechbootcamp/community/
+src/main/java/com/devon/techblog/
 ├── config/                          # 전역 설정
 │   ├── WebMvcConfig.java
 │   └── CloudinaryConfig.java
@@ -451,7 +451,7 @@ application/security/
 
 ```java
 // domain/member/entity/Member.java
-import com.kakaotechbootcamp.community.application.member.dto.MemberResponse;
+import com.devon.techblog.application.member.dto.MemberResponse;
 
 // ❌ Domain이 Application 레이어를 참조
 public class Member {
@@ -461,7 +461,7 @@ public class Member {
 
 ```java
 // common/exception/GlobalExceptionHandler.java
-import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
+import repository.member.domain.com.devon.techblog.MemberRepository;
 
 // ❌ Common이 Domain 레이어를 참조
 @RestControllerAdvice
@@ -474,9 +474,9 @@ public class GlobalExceptionHandler {
 
 ```java
 // application/member/service/MemberService.java
-import com.kakaotechbootcamp.community.domain.member.entity.Member;
-import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
-import com.kakaotechbootcamp.community.common.exception.CustomException;
+import entity.member.domain.com.devon.techblog.Member;
+import repository.member.domain.com.devon.techblog.MemberRepository;
+import exception.common.com.devon.techblog.CustomException;
 
 // ✅ Application이 Domain, Common 참조
 @Service

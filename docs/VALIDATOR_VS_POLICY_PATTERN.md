@@ -52,7 +52,7 @@ Entity (불변식 보장)
 ## 2. 패키지 구조
 
 ```
-com.kakaotechbootcamp.community
+com.devon.techblog
 ├── application
 │   └── post
 │       ├── PostService.java

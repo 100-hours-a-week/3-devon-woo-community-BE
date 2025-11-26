@@ -6,9 +6,9 @@ plugins {
 	id 'jacoco'
 }
 
-group = 'com.kakaotechbootcamp'
+group = 'com.devon'
 version = '0.0.1-SNAPSHOT'
-description = 'Kakako Tech Bootcamp Community'
+description = 'Tech Blog Web Application'
 
 java {
 	toolchain {
