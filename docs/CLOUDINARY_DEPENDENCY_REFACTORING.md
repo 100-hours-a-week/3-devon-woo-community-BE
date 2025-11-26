@@ -322,11 +322,11 @@ storage:
       preset: test-upload-preset
 ```
 
-**CommunityApplicationTests 수정**:
+**TechblogApplicationTests 수정**:
 ```java
 @SpringBootTest
 @ActiveProfiles("test")
-class CommunityApplicationTests {
+class TechblogApplicationTests {
 
     @Test
     void contextLoads() {
@@ -407,7 +407,7 @@ src/
 └── test/
     ├── java/
     │   └── com/devon/techblog/
-    │       ├── CommunityApplicationTests.java (프로파일 추가)
+    │       ├── TechblogApplicationTests.java (프로파일 추가)
     │       └── config/
     │           └── TestConfig.java (Mock 구현체 추가)
     └── resources/

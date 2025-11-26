@@ -7,7 +7,7 @@ spring:
 
 logging:
   level:
-    community.aop: DEBUG
+    techblog.aop: DEBUG
 
     # hibernate 로그 설정
     org.hibernate.SQL: OFF

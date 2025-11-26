@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TransactionalQueryLoggingAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("community.aop.Transaction");
+    private static final Logger log = LoggerFactory.getLogger("techblog.aop.Transaction");
     private static final AtomicLong TX_ID_COUNTER = new AtomicLong(0);
 
     private final EntityManager entityManager;

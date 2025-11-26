@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.comment.CommentRequestFixture;
 import com.devon.techblog.application.comment.dto.request.CommentCreateRequest;
 import com.devon.techblog.application.comment.dto.request.CommentUpdateRequest;
@@ -19,6 +18,7 @@ import com.devon.techblog.application.comment.service.CommentService;
 import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.application.member.dto.response.MemberResponse;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

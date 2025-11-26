@@ -25,7 +25,7 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("Community API")
+                .title("Techblog API")
                 .description("카카오테크부트캠프 커뮤니티 API 문서")
                 .version("1.0.0");
     }

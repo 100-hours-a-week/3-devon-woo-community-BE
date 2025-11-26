@@ -40,7 +40,7 @@
     </appender>
 
     <!-- AOP 전용 Logger -->
-    <logger name="community.aop" level="DEBUG" additivity="false">
+    <logger name="techblog.aop" level="DEBUG" additivity="false">
         <appender-ref ref="AOP_CONSOLE" />
     </logger>
 

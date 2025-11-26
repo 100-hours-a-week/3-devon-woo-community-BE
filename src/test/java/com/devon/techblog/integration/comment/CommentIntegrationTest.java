@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.comment.CommentRequestFixture;
 import com.devon.techblog.application.comment.dto.request.CommentCreateRequest;
 import com.devon.techblog.application.comment.dto.request.CommentUpdateRequest;
@@ -23,6 +22,7 @@ import com.devon.techblog.domain.post.entity.Comment;
 import com.devon.techblog.domain.post.entity.Post;
 import com.devon.techblog.domain.post.repository.CommentRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

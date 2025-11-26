@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServicePerformanceAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("community.aop.Service");
+    private static final Logger log = LoggerFactory.getLogger("techblog.aop.Service");
     private static final AtomicLong EXEC_ID_COUNTER = new AtomicLong(0);
 
     @Pointcut("execution(* com.devon.techblog.application.*.service.*.*(..))")

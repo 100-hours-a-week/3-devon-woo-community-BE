@@ -16,7 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 public class ApiLoggingAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("community.aop.API");
+    private static final Logger log = LoggerFactory.getLogger("techblog.aop.API");
 
     private static final AtomicLong REQUEST_ID_COUNTER = new AtomicLong(0);
 

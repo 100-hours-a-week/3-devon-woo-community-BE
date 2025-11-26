@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.member.MemberRequestFixture;
 import com.devon.techblog.application.member.dto.request.MemberUpdateRequest;
 import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
@@ -16,6 +15,7 @@ import com.devon.techblog.application.member.dto.response.MemberDetailsResponse;
 import com.devon.techblog.application.member.dto.response.MemberUpdateResponse;
 import com.devon.techblog.application.member.service.MemberService;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
