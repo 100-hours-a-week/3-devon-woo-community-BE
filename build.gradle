@@ -1,7 +1,9 @@
 plugins {
 	id 'java'
+	id 'java-test-fixtures'
 	id 'org.springframework.boot' version '3.4.10'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.kakaotechbootcamp'
@@ -71,6 +73,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	testImplementation 'com.h2database:h2'
+
+	// 테스트 픽스처
+	testFixturesImplementation 'org.springframework:spring-test'
 }
 
 
@@ -82,8 +87,8 @@ sourceSets {
 	main.java.srcDirs += [querydslDir]
 }
 
-tasks.withType(JavaCompile) {
-	options.generatedSourceOutputDirectory = file(querydslDir)
+tasks.withType(JavaCompile).configureEach {
+    options.generatedSourceOutputDirectory = file(querydslDir)
 }
 
 clean {
@@ -94,16 +99,65 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-task unitTest(type: Test) {
-	useJUnitPlatform {
-		includeTags 'unit'
-	}
-	outputs.upToDateWhen { false }
+tasks.register('unitTest', Test) {
+    useJUnitPlatform {
+        includeTags 'unit'
+    }
+    outputs.upToDateWhen { false }
 }
 
-task integrationTest(type: Test) {
-	useJUnitPlatform {
-		includeTags 'integration'
+tasks.register('integrationTest', Test) {
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+    outputs.upToDateWhen { false }
+}
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+test {
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
 	}
-	outputs.upToDateWhen { false }
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/Q*.class',
+				'**/*Application.class',
+				'**/*Config*.class',
+				'**/dto/**',
+				'**/exception/**'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/Q*.class',
+				'**/*Application.class',
+				'**/*Config*.class',
+				'**/dto/**',
+				'**/exception/**'
+			])
+		}))
+	}
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.70
+			}
+		}
+	}
 }

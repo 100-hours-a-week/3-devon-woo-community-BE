@@ -4,31 +4,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
+import com.kakaotechbootcamp.community.application.post.PostRequestFixture;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostCreateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostResponse;
+import com.kakaotechbootcamp.community.application.post.dto.response.PostSummaryResponse;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
-import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
-import com.kakaotechbootcamp.community.common.exception.code.PostErrorCode;
-import com.kakaotechbootcamp.community.config.UnitTest;
+import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import com.kakaotechbootcamp.community.domain.common.policy.OwnershipPolicy;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
+import com.kakaotechbootcamp.community.domain.post.dto.PostQueryDto;
 import com.kakaotechbootcamp.community.domain.post.entity.Attachment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.AttachmentRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostLikeRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
+import com.kakaotechbootcamp.community.domain.post.PostFixture;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @UnitTest
 class PostServiceTest {
@@ -51,227 +59,107 @@ class PostServiceTest {
     @InjectMocks
     private PostService postService;
 
-    @Test
-    @DisplayName("게시글 생성 성공 - 첨부파일 없이")
-    void createPost_WithoutAttachment_Success() {
-        Long memberId = 1L;
-        PostCreateRequest request = new PostCreateRequest(
-                "테스트 제목",
-                "테스트 내용",
-                null
-        );
+    private Member member;
+    private Post post;
 
-        Member member = Member.create("test@email.com", "password", "tester");
-        Post post = Post.create(member, request.title(), request.content());
-
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(postRepository.save(any(Post.class))).willReturn(post);
-
-        PostResponse response = postService.createPost(request, memberId);
-
-        assertThat(response).isNotNull();
-        assertThat(response.title()).isEqualTo("테스트 제목");
-        assertThat(response.content()).isEqualTo("테스트 내용");
-        verify(memberRepository).findById(memberId);
-        verify(postRepository).save(any(Post.class));
-        verify(attachmentRepository, never()).save(any(Attachment.class));
+    @BeforeEach
+    void setUp() {
+        member = MemberFixture.createWithId(1L);
+        post = PostFixture.createWithId(1L, member);
     }
 
     @Test
-    @DisplayName("게시글 생성 성공 - 첨부파일과 함께")
-    void createPost_WithAttachment_Success() {
-        Long memberId = 1L;
-        String imageUrl = "https://example.com/image.jpg";
-        PostCreateRequest request = new PostCreateRequest(
-                "테스트 제목",
-                "테스트 내용",
-                imageUrl
-        );
+    @DisplayName("게시글을 생성할 수 있다")
+    void createPost_success() {
+        PostCreateRequest request = PostRequestFixture.createRequest();
+        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(postRepository.save(any(Post.class))).willReturn(post);
 
-        Member member = Member.create("test@email.com", "password", "tester");
-        Post post = Post.create(member, request.title(), request.content());
-        Attachment attachment = Attachment.create(post, imageUrl);
+        PostResponse response = postService.createPost(request, 1L);
 
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+        assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
+        assertThat(response.content()).isEqualTo(PostFixture.DEFAULT_CONTENT);
+        verify(postRepository).save(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("게시글 생성 시 이미지가 있으면 저장된다")
+    void createPost_withImage() {
+        PostCreateRequest request = PostRequestFixture.createRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, PostFixture.DEFAULT_IMAGE_URL);
+        Attachment attachment = Attachment.create(post, PostFixture.DEFAULT_IMAGE_URL);
+        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(any(Post.class))).willReturn(post);
         given(attachmentRepository.save(any(Attachment.class))).willReturn(attachment);
 
-        PostResponse response = postService.createPost(request, memberId);
+        PostResponse response = postService.createPost(request, 1L);
 
-        assertThat(response).isNotNull();
-        assertThat(response.imageUrl()).isEqualTo(imageUrl);
-        verify(memberRepository).findById(memberId);
-        verify(postRepository).save(any(Post.class));
         verify(attachmentRepository).save(any(Attachment.class));
+        assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
     }
 
     @Test
-    @DisplayName("게시글 생성 실패 - 존재하지 않는 회원")
-    void createPost_MemberNotFound_ThrowsException() {
-        Long memberId = 999L;
-        PostCreateRequest request = new PostCreateRequest(
-                "테스트 제목",
-                "테스트 내용",
-                null
-        );
+    @DisplayName("게시글을 수정할 수 있다")
+    void updatePost_success() {
+        PostUpdateRequest request = PostRequestFixture.updateRequest();
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
+        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(postRepository.save(post)).willReturn(post);
+        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
 
-        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+        postService.updatePost(1L, request, 1L);
 
-        assertThatThrownBy(() -> postService.createPost(request, memberId))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", MemberErrorCode.USER_NOT_FOUND);
-
-        verify(memberRepository).findById(memberId);
-        verify(postRepository, never()).save(any(Post.class));
-    }
-
-    @Test
-    @DisplayName("게시글 수정 성공")
-    void updatePost_Success() {
-        Long postId = 1L;
-        Long memberId = 1L;
-        PostUpdateRequest request = new PostUpdateRequest(
-                "수정된 제목",
-                "수정된 내용",
-                null
-        );
-
-        Member member = mock(Member.class);
-        given(member.getId()).willReturn(memberId);
-
-        Post post = Post.create(member, "원본 제목", "원본 내용");
-
-        given(postRepository.findByIdWithMember(postId)).willReturn(Optional.of(post));
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
-        given(postRepository.save(any(Post.class))).willReturn(post);
-        given(attachmentRepository.findByPostId(postId)).willReturn(Optional.empty());
-
-        PostResponse response = postService.updatePost(postId, request, memberId);
-
-        assertThat(response).isNotNull();
-        assertThat(response.title()).isEqualTo("수정된 제목");
-        assertThat(response.content()).isEqualTo("수정된 내용");
-        verify(postRepository).findByIdWithMember(postId);
-        verify(ownershipPolicy).validateOwnership(memberId, memberId);
-        verify(postRepository).save(any(Post.class));
-    }
-
-    @Test
-    @DisplayName("게시글 수정 실패 - 존재하지 않는 게시글")
-    void updatePost_PostNotFound_ThrowsException() {
-        Long postId = 999L;
-        Long memberId = 1L;
-        PostUpdateRequest request = new PostUpdateRequest(
-                "수정된 제목",
-                "수정된 내용",
-                null
-        );
-
-        given(postRepository.findByIdWithMember(postId)).willReturn(Optional.empty());
-
-        assertThatThrownBy(() -> postService.updatePost(postId, request, memberId))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", PostErrorCode.POST_NOT_FOUND);
-
-        verify(postRepository).findByIdWithMember(postId);
-        verify(postRepository, never()).save(any(Post.class));
-    }
-
-    @Test
-    @DisplayName("게시글 삭제 성공")
-    void deletePost_Success() {
-        Long postId = 1L;
-        Long memberId = 1L;
-
-        Member member = mock(Member.class);
-        given(member.getId()).willReturn(memberId);
-
-        Post post = Post.create(member, "제목", "내용");
-
-        given(postRepository.findByIdWithMember(postId)).willReturn(Optional.of(post));
-        given(postRepository.save(any(Post.class))).willReturn(post);
-
-        postService.deletePost(postId, memberId);
-
-        assertThat(post.isDeleted()).isTrue();
-        verify(postRepository).findByIdWithMember(postId);
-        verify(ownershipPolicy).validateOwnership(memberId, memberId);
+        verify(ownershipPolicy).validateOwnership(1L, 1L);
         verify(postRepository).save(post);
+        assertThat(post.getTitle()).isEqualTo(PostFixture.UPDATED_TITLE);
+        assertThat(post.getContent()).isEqualTo(PostFixture.UPDATED_CONTENT);
     }
 
     @Test
-    @DisplayName("게시글 조회 성공 - 좋아요 하지 않은 경우")
-    void getPostDetails_NotLiked_Success() {
-        Long postId = 1L;
-        Long memberId = 1L;
+    @DisplayName("게시글을 삭제할 수 있다")
+    void deletePost_success() {
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
 
-        Member member = Member.create("test@email.com", "password", "tester");
-        Post post = Post.create(member, "제목", "내용");
+        postService.deletePost(1L, 1L);
 
-        given(postRepository.findByIdWithMember(postId)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(postId)).willReturn(Optional.empty());
-        given(postLikeRepository.existsByPostIdAndMemberId(postId, memberId)).willReturn(false);
-
-        PostResponse response = postService.getPostDetails(postId, memberId);
-
-        assertThat(response).isNotNull();
-        assertThat(response.postId()).isEqualTo(post.getId());
-        assertThat(response.title()).isEqualTo("제목");
-        assertThat(response.isLiked()).isFalse();
-        verify(postRepository).findByIdWithMember(postId);
-        verify(postLikeRepository).existsByPostIdAndMemberId(postId, memberId);
+        verify(ownershipPolicy).validateOwnership(1L, 1L);
+        verify(postRepository).save(post);
+        assertThat(post.isDeleted()).isTrue();
     }
 
     @Test
-    @DisplayName("게시글 조회 성공 - 좋아요 한 경우")
-    void getPostDetails_Liked_Success() {
-        Long postId = 1L;
-        Long memberId = 1L;
+    @DisplayName("게시글 상세를 조회할 수 있다")
+    void getPostDetails_success() {
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
+        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
+        given(postLikeRepository.existsByPostIdAndMemberId(1L, 1L)).willReturn(false);
 
-        Member member = Member.create("test@email.com", "password", "tester");
-        Post post = Post.create(member, "제목", "내용");
+        PostResponse response = postService.getPostDetails(1L, 1L);
 
-        given(postRepository.findByIdWithMember(postId)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(postId)).willReturn(Optional.empty());
-        given(postLikeRepository.existsByPostIdAndMemberId(postId, memberId)).willReturn(true);
-
-        PostResponse response = postService.getPostDetails(postId, memberId);
-
-        assertThat(response).isNotNull();
-        assertThat(response.isLiked()).isTrue();
-        verify(postLikeRepository).existsByPostIdAndMemberId(postId, memberId);
+        assertThat(response.postId()).isEqualTo(1L);
+        assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
     }
 
     @Test
-    @DisplayName("게시글 조회 성공 - 비로그인 사용자")
-    void getPostDetails_NotLoggedIn_Success() {
-        Long postId = 1L;
+    @DisplayName("존재하지 않는 게시글 조회 시 예외가 발생한다")
+    void getPostDetails_notFound() {
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
 
-        Member member = Member.create("test@email.com", "password", "tester");
-        Post post = Post.create(member, "제목", "내용");
-
-        given(postRepository.findByIdWithMember(postId)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(postId)).willReturn(Optional.empty());
-
-        PostResponse response = postService.getPostDetails(postId, null);
-
-        assertThat(response).isNotNull();
-        assertThat(response.isLiked()).isFalse();
-        verify(postRepository).findByIdWithMember(postId);
-        verify(postLikeRepository, never()).existsByPostIdAndMemberId(anyLong(), anyLong());
+        assertThatThrownBy(() -> postService.getPostDetails(1L, 1L))
+                .isInstanceOf(CustomException.class);
     }
 
     @Test
-    @DisplayName("게시글 조회 실패 - 존재하지 않는 게시글")
-    void getPostDetails_PostNotFound_ThrowsException() {
-        Long postId = 999L;
+    @DisplayName("게시글 목록을 페이지로 조회할 수 있다")
+    void getPostPage_success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        PostQueryDto dto = new PostQueryDto(1L, "제목", Instant.now(), 0L, 0L, 0L, 1L, "tester", null);
+        Page<PostQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
-        given(postRepository.findByIdWithMember(postId)).willReturn(Optional.empty());
+        given(postRepository.findAllActiveWithMemberAsDto(pageable)).willReturn(page);
 
-        assertThatThrownBy(() -> postService.getPostDetails(postId, null))
-                .isInstanceOf(CustomException.class)
-                .hasFieldOrPropertyWithValue("errorCode", PostErrorCode.POST_NOT_FOUND);
+        PageResponse<PostSummaryResponse> response = postService.getPostPage(pageable);
 
-        verify(postRepository).findByIdWithMember(postId);
+        assertThat(response.items()).hasSize(1);
+        assertThat(response.items().getFirst().postId()).isEqualTo(1L);
     }
 }

@@ -2,34 +2,13 @@ package com.kakaotechbootcamp.community.infra.redis.adapter;
 
 import java.time.Duration;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
-public class RedisService {
-    private final RedisTemplate<String, String> redisTemplate;
+public interface RedisService {
 
-    /**
-     * 값 저장
-     */
-    public void save(String key, String value, Duration ttl){
-        redisTemplate.opsForValue().set(key, value, ttl);
-    }
+    void save(String key, String value,  Duration ttl);
 
-    /**
-     * 값 조회
-     */
-    public Optional<String> find(String key){
-        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
-    }
+    Optional<String> find(java.lang.String key);
 
-    /**
-     * 값 삭제
-     */
-    public void delete(String key){
-        redisTemplate.delete(key);
-    }
+    void delete(String key);
 
 }
