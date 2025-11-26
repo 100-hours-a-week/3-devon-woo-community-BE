@@ -2,28 +2,36 @@ package com.kakaotechbootcamp.community.application.post.controller;
 
 import com.kakaotechbootcamp.community.application.common.dto.request.PageSortRequest;
 import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
+import com.kakaotechbootcamp.community.application.post.dto.ViewContext;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostCreateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostResponse;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostSummaryResponse;
-import com.kakaotechbootcamp.community.application.post.dto.ViewContext;
 import com.kakaotechbootcamp.community.application.post.service.PostLikeService;
 import com.kakaotechbootcamp.community.application.post.service.PostService;
 import com.kakaotechbootcamp.community.application.post.service.PostViewService;
 import com.kakaotechbootcamp.community.application.security.annotation.CurrentUser;
-import jakarta.servlet.http.HttpServletRequest;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import com.kakaotechbootcamp.community.common.swagger.CustomExceptionDescription;
 import com.kakaotechbootcamp.community.common.swagger.SwaggerResponseDescription;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Post", description = "게시글 관련 API")
 @RestController

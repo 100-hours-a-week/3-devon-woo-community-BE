@@ -2,16 +2,15 @@ package com.kakaotechbootcamp.community.config.annotation;
 
 import com.kakaotechbootcamp.community.config.JpaAuditingTestConfig;
 import com.kakaotechbootcamp.community.domain.config.QueryDslConfig;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
  * JPA 리포지토리 슬라이스 테스트를 위한 메타 어노테이션입니다.

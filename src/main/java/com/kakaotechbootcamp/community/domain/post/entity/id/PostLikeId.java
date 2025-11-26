@@ -1,10 +1,13 @@
 package com.kakaotechbootcamp.community.domain.post.entity.id;
 
 import jakarta.persistence.Embeddable;
-import lombok.*;
-
 import java.io.Serializable;
 import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter

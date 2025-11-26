@@ -2,12 +2,11 @@ package com.kakaotechbootcamp.community.infra.image.cloudinary;
 
 import com.kakaotechbootcamp.community.infra.image.ImageSignature;
 import com.kakaotechbootcamp.community.infra.image.ImageStorageService;
+import java.util.Map;
+import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 @Service
 public class CloudinaryImageStorageService implements ImageStorageService {

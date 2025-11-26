@@ -13,20 +13,18 @@ import com.kakaotechbootcamp.community.application.member.dto.request.MemberUpda
 import com.kakaotechbootcamp.community.application.member.dto.request.PasswordUpdateRequest;
 import com.kakaotechbootcamp.community.config.TestCurrentUserContext;
 import com.kakaotechbootcamp.community.config.annotation.IntegrationTest;
-import com.kakaotechbootcamp.community.config.TestSecurityConfig;
 import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.assertj.core.api.Assertions;
 
 @IntegrationTest
 class MemberIntegrationTest {

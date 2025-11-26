@@ -1,9 +1,8 @@
 package com.kakaotechbootcamp.community.application.common.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.data.domain.Page;
-
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Schema(description = "페이징 응답 공통 DTO")
 public record PageResponse<T>(

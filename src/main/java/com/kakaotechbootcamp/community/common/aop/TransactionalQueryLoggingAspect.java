@@ -2,6 +2,7 @@ package com.kakaotechbootcamp.community.common.aop;
 
 
 import jakarta.persistence.EntityManager;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,8 +12,6 @@ import org.hibernate.stat.Statistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 @Aspect
 @Component

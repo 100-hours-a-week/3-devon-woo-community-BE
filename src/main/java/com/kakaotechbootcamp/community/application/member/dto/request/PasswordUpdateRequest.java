@@ -1,11 +1,13 @@
 package com.kakaotechbootcamp.community.application.member.dto.request;
 
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_PASSWORD_FORMAT;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_FIELD;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_PASSWORD;
+import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.PASSWORD_MIN_LENGTH;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
-import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.*;
-import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.PASSWORD_MIN_LENGTH;
 
 @Schema(description = "비밀번호 변경 요청 DTO")
 public record PasswordUpdateRequest(

@@ -3,14 +3,13 @@ package com.kakaotechbootcamp.community.application.media.controller;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;
 import com.kakaotechbootcamp.community.infra.image.ImageSignature;
 import com.kakaotechbootcamp.community.infra.image.ImageStorageService;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/images")

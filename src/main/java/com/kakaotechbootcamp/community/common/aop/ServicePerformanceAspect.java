@@ -1,5 +1,6 @@
 package com.kakaotechbootcamp.community.common.aop;
 
+import java.util.concurrent.atomic.AtomicLong;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -7,8 +8,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 @Aspect
 @Component

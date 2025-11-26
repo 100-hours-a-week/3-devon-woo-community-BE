@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.kakaotechbootcamp.community.application.post.dto.ViewContext;
 import com.kakaotechbootcamp.community.config.annotation.UnitTest;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @UnitTest

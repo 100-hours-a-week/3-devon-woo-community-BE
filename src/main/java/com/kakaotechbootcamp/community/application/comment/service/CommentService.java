@@ -4,11 +4,11 @@ import com.kakaotechbootcamp.community.application.comment.dto.request.CommentCr
 import com.kakaotechbootcamp.community.application.comment.dto.request.CommentUpdateRequest;
 import com.kakaotechbootcamp.community.application.comment.dto.response.CommentResponse;
 import com.kakaotechbootcamp.community.application.common.dto.response.PageResponse;
-import com.kakaotechbootcamp.community.domain.common.policy.OwnershipPolicy;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.CommentErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.PostErrorCode;
+import com.kakaotechbootcamp.community.domain.common.policy.OwnershipPolicy;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import com.kakaotechbootcamp.community.domain.post.dto.CommentQueryDto;
@@ -16,13 +16,12 @@ import com.kakaotechbootcamp.community.domain.post.entity.Comment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.CommentRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

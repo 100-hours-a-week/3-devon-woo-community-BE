@@ -1,11 +1,10 @@
 package com.kakaotechbootcamp.community.application.security.util;
 
 import com.kakaotechbootcamp.community.application.security.config.CorsProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.net.URI;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component

@@ -5,10 +5,9 @@ import com.kakaotechbootcamp.community.common.exception.code.CommentErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.CommonErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.PostErrorCode;
-import lombok.Getter;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+import lombok.Getter;
 
 /**
  * Swagger API 응답 설명을 위한 Enum

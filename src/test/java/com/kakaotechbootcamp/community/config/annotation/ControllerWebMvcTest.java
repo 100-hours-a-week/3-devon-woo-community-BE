@@ -1,15 +1,14 @@
 package com.kakaotechbootcamp.community.config.annotation;
 
 import com.kakaotechbootcamp.community.config.TestSecurityConfig;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.AliasFor;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.AliasFor;
 
 /**
  * WebMvc 슬라이스 테스트에서 반복되는 보안 관련 설정을 묶어둔 메타 어노테이션

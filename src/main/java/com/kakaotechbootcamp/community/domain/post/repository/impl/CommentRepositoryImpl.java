@@ -1,5 +1,8 @@
 package com.kakaotechbootcamp.community.domain.post.repository.impl;
 
+import static com.kakaotechbootcamp.community.domain.member.entity.QMember.member;
+import static com.kakaotechbootcamp.community.domain.post.entity.QComment.comment;
+
 import com.kakaotechbootcamp.community.domain.common.repository.QueryDslOrderUtil;
 import com.kakaotechbootcamp.community.domain.post.dto.CommentQueryDto;
 import com.kakaotechbootcamp.community.domain.post.repository.CommentQueryRepository;
@@ -8,19 +11,15 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.kakaotechbootcamp.community.domain.member.entity.QMember.member;
-import static com.kakaotechbootcamp.community.domain.post.entity.QComment.comment;
 
 @Repository
 @RequiredArgsConstructor

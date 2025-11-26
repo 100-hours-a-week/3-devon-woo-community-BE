@@ -2,8 +2,6 @@ package com.kakaotechbootcamp.community.application.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -15,10 +13,10 @@ import com.kakaotechbootcamp.community.application.member.dto.response.MemberUpd
 import com.kakaotechbootcamp.community.application.member.validator.MemberValidator;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.config.annotation.UnitTest;
+import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
-import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

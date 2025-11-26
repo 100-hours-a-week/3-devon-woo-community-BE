@@ -5,7 +5,6 @@ import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.post.dto.CommentQueryDto;
 import com.kakaotechbootcamp.community.domain.post.entity.Comment;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 
 @Schema(description = "댓글 응답 DTO")

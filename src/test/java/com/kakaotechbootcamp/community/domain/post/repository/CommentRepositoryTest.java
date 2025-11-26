@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.kakaotechbootcamp.community.config.annotation.RepositoryJpaTest;
 import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
-import com.kakaotechbootcamp.community.domain.member.MemberFixture;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
 import com.kakaotechbootcamp.community.domain.post.CommentFixture;
 import com.kakaotechbootcamp.community.domain.post.PostFixture;

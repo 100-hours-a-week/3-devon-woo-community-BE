@@ -3,10 +3,8 @@ package com.kakaotechbootcamp.community.domain.member.repository;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;
 import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 

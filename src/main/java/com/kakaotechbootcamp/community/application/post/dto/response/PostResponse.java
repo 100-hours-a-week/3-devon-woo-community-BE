@@ -5,7 +5,6 @@ import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.post.entity.Attachment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 
 @Schema(description = "게시글 응답 DTO")

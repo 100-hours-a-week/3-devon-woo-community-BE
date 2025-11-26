@@ -2,9 +2,9 @@ package com.kakaotechbootcamp.community.fake;
 
 import com.kakaotechbootcamp.community.infra.redis.adapter.RedisService;
 import java.time.Duration;
-import java.util.Optional;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FakeRedisService implements RedisService {

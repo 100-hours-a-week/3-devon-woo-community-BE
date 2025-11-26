@@ -1,8 +1,8 @@
 package com.kakaotechbootcamp.community.application.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kakaotechbootcamp.community.application.security.dto.user.CustomUserDetails;
 import com.kakaotechbootcamp.community.application.security.dto.response.LoginResponse;
+import com.kakaotechbootcamp.community.application.security.dto.user.CustomUserDetails;
 import com.kakaotechbootcamp.community.application.security.util.CookieProvider;
 import com.kakaotechbootcamp.community.application.security.util.JwtTokenProvider;
 import com.kakaotechbootcamp.community.common.dto.api.ApiResponse;

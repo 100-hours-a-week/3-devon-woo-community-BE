@@ -1,8 +1,8 @@
 package com.kakaotechbootcamp.community.application.security.service;
 
-import com.kakaotechbootcamp.community.application.security.dto.user.CustomOAuthUserDetails;
 import com.kakaotechbootcamp.community.application.security.dto.oauth.OAuthUserInfo;
 import com.kakaotechbootcamp.community.application.security.dto.oauth.OAuthUserInfoFactory;
+import com.kakaotechbootcamp.community.application.security.dto.user.CustomOAuthUserDetails;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.oauth.OAuthMember;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;

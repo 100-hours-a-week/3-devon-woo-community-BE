@@ -1,11 +1,10 @@
 package com.kakaotechbootcamp.community.domain.post.repository;
 
 import com.kakaotechbootcamp.community.domain.post.dto.CommentQueryDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface CommentQueryRepository {
 

@@ -1,12 +1,13 @@
 package com.kakaotechbootcamp.community.application.post.dto.request;
 
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_IMAGE_URL;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_POST_CONTENT;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_POST_TITLE;
+import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.URL_PATTERN;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-
-import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.*;
-import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.URL_PATTERN;
 
 @Schema(description = "게시글 수정 요청 DTO")
 public record PostUpdateRequest(

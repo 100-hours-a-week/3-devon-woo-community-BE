@@ -2,7 +2,6 @@ package com.kakaotechbootcamp.community.domain.member.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.kakaotechbootcamp.community.config.annotation.IntegrationTest;
 import com.kakaotechbootcamp.community.config.annotation.RepositoryJpaTest;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.entity.MemberStatus;

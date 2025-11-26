@@ -3,7 +3,6 @@ package com.kakaotechbootcamp.community.application.post.dto.response;
 import com.kakaotechbootcamp.community.application.member.dto.response.MemberResponse;
 import com.kakaotechbootcamp.community.domain.post.dto.PostQueryDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 
 @Schema(description = "게시글 요약 응답 DTO")

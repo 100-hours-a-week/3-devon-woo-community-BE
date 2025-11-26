@@ -1,12 +1,11 @@
 package com.kakaotechbootcamp.community.application.common.dto.request;
 
 import com.kakaotechbootcamp.community.application.common.constant.PaginationConstants;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 페이징 및 정렬을 위한 공통 요청 DTO

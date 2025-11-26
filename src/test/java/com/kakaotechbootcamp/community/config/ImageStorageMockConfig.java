@@ -1,7 +1,6 @@
 package com.kakaotechbootcamp.community.config;
 
 import com.kakaotechbootcamp.community.fake.FakeImageStorageService;
-import com.kakaotechbootcamp.community.infra.image.ImageSignature;
 import com.kakaotechbootcamp.community.infra.image.ImageStorageService;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

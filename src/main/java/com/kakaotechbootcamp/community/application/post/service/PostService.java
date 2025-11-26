@@ -5,26 +5,25 @@ import com.kakaotechbootcamp.community.application.post.dto.request.PostCreateRe
 import com.kakaotechbootcamp.community.application.post.dto.request.PostUpdateRequest;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostResponse;
 import com.kakaotechbootcamp.community.application.post.dto.response.PostSummaryResponse;
-import com.kakaotechbootcamp.community.domain.post.dto.PostQueryDto;
-import com.kakaotechbootcamp.community.domain.common.policy.OwnershipPolicy;
 import com.kakaotechbootcamp.community.common.exception.CustomException;
 import com.kakaotechbootcamp.community.common.exception.code.MemberErrorCode;
 import com.kakaotechbootcamp.community.common.exception.code.PostErrorCode;
+import com.kakaotechbootcamp.community.domain.common.policy.OwnershipPolicy;
 import com.kakaotechbootcamp.community.domain.member.entity.Member;
 import com.kakaotechbootcamp.community.domain.member.repository.MemberRepository;
+import com.kakaotechbootcamp.community.domain.post.dto.PostQueryDto;
 import com.kakaotechbootcamp.community.domain.post.entity.Attachment;
 import com.kakaotechbootcamp.community.domain.post.entity.Post;
 import com.kakaotechbootcamp.community.domain.post.repository.AttachmentRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostLikeRepository;
 import com.kakaotechbootcamp.community.domain.post.repository.PostRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

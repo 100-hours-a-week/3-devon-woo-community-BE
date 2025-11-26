@@ -1,13 +1,19 @@
 package com.kakaotechbootcamp.community.application.member.dto.request;
 
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_EMAIL_FORMAT;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_NICKNAME;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_PASSWORD_FORMAT;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.INVALID_PROFILE_IMAGE;
+import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.REQUIRED_FIELD;
+import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.NICKNAME_MAX_LENGTH;
+import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.PASSWORD_MIN_LENGTH;
+import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.URL_PATTERN;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-
-import static com.kakaotechbootcamp.community.common.validation.ValidationMessages.*;
-import static com.kakaotechbootcamp.community.common.validation.ValidationPatterns.*;
 
 @Schema(description = "회원가입 요청 DTO")
 public record SignupRequest(
