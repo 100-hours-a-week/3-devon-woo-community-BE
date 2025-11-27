@@ -42,6 +42,6 @@ public class OAuthLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
     private String determineTargetUrl(HttpServletRequest request) {
         return CookieProvider.getRedirectUriCookie(request)
-                .orElse("http://localhost:3000");
+                .orElse("http://localhost:3000") + "/oauth/callback";
     }
 }
