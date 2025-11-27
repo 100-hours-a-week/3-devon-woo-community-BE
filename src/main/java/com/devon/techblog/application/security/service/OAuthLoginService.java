@@ -44,7 +44,7 @@ public class OAuthLoginService extends DefaultOAuth2UserService {
 
     private OAuthMember registerUser(OAuthUserInfo userInfo) {
         String email = userInfo.getEmail();
-        String name = userInfo.getName();
+        String name = userInfo.getName().substring(0,5);  // todo: 추후 닉네임 자동 생성기로 변경
         String randomPassword = passwordEncoder.encode("password");
 
         Member member = Member.create(email, randomPassword, name);
