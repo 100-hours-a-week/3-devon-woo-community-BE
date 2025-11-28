@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 echo "Husky pre-push: running tests and coverage verification..."
 
@@ -13,4 +13,3 @@ fi
 
 echo "✅ pre-push passed: tests and coverage OK."
 exit 0
-
