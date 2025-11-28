@@ -1,15 +1,17 @@
 #!/usr/bin/env sh
 
-echo "Husky pre-push: running tests and coverage verification..."
+echo "Husky pre-push 훅이 실행됩니다."
+echo "✅ 전체 테스트 및 커버리지 검증을 수행합니다..."
 
 ./gradlew test jacocoTestCoverageVerification
 status=$?
 
 if [ $status -ne 0 ]; then
-  echo "❌ pre-push failed: tests or coverage check failed."
-  echo "   Fix failing tests or meet coverage (>= 70%) before pushing."
+  echo "❌ pre-push 훅 실패: 테스트 또는 커버리지 검증에 실패했습니다."
+  echo "   - 실패한 테스트를 수정하거나,"
+  echo "   - 커버리지 기준을 만족한 뒤 다시 푸시해주세요."
   exit $status
 fi
 
-echo "✅ pre-push passed: tests and coverage OK."
+echo "✅ pre-push 훅 통과: 테스트와 커버리지가 기준을 만족합니다."
 exit 0
