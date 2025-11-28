@@ -1,46 +1,6 @@
 #!/usr/bin/env sh
 
 echo "🐶 Husky pre-commit 훅이 실행됩니다."
-echo "🔍 변경된 Java 파일 기준으로 포매터(Spotless)를 실행합니다..."
-
-# 저장소 루트 경로
-REPO_ROOT=$(git rev-parse --show-toplevel)
-
-# 커밋에 포함된(staged) Java 파일 목록
-CHANGED_JAVA_FILES=$(git diff --cached --name-only -- '*.java')
-
-if [ -z "$CHANGED_JAVA_FILES" ]; then
-  echo "✅ 변경된 Java 파일이 없어 포매터를 건너뜁니다."
-  exit 0
-fi
-
-# Spotless에 넘길 파일 목록을 콤마(,)로 이어 붙인 절대 경로로 생성
-SPOTLESS_FILES=""
-for file in $CHANGED_JAVA_FILES; do
-  abs_path="$REPO_ROOT/$file"
-  if [ -z "$SPOTLESS_FILES" ]; then
-    SPOTLESS_FILES="$abs_path"
-  else
-    SPOTLESS_FILES="$SPOTLESS_FILES,$abs_path"
-  fi
-done
-
-echo "📁 포매터 대상 파일:"
-echo "$CHANGED_JAVA_FILES"
-
-# 변경된 파일에 대해서만 Spotless 포매터 적용
-./gradlew spotlessApply -PspotlessFiles="$SPOTLESS_FILES"
-status=$?
-
-if [ $status -ne 0 ]; then
-  echo "❌ pre-commit 훅 실패: Spotless 포매터 실행에 실패했습니다."
-  exit $status
-fi
-
-# 포매터로 수정된 내용을 다시 stage 에 반영
-git add $CHANGED_JAVA_FILES
-
-echo "✅ Java 코드 포맷 정리 완료."
 echo "🧪 단위 테스트(unitTest)를 실행합니다..."
 
 ./gradlew unitTest
@@ -52,4 +12,4 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
-echo "✅ pre-commit 훅 통과: 포매터 및 unitTest 모두 성공했습니다."
+echo "✅ pre-commit 훅 통과: unitTest 성공."

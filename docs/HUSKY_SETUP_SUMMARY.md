@@ -28,16 +28,9 @@
 
 - 파일: `.husky/pre-commit`
 - 내용 (요약):
-  - 변경된(staged) Java 파일에 대해서만 Spotless 포매터를 실행.
-    - `git diff --cached --name-only -- '*.java'` 로 커밋에 포함된 Java 파일만 수집.
-    - 파일이 없으면 포매터를 건너뛰고 바로 통과.
-    - 있으면 `./gradlew spotlessApply -PspotlessFiles=<파일들>` 로 특정 파일만 포맷.
-    - 포맷 이후 `git add` 로 다시 stage 에 반영.
-  - 포맷 이후, 빠른 단위 테스트 태스크(`unitTest`) 실행.
+  - 빠른 단위 테스트 태스크(`unitTest`) 실행.
     - `./gradlew unitTest` 가 실패하면 커밋을 차단.
 - 목적:
-  - **커밋 직전에 Java 코드 스타일을 자동으로 정리**하고,
-  - 변경된 파일만 포매팅하여 속도를 유지하면서,
   - 태그 기반 `unitTest` 를 통해 **기본적인 테스트를 통과한 변경만 커밋**되도록 보장.
 
 ### 2.2 `prepare-commit-msg` (커밋 메시지 컨벤션 강제)
