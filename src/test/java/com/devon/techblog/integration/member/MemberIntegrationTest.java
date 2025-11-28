@@ -25,8 +25,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
+@Transactional
 class MemberIntegrationTest {
 
     @Autowired
@@ -45,7 +47,6 @@ class MemberIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        memberRepository.deleteAll();
         savedMember = memberRepository.save(MemberFixture.create(
                 "tester@example.com",
                 "currentPassword!",
@@ -56,7 +57,6 @@ class MemberIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        memberRepository.deleteAll();
         currentUserContext.clear();
     }
 

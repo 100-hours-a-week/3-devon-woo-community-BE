@@ -14,8 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
+@Transactional
 class MemberSqlIntegrationTest {
 
     @Autowired
@@ -29,7 +31,6 @@ class MemberSqlIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        memberRepository.deleteAll();
         currentUserContext.clear();
     }
 

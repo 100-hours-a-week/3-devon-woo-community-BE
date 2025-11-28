@@ -39,6 +39,12 @@ out/
 *.csv
 .env
 
+### NodeJs ###
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
 ### Local Environment ###
 local.properties
 .DS_Store
@@ -53,3 +59,4 @@ logs/
 ### spring app env ###
 *application-local.yml
 *.env
+

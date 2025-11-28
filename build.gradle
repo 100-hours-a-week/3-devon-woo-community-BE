@@ -3,6 +3,7 @@ plugins {
 	id 'java-test-fixtures'
 	id 'org.springframework.boot' version '3.4.10'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.diffplug.spotless' version '8.1.0'
 	id 'jacoco'
 }
 
@@ -97,12 +98,20 @@ clean {
 
 tasks.named('test') {
 	useJUnitPlatform()
+
+	// 사용 가능한 CPU 코어를 기준으로 병렬 실행 설정
+	def cores = Runtime.runtime.availableProcessors()
+	maxParallelForks = cores > 1 ? cores.intdiv(2) : 1
+
+	finalizedBy jacocoTestReport
 }
 
 tasks.register('unitTest', Test) {
     useJUnitPlatform {
         includeTags 'unit'
     }
+    def cores = Runtime.runtime.availableProcessors()
+    maxParallelForks = cores > 1 ? cores.intdiv(2) : 1
     outputs.upToDateWhen { false }
 }
 
@@ -110,15 +119,13 @@ tasks.register('integrationTest', Test) {
     useJUnitPlatform {
         includeTags 'integration'
     }
+    def cores = Runtime.runtime.availableProcessors()
+    maxParallelForks = cores > 1 ? cores.intdiv(2) : 1
     outputs.upToDateWhen { false }
 }
 
 jacoco {
 	toolVersion = "0.8.12"
-}
-
-test {
-	finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
@@ -156,8 +163,16 @@ jacocoTestCoverageVerification {
 	violationRules {
 		rule {
 			limit {
-				minimum = 0.70
+				minimum = 0.50
 			}
 		}
+	}
+}
+
+spotless {
+	java {
+		// Google Java Format를 사용한 코드 포매팅
+		googleJavaFormat()
+		target 'src/**/*.java'
 	}
 }

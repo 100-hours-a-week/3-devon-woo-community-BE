@@ -16,7 +16,7 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: false
-        generate_statistics: true
+        generate_statistics: false
         hbm2ddl:
           auto: create-drop
           jdbc_metadata_extraction_strategy: individually

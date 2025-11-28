@@ -9,15 +9,16 @@ import com.devon.techblog.config.annotation.IntegrationTest;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
+@Transactional
 class SignupIntegrationTest {
 
     @Autowired
@@ -31,12 +32,7 @@ class SignupIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        memberRepository.deleteAll();
-    }
-
-    @AfterEach
-    void tearDown() {
-        memberRepository.deleteAll();
+        // 각 테스트는 트랜잭션 롤백 덕분에 독립적으로 수행됨
     }
 
     @Test

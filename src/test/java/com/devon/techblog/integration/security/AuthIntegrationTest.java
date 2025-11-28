@@ -11,15 +11,16 @@ import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.fake.FakeJwtTokenProvider;
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
+@Transactional
 @Import(FakeJwtTokenProvider.class)
 class AuthIntegrationTest {
 
@@ -38,7 +39,6 @@ class AuthIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        memberRepository.deleteAll();
         savedMember = memberRepository.save(MemberFixture.create(
                 "tester@example.com",
                 "password123",
@@ -46,11 +46,6 @@ class AuthIntegrationTest {
         ));
         refreshToken = jwtTokenProvider.generateRefreshToken(savedMember.getId());
         fakeJwtTokenProvider = new FakeJwtTokenProvider();
-    }
-
-    @AfterEach
-    void tearDown() {
-        memberRepository.deleteAll();
     }
 
     @Test
