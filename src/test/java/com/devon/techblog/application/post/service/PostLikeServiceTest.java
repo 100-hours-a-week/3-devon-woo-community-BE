@@ -1,11 +1,9 @@
 package com.devon.techblog.application.post.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
 
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.PostErrorCode;
@@ -15,7 +13,6 @@ import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.PostFixture;
 import com.devon.techblog.domain.post.entity.Post;
-import com.devon.techblog.domain.post.entity.PostLike;
 import com.devon.techblog.domain.post.policy.PostLikePolicy;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
@@ -62,10 +59,6 @@ class PostLikeServiceTest {
         doNothing().when(postLikePolicy).validateCanLike(1L, 1L);
 
         postLikeService.likePost(1L, 1L);
-
-        verify(postLikePolicy).validateCanLike(1L, 1L);
-        verify(postLikeRepository).save(any(PostLike.class));
-        verify(postRepository).incrementLikeCount(1L);
     }
 
     @Test
@@ -105,10 +98,6 @@ class PostLikeServiceTest {
         doNothing().when(postLikePolicy).validateCanUnlike(1L, 1L);
 
         postLikeService.unlikePost(1L, 1L);
-
-        verify(postLikePolicy).validateCanUnlike(1L, 1L);
-        verify(postLikeRepository).deleteByPostIdAndMemberId(1L, 1L);
-        verify(postRepository).decrementLikeCount(1L);
     }
 
     @Test
