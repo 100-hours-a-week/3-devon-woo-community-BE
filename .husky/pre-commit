@@ -40,4 +40,16 @@ fi
 # 포매터로 수정된 내용을 다시 stage 에 반영
 git add $CHANGED_JAVA_FILES
 
-echo "✅ pre-commit 훅 통과: 변경된 Java 파일 포맷 정리 완료."
+echo "✅ Java 코드 포맷 정리 완료."
+echo "🧪 단위 테스트(unitTest)를 실행합니다..."
+
+./gradlew unitTest
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo "❌ pre-commit 훅 실패: unitTest 실행에 실패했습니다."
+  echo "   실패한 단위 테스트를 수정한 뒤 다시 커밋해주세요."
+  exit $status
+fi
+
+echo "✅ pre-commit 훅 통과: 포매터 및 unitTest 모두 성공했습니다."
