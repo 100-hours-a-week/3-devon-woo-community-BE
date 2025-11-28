@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+echo "Husky pre-push: running tests and coverage verification..."
+
+./gradlew test jacocoTestCoverageVerification
+status=$?
+
+if [ $status -ne 0 ]; then
+  echo "❌ pre-push failed: tests or coverage check failed."
+  echo "   Fix failing tests or meet coverage (>= 70%) before pushing."
+  exit $status
+fi
+
+echo "✅ pre-push passed: tests and coverage OK."
+exit 0
+
