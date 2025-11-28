@@ -31,8 +31,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
+@Transactional
 class CommentIntegrationTest {
 
     @Autowired
@@ -59,9 +61,6 @@ class CommentIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        commentRepository.deleteAll();
-        postRepository.deleteAll();
-        memberRepository.deleteAll();
         savedMember = memberRepository.save(MemberFixture.create(
                 "tester@example.com",
                 "password123",
@@ -74,9 +73,6 @@ class CommentIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        commentRepository.deleteAll();
-        postRepository.deleteAll();
-        memberRepository.deleteAll();
         currentUserContext.clear();
     }
 
