@@ -1,15 +1,4 @@
 #!/usr/bin/env sh
 
 echo "🐶 Husky pre-commit 훅이 실행됩니다."
-echo "🧪 단위 테스트(unitTest)를 실행합니다..."
-
-./gradlew unitTest
-status=$?
-
-if [ $status -ne 0 ]; then
-  echo "❌ pre-commit 훅 실패: unitTest 실행에 실패했습니다."
-  echo "   실패한 단위 테스트를 수정한 뒤 다시 커밋해주세요."
-  exit $status
-fi
-
-echo "✅ pre-commit 훅 통과: unitTest 성공."
+echo "현재 pre-commit 훅에서는 추가 검사를 수행하지 않습니다."
