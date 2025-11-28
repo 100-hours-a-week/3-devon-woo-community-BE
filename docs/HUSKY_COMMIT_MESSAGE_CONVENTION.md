@@ -7,10 +7,19 @@
 
 ## 1. 목표
 
-- 커밋 메시지 첫 줄에 **정해진 타입 + 이모지** 포맷을 강제.
-- 예시 포맷:
-  - `Feat ✨` / `Fix 🐛` / `Style ⭐️` / `Refactor ♻️` / `File 📁`
-  - `Test ✅` / `Docs 📝` / `Remove 🔥` / `Ci 💚` / `Release 🔖` / `Chore 🔧`
+- 커밋 메시지 첫 줄에 **정해진 소문자 타입 + 이모지** 포맷을 강제.
+- 사용 가능한 타입과 이모지:
+  - `✨ feat`
+  - `🐛 fix`
+  - `⚡ perf`
+  - `♻️ refactor`
+  - `🧪 test`
+  - `📝 docs`
+  - `🎨 style`
+  - `🔧 chore`
+  - `🚀 delopy`
+  - `⏪ revert`   
+
 - `Merge`, `Revert` 등 Git 기본 메시지는 예외 처리.
 - Mac/Windows 공통으로 동작 (Git Bash / WSL / 유닉스 셸 가정).
 
@@ -49,25 +58,12 @@ touch .husky/prepare-commit-msg
 
 ## 4. 커밋 메시지 포맷 강제 스크립트 예시
 
-아래는 `prepare-commit-msg` 훅에 넣을 예시 코드입니다.
+아래는 `prepare-commit-msg` 훅에 넣을 예시 코드입니다.  
+타입은 내부적으로 **소문자**로 정규화하여 처리합니다.
 
 ```bash
 #!/usr/bin/env bash
 . "$(dirname -- "$0")/_/husky.sh"
-
-emojies=(
-  "Feat ✨"
-  "Fix 🐛"
-  "Style ⭐️"
-  "Refactor ♻️"
-  "File 📁"
-  "Test ✅"
-  "Docs 📝"
-  "Remove 🔥"
-  "Ci 💚"
-  "Release 🔖"
-  "Chore 🔧"
-)
 
 COMMIT_MESSAGE_FILE_PATH=$1
 first_line=$(head -n1 "$COMMIT_MESSAGE_FILE_PATH")
@@ -79,28 +75,36 @@ if [[ $first_line =~ ^(Merge|Revert|Amend|Reset|Rebase|Tag) ]]; then
 fi
 
 type=$(echo "$first_line" | grep -o "^[A-Za-z]*")
-start_case_type="$(echo "$type" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')"
+normalized_type="$(echo "$type" | tr 'A-Z' 'a-z')"
 
 emoji=""
-for entry in "${emojies[@]}"; do
-  key="${entry%% *}"
-  value="${entry#* }"
-  if [[ "$start_case_type" == "$key" ]]; then
-    emoji=$value
-    break
-  fi
-done
+case "$normalized_type" in
+  feat)   emoji="✨" ;;
+  fix)    emoji="🐛" ;;
+  perf)   emoji="⚡" ;;
+  refactor) emoji="♻️" ;;
+  test)   emoji="🧪" ;;
+  docs)   emoji="📝" ;;
+  style)  emoji="🎨" ;;
+  chore)  emoji="🔧" ;;
+  hotfix) emoji="🚑" ;;
+  build)  emoji="🏗️" ;;
+  infra)  emoji="🏭" ;;
+  env)    emoji="🌱" ;;
+  *)      emoji="" ;;
+esac
 
 # 유효하지 않은 타입이면 커밋을 막고 가이드를 출력
-if [[ -z "$emoji" ]]; then
+if [[ -z "$emoji" || -z "$normalized_type" ]]; then
   echo "⛔ 올바르지 않은 커밋 타입입니다."
-  echo "   사용 가능한 타입: Feat, Fix, Style, Refactor, File, Test, Docs, Remove, Ci, Release, Chore"
-  echo "   예) Feat: 기능 추가 설명"
+  echo "   사용 가능한 타입:"
+  echo "     feat, fix, perf, refactor, test, docs, style, chore, delopy, revert"
+  echo "   예) feat: 기능 추가 설명"
   exit 1
 fi
 
-# 첫 번째 단어를 '이모지 + 타입(대소문자 정리)' 로 변환
-first_line=$(echo "$first_line" | sed "s/^$type/$emoji $start_case_type/")
+# 첫 번째 단어를 '이모지 + 타입(소문자)' 로 변환
+first_line=$(echo "$first_line" | sed "s/^$type/$emoji $normalized_type/")
 
 # (선택) 브랜치 이름이 필요하면 아래 변수 사용 가능
 branch_name=$(git rev-parse --abbrev-ref HEAD)
@@ -114,16 +118,16 @@ echo "$remaining_lines" >> "$COMMIT_MESSAGE_FILE_PATH"
 
 ## 5. 커밋 메시지 작성 규칙
 
-- 첫 줄은 반드시 **타입 + 콜론 + 설명** 형식으로 작성합니다.
+- 첫 줄은 반드시 **소문자 타입 + 콜론 + 설명** 형식으로 작성합니다.
   - 예:  
-    - `Feat: 게시글 좋아요 기능 추가`  
-    - `Fix: 로그인 실패 예외 처리 수정`  
-    - `Docs: Husky 가이드 문서 추가`
+    - `feat: 게시글 좋아요 기능 추가`  
+    - `fix: 로그인 실패 예외 처리 수정`  
+    - `docs: Husky 가이드 문서 추가`
 - 실제 커밋 메시지 저장 시, 훅이 자동으로 다음과 같이 바꿉니다.
-  - 입력: `Feat: 게시글 좋아요 기능 추가`  
-    - 저장: `✨ Feat: 게시글 좋아요 기능 추가`
-  - 입력: `Fix: 로그인 실패 예외 처리 수정`  
-    - 저장: `🐛 Fix: 로그인 실패 예외 처리 수정`
+  - 입력: `feat: 게시글 좋아요 기능 추가`  
+    - 저장: `✨ feat: 게시글 좋아요 기능 추가`
+  - 입력: `FIX: 로그인 실패 예외 처리 수정` (대문자로 입력해도)
+    - 저장: `🐛 fix: 로그인 실패 예외 처리 수정` (소문자로 정규화)
 - 허용되지 않은 타입으로 시작하면 커밋이 취소되고, 터미널에 안내 문구가 출력됩니다.
 
 ---
