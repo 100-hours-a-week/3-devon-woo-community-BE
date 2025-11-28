@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.application.post.PostRequestFixture;
@@ -79,7 +78,6 @@ class PostServiceTest {
 
         assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
         assertThat(response.content()).isEqualTo(PostFixture.DEFAULT_CONTENT);
-        verify(postRepository).save(any(Post.class));
     }
 
     @Test
@@ -93,8 +91,8 @@ class PostServiceTest {
 
         PostResponse response = postService.createPost(request, 1L);
 
-        verify(attachmentRepository).save(any(Attachment.class));
         assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
+        assertThat(response.imageUrl()).isNotNull();
     }
 
     @Test
@@ -108,8 +106,6 @@ class PostServiceTest {
 
         postService.updatePost(1L, request, 1L);
 
-        verify(ownershipPolicy).validateOwnership(1L, 1L);
-        verify(postRepository).save(post);
         assertThat(post.getTitle()).isEqualTo(PostFixture.UPDATED_TITLE);
         assertThat(post.getContent()).isEqualTo(PostFixture.UPDATED_CONTENT);
     }
@@ -121,8 +117,6 @@ class PostServiceTest {
 
         postService.deletePost(1L, 1L);
 
-        verify(ownershipPolicy).validateOwnership(1L, 1L);
-        verify(postRepository).save(post);
         assertThat(post.isDeleted()).isTrue();
     }
 

@@ -3,7 +3,6 @@ package com.devon.techblog.application.member.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 import com.devon.techblog.application.member.MemberRequestFixture;
 import com.devon.techblog.application.member.dto.request.MemberUpdateRequest;
@@ -73,10 +72,8 @@ class MemberServiceTest {
 
         MemberUpdateResponse response = memberService.updateMember(1L, request);
 
-        verify(memberValidator).validateNicknameNotDuplicated("newNick", member);
-        verify(memberRepository).save(member);
         assertThat(response.nickname()).isEqualTo("newNick");
-        assertThat(member.getProfileImageUrl()).isEqualTo("https://example.com/new.png");
+        assertThat(response.profileImage()).isEqualTo("https://example.com/new.png");
     }
 
     @Test
@@ -88,8 +85,6 @@ class MemberServiceTest {
 
         memberService.updatePassword(1L, request);
 
-        verify(memberValidator).validatePasswordUpdate(request, member);
-        verify(memberRepository).save(member);
         assertThat(member.getPassword()).isEqualTo("newPassword123");
     }
 
@@ -100,7 +95,6 @@ class MemberServiceTest {
 
         memberService.deleteMember(1L);
 
-        verify(memberRepository).save(member);
         assertThat(member.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
     }
 }

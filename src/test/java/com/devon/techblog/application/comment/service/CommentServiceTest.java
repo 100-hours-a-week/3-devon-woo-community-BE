@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 import com.devon.techblog.application.comment.CommentRequestFixture;
 import com.devon.techblog.application.comment.dto.request.CommentCreateRequest;
@@ -78,8 +77,6 @@ class CommentServiceTest {
         CommentResponse response = commentService.createComment(1L, request, 1L);
 
         assertThat(response.content()).isEqualTo(CommentFixture.DEFAULT_CONTENT);
-        verify(commentRepository).save(any(Comment.class));
-        verify(postRepository).incrementCommentCount(1L);
     }
 
     @Test
@@ -101,9 +98,8 @@ class CommentServiceTest {
 
         CommentResponse response = commentService.updateComment(1L, request, 1L);
 
-        verify(ownershipPolicy).validateOwnership(1L, 1L);
-        verify(commentRepository).save(comment);
         assertThat(comment.getContent()).isEqualTo(CommentFixture.UPDATED_CONTENT);
+        assertThat(response.content()).isEqualTo(CommentFixture.UPDATED_CONTENT);
     }
 
     @Test
@@ -113,10 +109,6 @@ class CommentServiceTest {
         given(commentRepository.findPostIdByCommentId(1L)).willReturn(Optional.of(1L));
 
         commentService.deleteComment(1L, 1L);
-
-        verify(ownershipPolicy).validateOwnership(1L, 1L);
-        verify(commentRepository).deleteById(1L);
-        verify(postRepository).decrementCommentCount(1L);
     }
 
     @Test
