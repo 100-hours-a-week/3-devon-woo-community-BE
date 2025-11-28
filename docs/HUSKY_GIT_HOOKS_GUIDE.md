@@ -142,8 +142,12 @@ fi
 
 ### 6.1 pre-push 파일 생성
 
+Husky v9 기준으로 `npx husky add` 명령은 deprecated 입니다.  
+따라서 pre-push 훅 파일을 직접 생성합니다.
+
 ```bash
-npx husky add .husky/pre-push "echo \"pre-push hook\""
+mkdir -p .husky
+touch .husky/pre-push
 ```
 
 위 명령으로 `.husky/pre-push` 파일이 생성됩니다. 이후 내용을 수정합니다.
@@ -205,4 +209,3 @@ Windows 환경에서 `gradlew.bat` 를 사용하고 싶다면, pre-commit 예시
 8. 변경 사항 커밋 후, 실제로 `git commit` / `git push` 시 훅이 잘 동작하는지 확인
 
 위 순서를 그대로 따라가면 Mac/Windows 모두에서 Husky 기반 Git commit/push hook을 무리 없이 도입할 수 있습니다.
-
