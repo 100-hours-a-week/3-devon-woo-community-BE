@@ -1,0 +1,27 @@
+{
+  "devDependencies": {
+    "husky": "^9.1.7"
+  },
+  "name": "3-devon-woo-community-be",
+  "version": "1.0.0",
+  "description": "기술 블로그·개발 커뮤니티를 위한 REST API 서버입니다.   게시글, 댓글, 회원, 이미지 업로드를 중심으로 실제 서비스 운영을 가정해 설계했습니다.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/100-hours-a-week/3-devon-woo-community-BE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/100-hours-a-week/3-devon-woo-community-BE/issues"
+  },
+  "homepage": "https://github.com/100-hours-a-week/3-devon-woo-community-BE#readme"
+}
