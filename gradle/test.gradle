@@ -1,0 +1,74 @@
+/// ====== 테스트 설정 분리 ====== ///
+
+// 테스트 병렬 실행을 위한 CPU 코어 수 계산 함수
+def calculateTestForks() {
+    def cores = Runtime.runtime.availableProcessors()
+    return cores > 1 ? cores.intdiv(2) : 1
+}
+
+// 공통 test 태스크 설정
+tasks.named('test') {
+    useJUnitPlatform()
+
+    maxParallelForks = calculateTestForks()
+
+    finalizedBy jacocoTestReport
+}
+
+// 단위 테스트 전용 태스크
+tasks.register('unitTest', Test) {
+    useJUnitPlatform {
+        includeTags 'unit'
+    }
+    maxParallelForks = calculateTestForks()
+    outputs.upToDateWhen { false }
+}
+
+// 통합 테스트 전용 태스크
+tasks.register('integrationTest', Test) {
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+    maxParallelForks = calculateTestForks()
+    outputs.upToDateWhen { false }
+}
+
+
+/// ====== JaCoCo 설정 ====== ///
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+// JaCoCo 최소 커버리지 기준 (필요 시 한 곳에서만 변경)
+def jacocoMinimumCoverage = 0.50
+
+// JaCoCo 커버리지 측정에서 제외할 클래스 설정 함수
+def configureJacocoClassDirs(task) {
+    afterEvaluate {
+        task.classDirectories.setFrom(files(task.classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                '**/Q*.class',
+                '**/*Application.class',
+                '**/*Config*.class',
+                '**/dto/**',
+                '**/exception/**'
+            ])
+        }))
+    }
+}
+
+
+
+// JaCoCo 리포트 및 검증 태스크 설정
+jacocoTestReport {
+    dependsOn test
+    reports { xml.required = true; html.required = true; csv.required = false }
+    configureJacocoClassDirs(it)
+}
+
+// JaCoCo 커버리지 검증 설정
+jacocoTestCoverageVerification {
+    configureJacocoClassDirs(it)
+    violationRules { rule { limit { minimum = jacocoMinimumCoverage } } }
+}
