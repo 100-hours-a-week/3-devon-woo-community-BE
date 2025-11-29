@@ -1,6 +1,6 @@
 package com.devon.techblog.application.security.util;
 
-import com.devon.techblog.application.security.config.JwtProperties;
+import com.devon.techblog.application.security.config.properties.JwtProperties;
 import com.devon.techblog.application.security.constants.JwtConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
