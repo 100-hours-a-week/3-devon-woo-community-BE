@@ -42,6 +42,32 @@ public class PostService {
         Member member = findMemberById(memberId);
 
         Post post = Post.create(member, request.title(), request.content());
+
+        // TODO : 임시로 하나 하나 구현, 추후 변경
+        if (request.summary() != null) {
+            post.updateSummary(request.summary());
+        }
+        if (request.tags() != null) {
+            post.updateTags(request.tags());
+        }
+        if (request.visibility() != null) {
+            post.updateVisibility(request.visibility());
+        }
+        if (request.isDraft() != null && request.isDraft()) {
+            post.markAsDraft();
+        } else if (request.isDraft() != null && !request.isDraft()) {
+            post.publish();
+        }
+        if (request.commentsAllowed() != null) {
+            post.setCommentsAllowed(request.commentsAllowed());
+        }
+        if (request.thumbnail() != null) {
+            post.updateThumbnail(request.thumbnail());
+        }
+        if (request.image() != null) {
+            post.updateImageUrl(request.image());
+        }
+
         Post savedPost = postRepository.save(post);
 
         Attachment savedAttachment = Optional.ofNullable(request.image())
@@ -61,7 +87,32 @@ public class PostService {
 
         ownershipPolicy.validateOwnership(post.getMember().getId(), memberId);
 
-        post.updatePost(request.title(), request.content());
+        if (request.title() != null || request.content() != null) {
+            post.updatePost(
+                    request.title() != null ? request.title() : post.getTitle(),
+                    request.content() != null ? request.content() : post.getContent()
+            );
+        }
+
+        if (request.summary() != null) {
+            post.updateSummary(request.summary());
+        }
+        if (request.tags() != null) {
+            post.updateTags(request.tags());
+        }
+        if (request.visibility() != null) {
+            post.updateVisibility(request.visibility());
+        }
+        if (request.commentsAllowed() != null) {
+            post.setCommentsAllowed(request.commentsAllowed());
+        }
+        if (request.thumbnail() != null) {
+            post.updateThumbnail(request.thumbnail());
+        }
+        if (request.image() != null) {
+            post.updateImageUrl(request.image());
+        }
+
         Post savedPost = postRepository.save(post);
 
         Attachment attachment = Optional.ofNullable(request.image())

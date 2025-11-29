@@ -146,7 +146,7 @@ class PostServiceTest {
     @DisplayName("게시글 목록을 페이지로 조회할 수 있다")
     void getPostPage_success() {
         Pageable pageable = PageRequest.of(0, 10);
-        PostQueryDto dto = new PostQueryDto(1L, "제목", Instant.now(), 0L, 0L, 0L, 1L, "tester", null);
+        PostQueryDto dto = new PostQueryDto(1L, "제목", Instant.now(), 0L, 0L, 0L, 1L, "tester", null, null, null);
         Page<PostQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
         given(postRepository.findAllActiveWithMemberAsDto(pageable)).willReturn(page);

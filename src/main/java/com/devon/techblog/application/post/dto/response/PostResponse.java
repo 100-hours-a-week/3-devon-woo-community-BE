@@ -69,18 +69,18 @@ public record PostResponse(
                 MemberResponse.of(member),
                 post.getTitle(),
                 post.getContent(),
-                attachment != null ? attachment.getAttachmentUrl() : null,
+                post.getImageUrl() != null ? post.getImageUrl() : (attachment != null ? attachment.getAttachmentUrl() : null),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 post.getViewsCount(),
                 post.getLikeCount(),
                 post.getCommentCount(),
                 isLiked,
-                null,
-                Collections.emptyList(),
-                null,
-                null,
-                "public"
+                post.getSummary(),
+                post.getTags() != null ? post.getTags() : Collections.emptyList(),
+                post.getSeries() != null ? post.getSeries().getId() : null,
+                post.getSeries() != null ? post.getSeries().getName() : null,
+                post.getVisibility() != null ? post.getVisibility() : "public"
         );
     }
 }

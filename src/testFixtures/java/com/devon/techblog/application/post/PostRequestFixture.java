@@ -18,16 +18,17 @@ public final class PostRequestFixture {
                 null,
                 null,
                 null,
+                null,
                 null
         );
     }
 
     public static PostCreateRequest createRequest(String title, String content) {
-        return new PostCreateRequest(title, content, null, null, null, null, null, null, null);
+        return new PostCreateRequest(title, content, null, null, null, null, null, null, null, null);
     }
 
     public static PostCreateRequest createRequest(String title, String content, String imageUrl) {
-        return new PostCreateRequest(title, content, imageUrl, null, null, null, null, null, null);
+        return new PostCreateRequest(title, content, imageUrl, null, null, null, null, null, null, null);
     }
 
     public static PostUpdateRequest updateRequest() {
@@ -39,15 +40,16 @@ public final class PostRequestFixture {
                 null,
                 null,
                 null,
+                null,
                 null
         );
     }
 
     public static PostUpdateRequest updateRequest(String title, String content) {
-        return new PostUpdateRequest(title, content, null, null, null, null, null, null);
+        return new PostUpdateRequest(title, content, null, null, null, null, null, null, null);
     }
 
     public static PostUpdateRequest updateRequest(String title, String content, String imageUrl) {
-        return new PostUpdateRequest(title, content, imageUrl, null, null, null, null, null);
+        return new PostUpdateRequest(title, content, imageUrl, null, null, null, null, null, null);
     }
 }

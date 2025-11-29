@@ -24,6 +24,10 @@ public record PostCreateRequest(
         @Pattern(regexp = URL_PATTERN, message = INVALID_IMAGE_URL)
         String image,
 
+        @Schema(description = "썸네일 URL", example = "https://picsum.photos/200/150")
+        @Pattern(regexp = URL_PATTERN, message = INVALID_IMAGE_URL)
+        String thumbnail,
+
         @Schema(description = "요약", example = "게시글 요약입니다")
         String summary,
 

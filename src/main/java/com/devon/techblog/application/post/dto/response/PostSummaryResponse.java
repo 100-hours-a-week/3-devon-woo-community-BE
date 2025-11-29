@@ -47,8 +47,8 @@ public record PostSummaryResponse(
                 dto.viewsCount(),
                 dto.likeCount(),
                 dto.commentCount(),
-                null,
-                null
+                dto.summary(),
+                dto.thumbnail()
         );
     }
 }
