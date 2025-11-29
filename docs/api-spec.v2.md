@@ -19,21 +19,21 @@
 - **Member API**
   - `GET /api/v1/members/me`
   - `GET /api/v1/members/{memberId}`
-  - `PUT /api/v1/members/me`
-  - `PUT /api/v1/members/me/password`
+  - `PATCH /api/v1/members/me`
+  - `PATCH /api/v1/members/me/password`
   - `DELETE /api/v1/members/me`
 - **Post API**
   - `GET /api/v1/posts`
   - `GET /api/v1/posts/{postId}`
   - `POST /api/v1/posts`
-  - `PUT /api/v1/posts/{postId}`
+  - `PATCH /api/v1/posts/{postId}`
   - `DELETE /api/v1/posts/{postId}`
   - `POST /api/v1/posts/{postId}/like`
   - `DELETE /api/v1/posts/{postId}/like`
 - **Comment API**
   - `GET /api/v1/posts/{postId}/comments`
   - `POST /api/v1/posts/{postId}/comments`
-  - `PUT /api/v1/comments/{commentId}`
+  - `PATCH /api/v1/comments/{commentId}`
   - `DELETE /api/v1/comments/{commentId}`
 
 ---
@@ -300,9 +300,9 @@
 - **대표 에러**
   - 404: 회원 없음 또는 비공개.
 
-### 3-3) 내 프로필 수정 – `PUT /api/v1/members/me`
+### 3-3) 내 프로필 수정 – `PATCH /api/v1/members/me`
 
-- **설명**: 자신의 프로필 정보 수정.
+- **설명**: 자신의 프로필 정보 수정 (부분 업데이트).
 - **인증**: 필요.
 - **권한**: 자기 자신만.
 - **요청 바디**
@@ -311,7 +311,7 @@
   - 200 OK
   - `ApiResponse<MemberResponse>`
 
-### 3-4) 비밀번호 변경 – `PUT /api/v1/members/me/password`
+### 3-4) 비밀번호 변경 – `PATCH /api/v1/members/me/password`
 
 - **설명**: 현재 비밀번호 검증 후 새 비밀번호로 변경.
 - **인증**: 필요.
@@ -434,9 +434,9 @@
   - 201 Created
   - `ApiResponse<PostResponse>`
 
-### 4-4) 게시글 수정 – `PUT /api/v1/posts/{postId}`
+### 4-4) 게시글 수정 – `PATCH /api/v1/posts/{postId}`
 
-- **설명**: 기존 게시글 수정.
+- **설명**: 기존 게시글 수정 (부분 업데이트).
 - **인증**: 필요.
 - **권한**: 작성자만.
 - **경로 파라미터**
@@ -532,9 +532,9 @@
   - 201 Created
   - `ApiResponse<CommentResponse>`
 
-### 5-3) 댓글 수정 – `PUT /api/v1/comments/{commentId}`
+### 5-3) 댓글 수정 – `PATCH /api/v1/comments/{commentId}`
 
-- **설명**: 댓글 수정.
+- **설명**: 댓글 수정 (부분 업데이트).
 - **인증**: 필요.
 - **권한**: 작성자만.
 - **경로 파라미터**
