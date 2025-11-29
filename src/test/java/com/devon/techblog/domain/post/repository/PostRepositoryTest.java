@@ -8,7 +8,9 @@ import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.PostFixture;
 import com.devon.techblog.domain.post.entity.Post;
+import com.devon.techblog.domain.post.entity.Series;
 import jakarta.transaction.Transactional;
+import java.util.Arrays;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +27,9 @@ class PostRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private SeriesRepository seriesRepository;
+
     private Member member;
 
     @BeforeEach
@@ -35,6 +40,7 @@ class PostRepositoryTest {
     @AfterEach
     void tearDown() {
         postRepository.deleteAll();
+        seriesRepository.deleteAll();
         memberRepository.deleteAll();
     }
 
@@ -169,5 +175,115 @@ class PostRepositoryTest {
 
         Post found = postRepository.findById(postId).orElseThrow();
         assertThat(found.getCommentCount()).isEqualTo(0L);
+    }
+
+    @Test
+    @DisplayName("새 필드들이 정상적으로 저장되고 조회된다")
+    void saveAndFindWithNewFields() {
+        Post post = PostFixture.create(member);
+        post.updateSummary("게시글 요약");
+        post.updateTags(Arrays.asList("Java", "Spring", "JPA"));
+        post.updateVisibility("private");
+        post.markAsDraft();
+        post.setCommentsAllowed(false);
+        post.updateThumbnail("https://example.com/thumb.jpg");
+        post.updateImageUrl("https://example.com/image.jpg");
+
+        Post saved = postRepository.save(post);
+        Post found = postRepository.findById(saved.getId()).orElseThrow();
+
+        assertThat(found.getSummary()).isEqualTo("게시글 요약");
+        assertThat(found.getTags()).containsExactly("Java", "Spring", "JPA");
+        assertThat(found.getVisibility()).isEqualTo("private");
+        assertThat(found.getIsDraft()).isTrue();
+        assertThat(found.getCommentsAllowed()).isFalse();
+        assertThat(found.getThumbnail()).isEqualTo("https://example.com/thumb.jpg");
+        assertThat(found.getImageUrl()).isEqualTo("https://example.com/image.jpg");
+    }
+
+    @Test
+    @DisplayName("태그가 ElementCollection으로 정상적으로 저장되고 조회된다")
+    void saveAndFindWithTags() {
+        Post post = PostFixture.create(member);
+        post.addTag("Kotlin");
+        post.addTag("Spring Boot");
+        post.addTag("Docker");
+
+        Post saved = postRepository.save(post);
+        postRepository.flush();
+
+        Post found = postRepository.findById(saved.getId()).orElseThrow();
+
+        assertThat(found.getTags()).hasSize(3);
+        assertThat(found.getTags()).containsExactlyInAnyOrder("Kotlin", "Spring Boot", "Docker");
+    }
+
+    @Test
+    @DisplayName("시리즈와 함께 게시글을 저장하고 조회할 수 있다")
+    void saveAndFindWithSeries() {
+        Series series = seriesRepository.save(Series.create(member, "시리즈명", "설명"));
+
+        Post post = PostFixture.create(member);
+        post.setSeries(series);
+
+        Post saved = postRepository.save(post);
+        Post found = postRepository.findById(saved.getId()).orElseThrow();
+
+        assertThat(found.getSeries()).isNotNull();
+        assertThat(found.getSeries().getId()).isEqualTo(series.getId());
+        assertThat(found.getSeries().getName()).isEqualTo("시리즈명");
+    }
+
+    @Test
+    @DisplayName("시리즈를 제거할 수 있다")
+    void removeSeries() {
+        Series series = seriesRepository.save(Series.create(member, "시리즈명", "설명"));
+
+        Post post = PostFixture.create(member);
+        post.setSeries(series);
+        Post saved = postRepository.save(post);
+
+        saved.removeSeries();
+        postRepository.save(saved);
+        postRepository.flush();
+
+        Post found = postRepository.findById(saved.getId()).orElseThrow();
+        assertThat(found.getSeries()).isNull();
+    }
+
+    @Test
+    @DisplayName("기본값으로 생성된 필드들이 정상적으로 저장된다")
+    void saveWithDefaultValues() {
+        Post post = PostFixture.create(member);
+        Post saved = postRepository.save(post);
+        Post found = postRepository.findById(saved.getId()).orElseThrow();
+
+        assertThat(found.getTags()).isEmpty();
+        assertThat(found.getVisibility()).isEqualTo("public");
+        assertThat(found.getIsDraft()).isFalse();
+        assertThat(found.getCommentsAllowed()).isTrue();
+        assertThat(found.getSummary()).isNull();
+        assertThat(found.getSeries()).isNull();
+        assertThat(found.getThumbnail()).isNull();
+        assertThat(found.getImageUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("필드 수정 후 재조회 시 변경된 값이 반영된다")
+    void updateAndReload() {
+        Post post = postRepository.save(PostFixture.create(member));
+
+        post.updateSummary("새 요약");
+        post.updateTags(Arrays.asList("React", "TypeScript"));
+        post.publish();
+
+        postRepository.save(post);
+        postRepository.flush();
+
+        Post reloaded = postRepository.findById(post.getId()).orElseThrow();
+
+        assertThat(reloaded.getSummary()).isEqualTo("새 요약");
+        assertThat(reloaded.getTags()).containsExactly("React", "TypeScript");
+        assertThat(reloaded.getIsDraft()).isFalse();
     }
 }
