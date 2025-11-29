@@ -7,8 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.devon.techblog.application.member.dto.request.SignupRequest;
-import com.devon.techblog.application.member.dto.response.SignupResponse;
 import com.devon.techblog.application.member.service.SignupService;
+import com.devon.techblog.application.security.dto.response.LoginResponse;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -42,8 +42,9 @@ class SignupControllerTest {
                 null
         );
 
-        SignupResponse response = new SignupResponse(
-                1L
+        LoginResponse response = new LoginResponse(
+                1L,
+                "fake-access-token"
         );
 
         given(signupService.signup(any())).willReturn(response);

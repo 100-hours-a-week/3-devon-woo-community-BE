@@ -5,8 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import com.devon.techblog.application.member.dto.request.SignupRequest;
-import com.devon.techblog.application.member.dto.response.SignupResponse;
 import com.devon.techblog.application.member.validator.AuthValidator;
+import com.devon.techblog.application.security.dto.response.LoginResponse;
+import com.devon.techblog.application.security.util.JwtTokenProvider;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -27,6 +28,8 @@ class SignupServiceTest {
     private AuthValidator authValidator;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
 
     @InjectMocks
     private SignupService signupService;
@@ -52,9 +55,11 @@ class SignupServiceTest {
             ReflectionTestUtils.setField(member, "id", 1L);
             return member;
         });
+        given(jwtTokenProvider.generateAccessToken(any(), any())).willReturn("fake-token");
 
-        SignupResponse response = signupService.signup(request);
+        LoginResponse response = signupService.signup(request);
 
         assertThat(response.userId()).isEqualTo(1L);
+        assertThat(response.accessToken()).isEqualTo("fake-token");
     }
 }
