@@ -167,6 +167,20 @@ public class PostService {
         return PageResponse.of(postSummaries, postDtoPage);
     }
 
+    /**
+     * 태그로 게시글 필터링 조회 (+페이징 및 정렬)
+     */
+    @Transactional(readOnly = true)
+    public PageResponse<PostSummaryResponse> getPostPageByTags(List<String> tags, Pageable pageable) {
+        Page<PostQueryDto> postDtoPage = postRepository.findByTagsIn(tags, pageable);
+
+        List<PostSummaryResponse> postSummaries = postDtoPage.getContent().stream()
+                .map(PostSummaryResponse::fromDto)
+                .toList();
+
+        return PageResponse.of(postSummaries, postDtoPage);
+    }
+
     private Post findByIdWithMember(Long postId) {
         return postRepository.findByIdWithMember(postId)
                 .orElseThrow(() -> new CustomException(PostErrorCode.POST_NOT_FOUND));
