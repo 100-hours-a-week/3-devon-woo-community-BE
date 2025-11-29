@@ -51,13 +51,13 @@ public record MemberDetailsResponse(
                 member.getEmail(),
                 member.getProfileImageUrl(),
                 member.getRole().name(),
-                null,
-                null,
-                null,
-                null,
-                Collections.emptyList(),
-                Collections.emptyList(),
-                SocialLinks.empty()
+                member.getHandle(),
+                member.getBio(),
+                member.getCompany(),
+                member.getLocation(),
+                member.getPrimaryStack() != null ? member.getPrimaryStack() : Collections.emptyList(),
+                member.getInterests() != null ? member.getInterests() : Collections.emptyList(),
+                member.getSocialLinks() != null ? member.getSocialLinks() : SocialLinks.empty()
         );
     }
 }
