@@ -2,7 +2,9 @@ package com.devon.techblog.domain.post.entity;
 
 import com.devon.techblog.domain.common.entity.BaseTimeEntity;
 import com.devon.techblog.domain.member.entity.Member;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +13,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,6 +56,33 @@ public class Post extends BaseTimeEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+    @Column(name = "summary", length = 500)
+    private String summary;
+
+    @ElementCollection
+    @CollectionTable(name = "post_tag", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "tag", length = 50)
+    private List<String> tags;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "series_id")
+    private Series series;
+
+    @Column(name = "visibility", length = 20)
+    private String visibility;
+
+    @Column(name = "is_draft", nullable = false)
+    private Boolean isDraft;
+
+    @Column(name = "comments_allowed", nullable = false)
+    private Boolean commentsAllowed;
+
+    @Column(name = "thumbnail", length = 500)
+    private String thumbnail;
+
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     public static Post create(Member member, String title, String content) {
         validateCreate(member, title, content);
         return Post.builder()
@@ -62,6 +93,10 @@ public class Post extends BaseTimeEntity {
                 .likeCount(0L)
                 .commentCount(0L)
                 .isDeleted(false)
+                .tags(new ArrayList<>())
+                .visibility("public")
+                .isDraft(false)
+                .commentsAllowed(true)
                 .build();
     }
 
@@ -103,6 +138,77 @@ public class Post extends BaseTimeEntity {
 
     public boolean isDeleted() {
         return this.isDeleted;
+    }
+
+    public void updateSummary(String summary) {
+        if (summary != null && summary.length() > 500) {
+            throw new IllegalArgumentException("summary too long");
+        }
+        this.summary = summary;
+    }
+
+    public void updateTags(List<String> tags) {
+        this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
+    }
+
+    public void addTag(String tag) {
+        Assert.hasText(tag, "tag required");
+        if (tag.length() > 50) {
+            throw new IllegalArgumentException("tag too long");
+        }
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        if (!this.tags.contains(tag)) {
+            this.tags.add(tag);
+        }
+    }
+
+    public void removeTag(String tag) {
+        if (this.tags != null) {
+            this.tags.remove(tag);
+        }
+    }
+
+    public void setSeries(Series series) {
+        this.series = series;
+    }
+
+    public void removeSeries() {
+        this.series = null;
+    }
+
+    public void updateVisibility(String visibility) {
+        if (visibility != null && visibility.length() > 20) {
+            throw new IllegalArgumentException("visibility too long");
+        }
+        this.visibility = visibility;
+    }
+
+    public void markAsDraft() {
+        this.isDraft = true;
+    }
+
+    public void publish() {
+        this.isDraft = false;
+    }
+
+    public void setCommentsAllowed(Boolean commentsAllowed) {
+        this.commentsAllowed = commentsAllowed != null ? commentsAllowed : true;
+    }
+
+    public void updateThumbnail(String thumbnail) {
+        if (thumbnail != null && thumbnail.length() > 500) {
+            throw new IllegalArgumentException("thumbnail url too long");
+        }
+        this.thumbnail = thumbnail;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        if (imageUrl != null && imageUrl.length() > 500) {
+            throw new IllegalArgumentException("image url too long");
+        }
+        this.imageUrl = imageUrl;
     }
 
     private static void validateCreate(Member member, String title, String content){
