@@ -1,6 +1,6 @@
 package com.devon.techblog.application.security.util;
 
-import com.devon.techblog.application.security.config.CorsProperties;
+import com.devon.techblog.application.security.config.properties.CorsProperties;
 import java.net.URI;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

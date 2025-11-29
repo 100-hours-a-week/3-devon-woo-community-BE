@@ -1,5 +1,6 @@
 package com.devon.techblog.application.security.config;
 
+import com.devon.techblog.application.security.config.properties.CorsProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

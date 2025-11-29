@@ -1,4 +1,4 @@
-package com.devon.techblog.config;
+package com.devon.techblog.application.security.config;
 
 import com.devon.techblog.application.security.resolver.CurrentUserArgumentResolver;
 import java.util.List;

@@ -3,6 +3,7 @@ package com.devon.techblog.infra.image.cloudinary;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.devon.techblog.infra.image.ImageSignature;
+import com.devon.techblog.infra.image.cloudinary.service.CloudinaryImageStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;

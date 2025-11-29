@@ -1,4 +1,4 @@
-package com.devon.techblog.infra.image.cloudinary;
+package com.devon.techblog.infra.image.cloudinary.service;
 
 import com.devon.techblog.infra.image.ImageSignature;
 import com.devon.techblog.infra.image.ImageStorageService;

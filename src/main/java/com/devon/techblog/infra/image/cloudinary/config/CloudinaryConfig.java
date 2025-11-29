@@ -1,4 +1,4 @@
-package com.devon.techblog.config;
+package com.devon.techblog.infra.image.cloudinary.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

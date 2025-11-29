@@ -1,4 +1,4 @@
-package com.devon.techblog.application.security.config;
+package com.devon.techblog.application.security.config.properties;
 
 import lombok.Getter;
 import lombok.Setter;
