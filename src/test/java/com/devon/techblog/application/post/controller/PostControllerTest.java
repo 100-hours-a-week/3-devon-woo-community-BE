@@ -54,7 +54,7 @@ class PostControllerTest {
     void createPost_success() throws Exception {
         PostCreateRequest request = PostRequestFixture.createRequest();
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
-        PostResponse response = new PostResponse(1L, memberResponse, "제목", "내용", null, Instant.now(), Instant.now(), 0L, 0L, false);
+        PostResponse response = new PostResponse(1L, memberResponse, "제목", "내용", null, Instant.now(), Instant.now(), 0L, 0L, 0L, false, null, null, null, null, "public");
 
         given(postService.createPost(any(), any())).willReturn(response);
 
@@ -72,7 +72,7 @@ class PostControllerTest {
     void updatePost_success() throws Exception {
         PostUpdateRequest request = PostRequestFixture.updateRequest();
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
-        PostResponse response = new PostResponse(1L, memberResponse, "수정된제목", "수정된내용", null, Instant.now(), Instant.now(), 0L, 0L, false);
+        PostResponse response = new PostResponse(1L, memberResponse, "수정된제목", "수정된내용", null, Instant.now(), Instant.now(), 0L, 0L, 0L, false, null, null, null, null, "public");
 
         given(postService.updatePost(any(), any(), any())).willReturn(response);
 
@@ -97,7 +97,7 @@ class PostControllerTest {
     @DisplayName("게시글 단건 조회 - 200 OK")
     void getPost_success() throws Exception {
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
-        PostResponse response = new PostResponse(1L, memberResponse, "제목", "내용", null, Instant.now(), Instant.now(), 10L, 5L, false);
+        PostResponse response = new PostResponse(1L, memberResponse, "제목", "내용", null, Instant.now(), Instant.now(), 10L, 5L, 0L, false, null, null, null, null, "public");
 
         given(postService.getPostDetails(any(), any())).willReturn(response);
 
@@ -114,7 +114,7 @@ class PostControllerTest {
     @DisplayName("게시글 목록 조회 - 200 OK")
     void getPostPage_success() throws Exception {
         MemberResponse memberResponse = new MemberResponse(1L, "tester", null);
-        PostSummaryResponse summary = new PostSummaryResponse(1L, "제목", memberResponse, Instant.now(), 10L, 5L, 3L);
+        PostSummaryResponse summary = new PostSummaryResponse(1L, "제목", memberResponse, Instant.now(), 10L, 5L, 3L, null, null);
         PageResponse<PostSummaryResponse> response = new PageResponse<>(List.of(summary), 0, 10, 1, 1);
 
         given(postService.getPostPage(any())).willReturn(response);

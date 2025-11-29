@@ -10,10 +10,30 @@ public final class MemberRequestFixture {
     private MemberRequestFixture() {}
 
     public static MemberUpdateRequest updateRequest() {
-        return new MemberUpdateRequest(DEFAULT_NEW_NICKNAME, DEFAULT_NEW_PROFILE_IMAGE);
+        return new MemberUpdateRequest(
+                DEFAULT_NEW_NICKNAME,
+                DEFAULT_NEW_PROFILE_IMAGE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     public static MemberUpdateRequest updateRequest(String nickname, String profileImageUrl) {
-        return new MemberUpdateRequest(nickname, profileImageUrl);
+        return new MemberUpdateRequest(
+                nickname,
+                profileImageUrl,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 }
