@@ -3,3 +3,11 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+aop:
+  api-logging:
+    enabled: false
+  service-performance:
+    enabled: false
+  transactional-query-logging:
+    enabled: false
