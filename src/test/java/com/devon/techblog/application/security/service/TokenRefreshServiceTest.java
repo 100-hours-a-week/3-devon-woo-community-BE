@@ -10,6 +10,7 @@ import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.repository.MemberRepository;
+import com.devon.techblog.application.security.service.TokenBlacklistService;
 import com.devon.techblog.application.security.util.JwtTokenProvider;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,9 @@ class TokenRefreshServiceTest {
     @Mock
     private MemberRepository memberRepository;
 
+    @Mock
+    private TokenBlacklistService tokenBlacklistService;
+
     @InjectMocks
     private TokenRefreshService tokenRefreshService;
 
@@ -46,6 +50,7 @@ class TokenRefreshServiceTest {
     void refreshAccessToken_success() {
         given(jwtTokenProvider.isRefreshToken(VALID_REFRESH_TOKEN)).willReturn(true);
         given(jwtTokenProvider.isTokenExpired(VALID_REFRESH_TOKEN)).willReturn(false);
+        given(tokenBlacklistService.isBlacklisted(VALID_REFRESH_TOKEN)).willReturn(false);
         given(jwtTokenProvider.getUidFromToken(VALID_REFRESH_TOKEN)).willReturn(activeMember.getId());
         given(memberRepository.findById(activeMember.getId())).willReturn(Optional.of(activeMember));
         given(jwtTokenProvider.generateAccessToken(activeMember.getId(), activeMember.getRole().name()))
@@ -108,5 +113,18 @@ class TokenRefreshServiceTest {
                 .isInstanceOf(CustomException.class)
                 .satisfies(exception -> assertThat(((CustomException) exception).getErrorCode())
                         .isEqualTo(MemberErrorCode.MEMBER_INACTIVE));
+    }
+
+    @Test
+    @DisplayName("블랙리스트에 포함된 리프레시 토큰이면 예외")
+    void refreshAccessToken_blacklistedToken() {
+        given(jwtTokenProvider.isRefreshToken(VALID_REFRESH_TOKEN)).willReturn(true);
+        given(jwtTokenProvider.isTokenExpired(VALID_REFRESH_TOKEN)).willReturn(false);
+        given(tokenBlacklistService.isBlacklisted(VALID_REFRESH_TOKEN)).willReturn(true);
+
+        assertThatThrownBy(() -> tokenRefreshService.refreshAccessToken(VALID_REFRESH_TOKEN))
+                .isInstanceOf(CustomException.class)
+                .satisfies(exception -> assertThat(((CustomException) exception).getErrorCode())
+                        .isEqualTo(AuthErrorCode.REFRESH_TOKEN_INVALID));
     }
 }
