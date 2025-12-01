@@ -44,11 +44,7 @@ class AuthLogoutIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        savedMember = memberRepository.save(MemberFixture.create(
-                "logout@example.com",
-                "password123",
-                "logout"
-        ));
+        savedMember = memberRepository.save(MemberFixture.create());
         refreshToken = jwtTokenProvider.generateRefreshToken(savedMember.getId());
     }
 

@@ -39,11 +39,7 @@ class AuthIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        savedMember = memberRepository.save(MemberFixture.create(
-                "tester@example.com",
-                "password123",
-                "tester"
-        ));
+        savedMember = memberRepository.save(MemberFixture.create());
         refreshToken = jwtTokenProvider.generateRefreshToken(savedMember.getId());
         fakeJwtTokenProvider = new FakeJwtTokenProvider();
     }
