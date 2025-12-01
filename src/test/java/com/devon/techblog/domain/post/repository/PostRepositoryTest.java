@@ -10,7 +10,6 @@ import com.devon.techblog.domain.post.PostFixture;
 import com.devon.techblog.domain.post.entity.Post;
 import com.devon.techblog.domain.post.entity.Series;
 import jakarta.transaction.Transactional;
-import java.util.Arrays;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -182,7 +181,6 @@ class PostRepositoryTest {
     void saveAndFindWithNewFields() {
         Post post = PostFixture.create(member);
         post.updateSummary("게시글 요약");
-        post.updateTags(Arrays.asList("Java", "Spring", "JPA"));
         post.updateVisibility("private");
         post.markAsDraft();
         post.setCommentsAllowed(false);
@@ -193,29 +191,11 @@ class PostRepositoryTest {
         Post found = postRepository.findById(saved.getId()).orElseThrow();
 
         assertThat(found.getSummary()).isEqualTo("게시글 요약");
-        assertThat(found.getTags()).containsExactly("Java", "Spring", "JPA");
         assertThat(found.getVisibility()).isEqualTo("private");
         assertThat(found.getIsDraft()).isTrue();
         assertThat(found.getCommentsAllowed()).isFalse();
         assertThat(found.getThumbnail()).isEqualTo("https://example.com/thumb.jpg");
         assertThat(found.getImageUrl()).isEqualTo("https://example.com/image.jpg");
-    }
-
-    @Test
-    @DisplayName("태그가 ElementCollection으로 정상적으로 저장되고 조회된다")
-    void saveAndFindWithTags() {
-        Post post = PostFixture.create(member);
-        post.addTag("Kotlin");
-        post.addTag("Spring Boot");
-        post.addTag("Docker");
-
-        Post saved = postRepository.save(post);
-        postRepository.flush();
-
-        Post found = postRepository.findById(saved.getId()).orElseThrow();
-
-        assertThat(found.getTags()).hasSize(3);
-        assertThat(found.getTags()).containsExactlyInAnyOrder("Kotlin", "Spring Boot", "Docker");
     }
 
     @Test
@@ -258,7 +238,7 @@ class PostRepositoryTest {
         Post saved = postRepository.save(post);
         Post found = postRepository.findById(saved.getId()).orElseThrow();
 
-        assertThat(found.getTags()).isEmpty();
+        assertThat(found.getPostTags()).isEmpty();
         assertThat(found.getVisibility()).isEqualTo("public");
         assertThat(found.getIsDraft()).isFalse();
         assertThat(found.getCommentsAllowed()).isTrue();
@@ -274,7 +254,6 @@ class PostRepositoryTest {
         Post post = postRepository.save(PostFixture.create(member));
 
         post.updateSummary("새 요약");
-        post.updateTags(Arrays.asList("React", "TypeScript"));
         post.publish();
 
         postRepository.save(post);
@@ -283,7 +262,6 @@ class PostRepositoryTest {
         Post reloaded = postRepository.findById(post.getId()).orElseThrow();
 
         assertThat(reloaded.getSummary()).isEqualTo("새 요약");
-        assertThat(reloaded.getTags()).containsExactly("React", "TypeScript");
         assertThat(reloaded.getIsDraft()).isFalse();
     }
 }

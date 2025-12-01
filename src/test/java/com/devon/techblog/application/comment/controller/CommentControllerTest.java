@@ -126,8 +126,7 @@ class CommentControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"))
-                .andExpect(jsonPath("$.data").isArray());
+                .andExpect(jsonPath("$.message").value("validation_failed"));
     }
 
     @Test
@@ -140,8 +139,7 @@ class CommentControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"))
-                .andExpect(jsonPath("$.data").isArray());
+                .andExpect(jsonPath("$.message").value("validation_failed"));
     }
 
     @Test

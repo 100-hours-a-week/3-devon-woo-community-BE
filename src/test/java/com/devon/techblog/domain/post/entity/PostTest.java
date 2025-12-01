@@ -155,7 +155,7 @@ class PostTest {
         Member member = Member.create("user@test.com", "password123", "tester");
         Post post = Post.create(member, "제목", "내용");
 
-        assertThat(post.getTags()).isEmpty();
+        assertThat(post.getPostTags()).isEmpty();
         assertThat(post.getVisibility()).isEqualTo("public");
         assertThat(post.getIsDraft()).isFalse();
         assertThat(post.getCommentsAllowed()).isTrue();
@@ -182,66 +182,6 @@ class PostTest {
                 .hasMessageContaining("summary too long");
     }
 
-    @Test
-    @DisplayName("태그 목록을 전체 교체할 수 있다")
-    void updateTags_replacesAllTags() {
-        Member member = Member.create("user@test.com", "password123", "tester");
-        Post post = Post.create(member, "제목", "내용");
-
-        List<String> tags = Arrays.asList("Java", "Spring", "JPA");
-        post.updateTags(tags);
-        assertThat(post.getTags()).containsExactly("Java", "Spring", "JPA");
-
-        post.updateTags(Arrays.asList("Kotlin"));
-        assertThat(post.getTags()).containsExactly("Kotlin");
-
-        post.updateTags(null);
-        assertThat(post.getTags()).isEmpty();
-    }
-
-    @Test
-    @DisplayName("태그를 개별적으로 추가할 수 있다")
-    void addTag_addsIndividualTag() {
-        Member member = Member.create("user@test.com", "password123", "tester");
-        Post post = Post.create(member, "제목", "내용");
-
-        post.addTag("Java");
-        assertThat(post.getTags()).containsExactly("Java");
-
-        post.addTag("Spring");
-        assertThat(post.getTags()).containsExactly("Java", "Spring");
-
-        post.addTag("Java");
-        assertThat(post.getTags()).containsExactly("Java", "Spring");
-    }
-
-    @Test
-    @DisplayName("태그는 50자를 초과할 수 없다")
-    void addTag_lengthGuard() {
-        Member member = Member.create("user@test.com", "password123", "tester");
-        Post post = Post.create(member, "제목", "내용");
-
-        assertThatThrownBy(() -> post.addTag("a".repeat(51)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("tag too long");
-
-        assertThatThrownBy(() -> post.addTag(""))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("태그를 개별적으로 제거할 수 있다")
-    void removeTag_removesTag() {
-        Member member = Member.create("user@test.com", "password123", "tester");
-        Post post = Post.create(member, "제목", "내용");
-
-        post.updateTags(Arrays.asList("Java", "Spring", "JPA"));
-        post.removeTag("Spring");
-        assertThat(post.getTags()).containsExactly("Java", "JPA");
-
-        post.removeTag("NonExistent");
-        assertThat(post.getTags()).containsExactly("Java", "JPA");
-    }
 
     @Test
     @DisplayName("시리즈를 설정하고 제거할 수 있다")

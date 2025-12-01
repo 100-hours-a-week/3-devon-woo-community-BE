@@ -150,10 +150,6 @@ public class Post extends BaseTimeEntity {
         this.postTags.add(postTag);
     }
 
-    public void removePostTag(PostTag postTag) {
-        this.postTags.remove(postTag);
-    }
-
     public void clearPostTags() {
         this.postTags.clear();
     }

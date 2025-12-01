@@ -21,13 +21,13 @@ import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.PostFixture;
+import com.devon.techblog.domain.post.PostQueryDtoFixture;
 import com.devon.techblog.domain.post.dto.PostQueryDto;
 import com.devon.techblog.domain.post.entity.Attachment;
 import com.devon.techblog.domain.post.entity.Post;
 import com.devon.techblog.domain.post.repository.AttachmentRepository;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -149,7 +149,7 @@ class PostServiceTest {
     @DisplayName("게시글 목록을 페이지로 조회할 수 있다")
     void getPostPage_success() {
         Pageable pageable = PageRequest.of(0, 10);
-        PostQueryDto dto = new PostQueryDto(1L, "제목", Instant.now(), 0L, 0L, 0L, 1L, "tester", null, null, null);
+        PostQueryDto dto = PostQueryDtoFixture.create();
         Page<PostQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
         given(postRepository.findAllActiveWithMemberAsDto(pageable)).willReturn(page);
@@ -237,7 +237,7 @@ class PostServiceTest {
     void getPostPageByTags_success() {
         Pageable pageable = PageRequest.of(0, 10);
         List<String> tags = List.of("Java", "Spring");
-        PostQueryDto dto = new PostQueryDto(1L, "제목", Instant.now(), 0L, 0L, 0L, 1L, "tester", null, null, List.of("Java", "Spring"));
+        PostQueryDto dto = PostQueryDtoFixture.create();
         Page<PostQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
         given(postRepository.findByTagsIn(tags, pageable)).willReturn(page);
