@@ -3,6 +3,7 @@ package com.devon.techblog.application.post.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 
@@ -22,6 +23,7 @@ import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.PostFixture;
 import com.devon.techblog.domain.post.PostQueryDtoFixture;
+import com.devon.techblog.domain.post.dto.PostSearchCondition;
 import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.entity.Attachment;
 import com.devon.techblog.domain.post.entity.Post;
@@ -152,7 +154,7 @@ class PostServiceTest {
         PostSummaryQueryDto dto = PostQueryDtoFixture.create();
         Page<PostSummaryQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
-        given(postRepository.findAllActiveWithMemberAsDto(pageable)).willReturn(page);
+        given(postRepository.searchPosts(any(PostSearchCondition.class), eq(pageable))).willReturn(page);
 
         PageResponse<PostSummaryResponse> response = postService.getPostPage(pageable);
 
@@ -240,7 +242,7 @@ class PostServiceTest {
         PostSummaryQueryDto dto = PostQueryDtoFixture.create();
         Page<PostSummaryQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
-        given(postRepository.findByTagsIn(tags, pageable)).willReturn(page);
+        given(postRepository.searchPosts(any(PostSearchCondition.class), eq(pageable))).willReturn(page);
 
         PageResponse<PostSummaryResponse> response = postService.getPostPageByTags(tags, pageable);
 
@@ -255,7 +257,7 @@ class PostServiceTest {
         List<String> tags = List.of("NonExistentTag");
         Page<PostSummaryQueryDto> page = new PageImpl<>(List.of(), pageable, 0);
 
-        given(postRepository.findByTagsIn(tags, pageable)).willReturn(page);
+        given(postRepository.searchPosts(any(PostSearchCondition.class), eq(pageable))).willReturn(page);
 
         PageResponse<PostSummaryResponse> response = postService.getPostPageByTags(tags, pageable);
 

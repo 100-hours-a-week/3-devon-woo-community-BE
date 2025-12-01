@@ -11,6 +11,7 @@ import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
+import com.devon.techblog.domain.post.dto.PostSearchCondition;
 import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.entity.Attachment;
 import com.devon.techblog.domain.post.entity.Post;
@@ -160,7 +161,7 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public PageResponse<PostSummaryResponse> getPostPage(Pageable pageable) {
-        Page<PostSummaryQueryDto> postDtoPage = postRepository.findAllActiveWithMemberAsDto(pageable);
+        Page<PostSummaryQueryDto> postDtoPage = postRepository.searchPosts(PostSearchCondition.empty(), pageable);
 
         List<PostSummaryResponse> postSummaries = postDtoPage.getContent().stream()
                 .map(PostSummaryResponse::fromDto)
@@ -174,7 +175,7 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public PageResponse<PostSummaryResponse> getPostPageByTags(List<String> tags, Pageable pageable) {
-        Page<PostSummaryQueryDto> postDtoPage = postRepository.findByTagsIn(tags, pageable);
+        Page<PostSummaryQueryDto> postDtoPage = postRepository.searchPosts(PostSearchCondition.forTags(tags), pageable);
 
         List<PostSummaryResponse> postSummaries = postDtoPage.getContent().stream()
                 .map(PostSummaryResponse::fromDto)
