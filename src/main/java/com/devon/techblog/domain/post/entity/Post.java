@@ -2,9 +2,8 @@ package com.devon.techblog.domain.post.entity;
 
 import com.devon.techblog.domain.common.entity.BaseTimeEntity;
 import com.devon.techblog.domain.member.entity.Member;
-import jakarta.persistence.CollectionTable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +59,9 @@ public class Post extends BaseTimeEntity {
     @Column(name = "summary", length = 500)
     private String summary;
 
-    @ElementCollection
-    @CollectionTable(name = "post_tag", joinColumns = @JoinColumn(name = "post_id"))
-    @Column(name = "tag", length = 50)
-    private List<String> tags;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PostTag> postTags = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "series_id")
@@ -93,7 +92,6 @@ public class Post extends BaseTimeEntity {
                 .likeCount(0L)
                 .commentCount(0L)
                 .isDeleted(false)
-                .tags(new ArrayList<>())
                 .visibility("public")
                 .isDraft(false)
                 .commentsAllowed(true)
@@ -147,27 +145,23 @@ public class Post extends BaseTimeEntity {
         this.summary = summary;
     }
 
-    public void updateTags(List<String> tags) {
-        this.tags = tags != null ? new ArrayList<>(tags) : new ArrayList<>();
+    public void addPostTag(PostTag postTag) {
+        Assert.notNull(postTag, "postTag required");
+        this.postTags.add(postTag);
     }
 
-    public void addTag(String tag) {
-        Assert.hasText(tag, "tag required");
-        if (tag.length() > 50) {
-            throw new IllegalArgumentException("tag too long");
-        }
-        if (this.tags == null) {
-            this.tags = new ArrayList<>();
-        }
-        if (!this.tags.contains(tag)) {
-            this.tags.add(tag);
-        }
+    public void removePostTag(PostTag postTag) {
+        this.postTags.remove(postTag);
     }
 
-    public void removeTag(String tag) {
-        if (this.tags != null) {
-            this.tags.remove(tag);
-        }
+    public void clearPostTags() {
+        this.postTags.clear();
+    }
+
+    public List<String> getTagNames() {
+        return this.postTags.stream()
+                .map(pt -> pt.getTag().getName())
+                .toList();
     }
 
     public void setSeries(Series series) {

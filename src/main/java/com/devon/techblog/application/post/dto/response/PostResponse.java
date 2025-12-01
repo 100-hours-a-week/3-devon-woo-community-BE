@@ -77,7 +77,7 @@ public record PostResponse(
                 post.getCommentCount(),
                 isLiked,
                 post.getSummary(),
-                post.getTags() != null ? post.getTags() : Collections.emptyList(),
+                post.getTagNames(),
                 post.getSeries() != null ? post.getSeries().getId() : null,
                 post.getSeries() != null ? post.getSeries().getName() : null,
                 post.getVisibility() != null ? post.getVisibility() : "public"

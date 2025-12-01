@@ -33,6 +33,7 @@ public class PostService {
     private final AttachmentRepository attachmentRepository;
     private final OwnershipPolicy ownershipPolicy;
     private final PostLikeRepository postLikeRepository;
+    private final TagService tagService;
 
     /**
      * 게시글 생성
@@ -43,12 +44,8 @@ public class PostService {
 
         Post post = Post.create(member, request.title(), request.content());
 
-        // TODO : 임시로 하나 하나 구현, 추후 변경
         if (request.summary() != null) {
             post.updateSummary(request.summary());
-        }
-        if (request.tags() != null) {
-            post.updateTags(request.tags());
         }
         if (request.visibility() != null) {
             post.updateVisibility(request.visibility());
@@ -70,6 +67,9 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
+        if (request.tags() != null && !request.tags().isEmpty()) {
+            tagService.updatePostTags(savedPost, request.tags());
+        }
 
         savedPost.getPostTags().size();
 
@@ -102,7 +102,7 @@ public class PostService {
             post.updateSummary(request.summary());
         }
         if (request.tags() != null) {
-            post.updateTags(request.tags());
+            tagService.updatePostTags(post, request.tags());
         }
         if (request.visibility() != null) {
             post.updateVisibility(request.visibility());
