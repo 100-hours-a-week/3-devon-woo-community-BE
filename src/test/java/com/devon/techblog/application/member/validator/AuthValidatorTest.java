@@ -9,7 +9,6 @@ import com.devon.techblog.application.member.dto.request.SignupRequest;
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.repository.MemberRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
