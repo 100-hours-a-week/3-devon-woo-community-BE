@@ -52,7 +52,8 @@ public class PostService {
         }
         if (request.isDraft() != null && request.isDraft()) {
             post.markAsDraft();
-        } else if (request.isDraft() != null && !request.isDraft()) {
+        }
+        else if (request.isDraft() != null) {
             post.publish();
         }
         if (request.commentsAllowed() != null) {
