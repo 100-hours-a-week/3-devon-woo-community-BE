@@ -51,7 +51,9 @@ def configureJacocoClassDirs(task) {
                 '**/Q*.class',
                 '**/*Application.class',
                 '**/*Config*.class',
+                '**/common/aop/**',
                 '**/dto/**',
+                '**/*Dto*.class',
                 '**/exception/**'
             ])
         }))
