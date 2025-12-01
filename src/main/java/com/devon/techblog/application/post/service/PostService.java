@@ -70,6 +70,9 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
+
+        savedPost.getPostTags().size();
+
         Attachment savedAttachment = Optional.ofNullable(request.image())
                 .map(img -> attachmentRepository.save(Attachment.create(savedPost, img)))
                 .orElse(null);
@@ -83,6 +86,7 @@ public class PostService {
     @Transactional
     public PostResponse updatePost(Long postId, PostUpdateRequest request, Long memberId) {
         Post post = findByIdWithMember(postId);
+        post.getPostTags().size();
         Member member = findMemberById(memberId);
 
         ownershipPolicy.validateOwnership(post.getMember().getId(), memberId);
@@ -140,6 +144,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostResponse getPostDetails(Long postId, Long memberId) {
         Post post = findByIdWithMember(postId);
+        post.getPostTags().size();
 
         Member member = post.getMember();
         Attachment attachment = attachmentRepository.findByPostId(postId)

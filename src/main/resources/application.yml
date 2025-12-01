@@ -26,6 +26,7 @@ spring:
     properties:
       hibernate:
         generate_statistics: true
+        default_batch_fetch_size: 20
 
   data:
     redis:
