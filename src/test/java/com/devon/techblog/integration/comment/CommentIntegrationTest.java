@@ -193,4 +193,83 @@ class CommentIntegrationTest {
 
         Assertions.assertThat(commentRepository.count()).isEqualTo(3);
     }
+
+    @Test
+    @DisplayName("통합 테스트 - 존재하지 않는 댓글 조회 시 404를 반환한다")
+    void getComment_notFound_returns404() throws Exception {
+        mockMvc.perform(get("/api/v1/comments/{commentId}", 999999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 존재하지 않는 댓글 수정 시 404를 반환한다")
+    void updateComment_notFound_returns404() throws Exception {
+        CommentUpdateRequest request = CommentRequestFixture.updateRequest();
+
+        mockMvc.perform(patch("/api/v1/comments/{commentId}", 999999L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 다른 회원의 댓글 수정 시 403을 반환한다")
+    void updateComment_otherMember_returns403() throws Exception {
+        Member otherMember = memberRepository.save(MemberFixture.create(
+                "other@example.com",
+                "password123",
+                "other"
+        ));
+        currentUserContext.setCurrentUserId(otherMember.getId());
+
+        CommentUpdateRequest request = CommentRequestFixture.updateRequest();
+
+        mockMvc.perform(patch("/api/v1/comments/{commentId}", savedComment.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 다른 회원의 댓글 삭제 시 403을 반환한다")
+    void deleteComment_otherMember_returns403() throws Exception {
+        Member otherMember = memberRepository.save(MemberFixture.create(
+                "other@example.com",
+                "password123",
+                "other"
+        ));
+        currentUserContext.setCurrentUserId(otherMember.getId());
+
+        mockMvc.perform(delete("/api/v1/comments/{commentId}", savedComment.getId()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - content 누락 시 400을 반환한다")
+    void createComment_withoutContent_returns400() throws Exception {
+        CommentCreateRequest request = CommentRequestFixture.createRequestWithoutContent();
+
+        mockMvc.perform(post("/api/v1/posts/{postId}/comments", savedPost.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"));
+    }
+
+    @Test
+    @DisplayName("통합 테스트 - 존재하지 않는 게시글에 댓글 생성 시 404를 반환한다")
+    void createComment_postNotFound_returns404() throws Exception {
+        CommentCreateRequest request = CommentRequestFixture.createRequest();
+
+        mockMvc.perform(post("/api/v1/posts/{postId}/comments", 999999L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false));
+    }
 }

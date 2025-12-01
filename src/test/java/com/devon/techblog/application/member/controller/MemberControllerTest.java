@@ -2,6 +2,7 @@ package com.devon.techblog.application.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -13,6 +14,8 @@ import com.devon.techblog.application.member.dto.request.MemberUpdateRequest;
 import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
 import com.devon.techblog.application.member.dto.response.MemberDetailsResponse;
 import com.devon.techblog.application.member.service.MemberService;
+import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -111,5 +114,59 @@ class MemberControllerTest {
 
         mockMvc.perform(delete("/api/v1/members/me"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 시 잘못된 프로필 이미지 URL - 400 Bad Request")
+    void updateMember_withInvalidProfileImage_returns400() throws Exception {
+        MemberUpdateRequest request = MemberRequestFixture.updateRequestWithInvalidProfileImage("invalid-url");
+
+        mockMvc.perform(patch("/api/v1/members/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 현재 비밀번호 누락 - 400 Bad Request")
+    void updatePassword_withoutCurrentPassword_returns400() throws Exception {
+        PasswordUpdateRequest request = MemberRequestFixture.passwordUpdateRequestWithoutCurrent();
+
+        mockMvc.perform(patch("/api/v1/members/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 새 비밀번호가 너무 짧음 - 400 Bad Request")
+    void updatePassword_withShortNewPassword_returns400() throws Exception {
+        PasswordUpdateRequest request = MemberRequestFixture.passwordUpdateRequestWithShortNew();
+
+        mockMvc.perform(patch("/api/v1/members/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원 조회 - 404 Not Found")
+    void getMemberProfile_notFound_returns404() throws Exception {
+        willThrow(new CustomException(MemberErrorCode.USER_NOT_FOUND))
+                .given(memberService).getMemberProfile(any());
+
+        mockMvc.perform(get("/api/v1/members/{memberId}", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value(MemberErrorCode.USER_NOT_FOUND.getMessage()));
     }
 }

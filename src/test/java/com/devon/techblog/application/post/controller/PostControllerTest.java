@@ -2,6 +2,7 @@ package com.devon.techblog.application.post.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,6 +21,8 @@ import com.devon.techblog.application.post.dto.response.PostSummaryResponse;
 import com.devon.techblog.application.post.service.PostLikeService;
 import com.devon.techblog.application.post.service.PostService;
 import com.devon.techblog.application.post.service.PostViewService;
+import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
@@ -143,5 +146,97 @@ class PostControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(postLikeService).unlikePost(any(), any());
+    }
+
+    @Test
+    @DisplayName("게시글 생성 시 title 누락 - 400 Bad Request")
+    void createPost_withoutTitle_returns400() throws Exception {
+        PostCreateRequest request = PostRequestFixture.createRequestWithoutTitle();
+
+        mockMvc.perform(post("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("게시글 생성 시 content 누락 - 400 Bad Request")
+    void createPost_withoutContent_returns400() throws Exception {
+        PostCreateRequest request = PostRequestFixture.createRequestWithoutContent();
+
+        mockMvc.perform(post("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("게시글 생성 시 잘못된 이미지 URL - 400 Bad Request")
+    void createPost_withInvalidImageUrl_returns400() throws Exception {
+        PostCreateRequest request = PostRequestFixture.createRequestWithInvalidImage("invalid-url");
+
+        mockMvc.perform(post("/api/v1/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("게시글 수정 시 잘못된 썸네일 URL - 400 Bad Request")
+    void updatePost_withInvalidThumbnailUrl_returns400() throws Exception {
+        PostUpdateRequest request = PostRequestFixture.updateRequestWithInvalidThumbnail("not-a-url");
+
+        mockMvc.perform(patch("/api/v1/posts/{postId}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"))
+                .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글 조회 - 404 Not Found")
+    void getPost_notFound_returns404() throws Exception {
+        willThrow(new CustomException(PostErrorCode.POST_NOT_FOUND))
+                .given(postService).getPostDetails(any(), any());
+
+        mockMvc.perform(get("/api/v1/posts/{postId}", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value(PostErrorCode.POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글 좋아요 - 404 Not Found")
+    void likePost_notFound_returns404() throws Exception {
+        willThrow(new CustomException(PostErrorCode.POST_NOT_FOUND))
+                .given(postLikeService).likePost(any(), any());
+
+        mockMvc.perform(post("/api/v1/posts/{postId}/like", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value(PostErrorCode.POST_NOT_FOUND.getMessage()));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글 좋아요 취소 - 404 Not Found")
+    void unlikePost_notFound_returns404() throws Exception {
+        willThrow(new CustomException(PostErrorCode.POST_NOT_FOUND))
+                .given(postLikeService).unlikePost(any(), any());
+
+        mockMvc.perform(delete("/api/v1/posts/{postId}/like", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value(PostErrorCode.POST_NOT_FOUND.getMessage()));
     }
 }

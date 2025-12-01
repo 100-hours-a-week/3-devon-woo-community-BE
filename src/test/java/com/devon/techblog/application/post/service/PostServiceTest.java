@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 
 import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.application.post.PostRequestFixture;
@@ -12,6 +13,8 @@ import com.devon.techblog.application.post.dto.request.PostUpdateRequest;
 import com.devon.techblog.application.post.dto.response.PostResponse;
 import com.devon.techblog.application.post.dto.response.PostSummaryResponse;
 import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.code.MemberErrorCode;
+import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.MemberFixture;
@@ -155,5 +158,108 @@ class PostServiceTest {
 
         assertThat(response.items()).hasSize(1);
         assertThat(response.items().getFirst().postId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("게시글 생성 시 회원이 존재하지 않으면 예외가 발생한다")
+    void createPost_memberNotFound_throwsException() {
+        PostCreateRequest request = PostRequestFixture.createRequest();
+        given(memberRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> postService.createPost(request, 1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("게시글 수정 시 게시글이 존재하지 않으면 예외가 발생한다")
+    void updatePost_postNotFound_throwsException() {
+        PostUpdateRequest request = PostRequestFixture.updateRequest();
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> postService.updatePost(1L, request, 1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(PostErrorCode.POST_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("게시글 수정 시 소유자가 아니면 예외가 발생한다")
+    void updatePost_notOwner_throwsException() {
+        PostUpdateRequest request = PostRequestFixture.updateRequest();
+        Member otherMember = MemberFixture.createWithId(2L);
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
+        given(memberRepository.findById(2L)).willReturn(Optional.of(otherMember));
+        doThrow(new CustomException(PostErrorCode.NO_PERMISSION))
+                .when(ownershipPolicy).validateOwnership(1L, 2L);
+
+        assertThatThrownBy(() -> postService.updatePost(1L, request, 2L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(PostErrorCode.NO_PERMISSION.getMessage());
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 시 소유자가 아니면 예외가 발생한다")
+    void deletePost_notOwner_throwsException() {
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
+        doThrow(new CustomException(PostErrorCode.NO_PERMISSION))
+                .when(ownershipPolicy).validateOwnership(1L, 2L);
+
+        assertThatThrownBy(() -> postService.deletePost(1L, 2L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(PostErrorCode.NO_PERMISSION.getMessage());
+    }
+
+    @Test
+    @DisplayName("게시글 조회 시 좋아요 여부를 확인한다 - memberId가 있을 때")
+    void getPostDetails_withMemberId_checksLiked() {
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
+        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
+        given(postLikeRepository.existsByPostIdAndMemberId(1L, 1L)).willReturn(true);
+
+        PostResponse response = postService.getPostDetails(1L, 1L);
+
+        assertThat(response.isLiked()).isTrue();
+    }
+
+    @Test
+    @DisplayName("게시글 조회 시 좋아요 여부를 확인한다 - memberId가 null일 때")
+    void getPostDetails_withoutMemberId_isLikedFalse() {
+        given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
+        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
+
+        PostResponse response = postService.getPostDetails(1L, null);
+
+        assertThat(response.isLiked()).isFalse();
+    }
+
+    @Test
+    @DisplayName("태그로 게시글을 필터링하여 조회할 수 있다")
+    void getPostPageByTags_success() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<String> tags = List.of("Java", "Spring");
+        PostQueryDto dto = new PostQueryDto(1L, "제목", Instant.now(), 0L, 0L, 0L, 1L, "tester", null, null, List.of("Java", "Spring"));
+        Page<PostQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
+
+        given(postRepository.findByTagsIn(tags, pageable)).willReturn(page);
+
+        PageResponse<PostSummaryResponse> response = postService.getPostPageByTags(tags, pageable);
+
+        assertThat(response.items()).hasSize(1);
+        assertThat(response.items().getFirst().postId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("태그로 게시글 조회 시 결과가 없으면 빈 리스트를 반환한다")
+    void getPostPageByTags_noResults_returnsEmptyList() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<String> tags = List.of("NonExistentTag");
+        Page<PostQueryDto> page = new PageImpl<>(List.of(), pageable, 0);
+
+        given(postRepository.findByTagsIn(tags, pageable)).willReturn(page);
+
+        PageResponse<PostSummaryResponse> response = postService.getPostPageByTags(tags, pageable);
+
+        assertThat(response.items()).isEmpty();
+        assertThat(response.totalElements()).isZero();
     }
 }

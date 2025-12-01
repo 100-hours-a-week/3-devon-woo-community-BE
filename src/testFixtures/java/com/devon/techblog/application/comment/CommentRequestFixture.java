@@ -23,4 +23,12 @@ public final class CommentRequestFixture {
     public static CommentUpdateRequest updateRequest(String content) {
         return new CommentUpdateRequest(content);
     }
+
+    public static CommentCreateRequest createRequestWithoutContent() {
+        return new CommentCreateRequest(null);
+    }
+
+    public static CommentUpdateRequest updateRequestWithoutContent() {
+        return new CommentUpdateRequest(null);
+    }
 }

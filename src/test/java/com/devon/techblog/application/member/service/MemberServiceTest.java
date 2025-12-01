@@ -3,6 +3,7 @@ package com.devon.techblog.application.member.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 
 import com.devon.techblog.application.member.MemberRequestFixture;
 import com.devon.techblog.application.member.dto.request.MemberUpdateRequest;
@@ -11,6 +12,7 @@ import com.devon.techblog.application.member.dto.response.MemberDetailsResponse;
 import com.devon.techblog.application.member.dto.response.MemberUpdateResponse;
 import com.devon.techblog.application.member.validator.MemberValidator;
 import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
@@ -96,5 +98,110 @@ class MemberServiceTest {
         memberService.deleteMember(1L);
 
         assertThat(member.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 시 회원이 존재하지 않으면 예외가 발생한다")
+    void updateMember_memberNotFound_throwsException() {
+        MemberUpdateRequest request = MemberRequestFixture.updateRequest();
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> memberService.updateMember(1L, request))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 시 닉네임 중복이면 예외가 발생한다")
+    void updateMember_duplicateNickname_throwsException() {
+        MemberUpdateRequest request = MemberRequestFixture.updateRequest();
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
+        doThrow(new CustomException(MemberErrorCode.DUPLICATE_NICKNAME))
+                .when(memberValidator).validateNicknameNotDuplicated(request.nickname(), member);
+
+        assertThatThrownBy(() -> memberService.updateMember(1L, request))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.DUPLICATE_NICKNAME.getMessage());
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 시 닉네임이 null이면 닉네임 검증을 건너뛴다")
+    void updateMember_withNullNickname_skipsNicknameValidation() {
+        MemberUpdateRequest request = new MemberUpdateRequest(
+                null,
+                "https://example.com/new.png",
+                null, null, null, null, null, null, null
+        );
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
+        given(memberRepository.save(member)).willReturn(member);
+
+        MemberUpdateResponse response = memberService.updateMember(1L, request);
+
+        assertThat(response.nickname()).isEqualTo("tester");
+        assertThat(response.profileImage()).isEqualTo("https://example.com/new.png");
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 시 프로필 이미지가 null이면 이미지 변경을 건너뛴다")
+    void updateMember_withNullProfileImage_skipsImageUpdate() {
+        MemberUpdateRequest request = new MemberUpdateRequest(
+                "newNick",
+                null,
+                null, null, null, null, null, null, null
+        );
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
+        given(memberRepository.save(member)).willReturn(member);
+
+        MemberUpdateResponse response = memberService.updateMember(1L, request);
+
+        assertThat(response.nickname()).isEqualTo("newNick");
+        assertThat(response.profileImage()).isEqualTo("https://example.com/profile.png");
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 회원이 존재하지 않으면 예외가 발생한다")
+    void updatePassword_memberNotFound_throwsException() {
+        PasswordUpdateRequest request = MemberRequestFixture.passwordUpdateRequest();
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> memberService.updatePassword(1L, request))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 현재 비밀번호가 일치하지 않으면 예외가 발생한다")
+    void updatePassword_invalidCurrentPassword_throwsException() {
+        PasswordUpdateRequest request = new PasswordUpdateRequest("wrongPassword", "newPassword123");
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
+        doThrow(new CustomException(MemberErrorCode.INVALID_CURRENT_PASSWORD))
+                .when(memberValidator).validatePasswordUpdate(request, member);
+
+        assertThatThrownBy(() -> memberService.updatePassword(1L, request))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.INVALID_CURRENT_PASSWORD.getMessage());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 새 비밀번호가 현재 비밀번호와 동일하면 예외가 발생한다")
+    void updatePassword_sameAsCurrentPassword_throwsException() {
+        PasswordUpdateRequest request = new PasswordUpdateRequest("password1234", "password1234");
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
+        doThrow(new CustomException(MemberErrorCode.SAME_AS_CURRENT_PASSWORD))
+                .when(memberValidator).validatePasswordUpdate(request, member);
+
+        assertThatThrownBy(() -> memberService.updatePassword(1L, request))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.SAME_AS_CURRENT_PASSWORD.getMessage());
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 시 회원이 존재하지 않으면 예외가 발생한다")
+    void deleteMember_memberNotFound_throwsException() {
+        given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> memberService.deleteMember(1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
     }
 }
