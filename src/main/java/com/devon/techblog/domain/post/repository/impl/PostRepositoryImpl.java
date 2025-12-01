@@ -6,7 +6,7 @@ import static com.devon.techblog.domain.post.entity.QPostTag.postTag;
 import static com.devon.techblog.domain.post.entity.QTag.tag;
 
 import com.devon.techblog.domain.common.repository.QueryDslOrderUtil;
-import com.devon.techblog.domain.post.dto.PostQueryDto;
+import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.repository.PostQueryRepository;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -38,9 +38,9 @@ public class PostRepositoryImpl implements PostQueryRepository {
     );
 
     @Override
-    public Page<PostQueryDto> findAllActiveWithMemberAsDto(Pageable pageable) {
-        List<PostQueryDto> content = queryFactory
-                .select(Projections.constructor(PostQueryDto.class,
+    public Page<PostSummaryQueryDto> findAllActiveWithMemberAsDto(Pageable pageable) {
+        List<PostSummaryQueryDto> content = queryFactory
+                .select(Projections.constructor(PostSummaryQueryDto.class,
                         post.id,
                         post.title,
                         post.createdAt,
@@ -70,11 +70,11 @@ public class PostRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public Page<PostQueryDto> searchByTitleOrContent(String keyword, Pageable pageable) {
+    public Page<PostSummaryQueryDto> searchByTitleOrContent(String keyword, Pageable pageable) {
         BooleanExpression condition = isNotDeleted().and(keywordSearch(keyword));
 
-        List<PostQueryDto> content = queryFactory
-                .select(Projections.constructor(PostQueryDto.class,
+        List<PostSummaryQueryDto> content = queryFactory
+                .select(Projections.constructor(PostSummaryQueryDto.class,
                         post.id,
                         post.title,
                         post.createdAt,
@@ -104,15 +104,15 @@ public class PostRepositoryImpl implements PostQueryRepository {
     }
 
     @Override
-    public Page<PostQueryDto> findByTagsIn(List<String> tags, Pageable pageable) {
+    public Page<PostSummaryQueryDto> findByTagsIn(List<String> tags, Pageable pageable) {
         if (tags == null || tags.isEmpty()) {
             return findAllActiveWithMemberAsDto(pageable);
         }
 
         BooleanExpression condition = isNotDeleted().and(hasAnyTag(tags));
 
-        List<PostQueryDto> content = queryFactory
-                .select(Projections.constructor(PostQueryDto.class,
+        List<PostSummaryQueryDto> content = queryFactory
+                .select(Projections.constructor(PostSummaryQueryDto.class,
                         post.id,
                         post.title,
                         post.createdAt,

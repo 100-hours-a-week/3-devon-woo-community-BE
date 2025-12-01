@@ -6,7 +6,7 @@ import java.time.Instant;
  * QueryDSL Projection용 게시글 요약 DTO
  * 필요한 필드만 조회하여 성능 최적화
  */
-public record PostQueryDto(
+public record PostSummaryQueryDto(
         Long postId,
         String title,
         Instant createdAt,
