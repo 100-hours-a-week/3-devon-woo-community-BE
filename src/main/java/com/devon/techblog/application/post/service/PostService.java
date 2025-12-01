@@ -19,7 +19,6 @@ import com.devon.techblog.domain.post.repository.AttachmentRepository;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,37 +44,13 @@ public class PostService {
 
         Post post = Post.create(member, request.title(), request.content());
 
-        if (request.summary() != null) {
-            post.updateSummary(request.summary());
-        }
-        if (request.visibility() != null) {
-            post.updateVisibility(request.visibility());
-        }
-        if (request.isDraft() != null && request.isDraft()) {
-            post.markAsDraft();
-        }
-        else if (request.isDraft() != null) {
-            post.publish();
-        }
-        if (request.commentsAllowed() != null) {
-            post.setCommentsAllowed(request.commentsAllowed());
-        }
-        if (request.thumbnail() != null) {
-            post.updateThumbnail(request.thumbnail());
-        }
-        if (request.image() != null) {
-            post.updateImageUrl(request.image());
-        }
+        applyPostMutation(post, PostMutationData.fromCreateRequest(request));
 
         Post savedPost = postRepository.save(post);
 
-        if (request.tags() != null && !request.tags().isEmpty()) {
-            tagService.updatePostTags(savedPost, request.tags());
-        }
+        updateTags(savedPost, request.tags(), false);
 
-        Attachment savedAttachment = Optional.ofNullable(request.image())
-                .map(img -> attachmentRepository.save(Attachment.create(savedPost, img)))
-                .orElse(null);
+        Attachment savedAttachment = saveAttachment(savedPost, request.image(), false);
 
         return PostResponse.of(savedPost, member, savedAttachment);
     }
@@ -97,30 +72,12 @@ public class PostService {
             );
         }
 
-        if (request.summary() != null) {
-            post.updateSummary(request.summary());
-        }
-        if (request.tags() != null) {
-            tagService.updatePostTags(post, request.tags());
-        }
-        if (request.visibility() != null) {
-            post.updateVisibility(request.visibility());
-        }
-        if (request.commentsAllowed() != null) {
-            post.setCommentsAllowed(request.commentsAllowed());
-        }
-        if (request.thumbnail() != null) {
-            post.updateThumbnail(request.thumbnail());
-        }
-        if (request.image() != null) {
-            post.updateImageUrl(request.image());
-        }
+        applyPostMutation(post, PostMutationData.fromUpdateRequest(request));
+        updateTags(post, request.tags(), true);
 
         Post savedPost = postRepository.save(post);
 
-        Attachment attachment = Optional.ofNullable(request.image())
-                .map(img -> attachmentRepository.save(Attachment.create(savedPost, img)))
-                .orElseGet(() -> attachmentRepository.findByPostId(postId).orElse(null));
+        Attachment attachment = saveAttachment(savedPost, request.image(), true);
 
         return PostResponse.of(savedPost, member, attachment);
     }
@@ -192,5 +149,82 @@ public class PostService {
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
+    }
+
+    private void applyPostMutation(Post post, PostMutationData data) {
+        if (data.summary() != null) {
+            post.updateSummary(data.summary());
+        }
+        if (data.visibility() != null) {
+            post.updateVisibility(data.visibility());
+        }
+        if (data.isDraft() != null) {
+            if (data.isDraft()) {
+                post.markAsDraft();
+            } else {
+                post.publish();
+            }
+        }
+        if (data.commentsAllowed() != null) {
+            post.setCommentsAllowed(data.commentsAllowed());
+        }
+        if (data.thumbnail() != null) {
+            post.updateThumbnail(data.thumbnail());
+        }
+        if (data.image() != null) {
+            post.updateImageUrl(data.image());
+        }
+    }
+
+    private void updateTags(Post post, List<String> tags, boolean allowEmpty) {
+        if (tags == null) {
+            return;
+        }
+        if (!allowEmpty && tags.isEmpty()) {
+            return;
+        }
+        tagService.updatePostTags(post, tags);
+    }
+
+    private Attachment saveAttachment(Post post, String imageUrl, boolean fallbackToExisting) {
+        if (imageUrl != null) {
+            return attachmentRepository.save(Attachment.create(post, imageUrl));
+        }
+        if (fallbackToExisting) {
+            return attachmentRepository.findByPostId(post.getId()).orElse(null);
+        }
+        return null;
+    }
+
+    private record PostMutationData(
+            String summary,
+            String visibility,
+            Boolean isDraft,
+            Boolean commentsAllowed,
+            String thumbnail,
+            String image
+    ) {
+
+        private static PostMutationData fromCreateRequest(PostCreateRequest request) {
+            return new PostMutationData(
+                    request.summary(),
+                    request.visibility(),
+                    request.isDraft(),
+                    request.commentsAllowed(),
+                    request.thumbnail(),
+                    request.image()
+            );
+        }
+
+        private static PostMutationData fromUpdateRequest(PostUpdateRequest request) {
+            return new PostMutationData(
+                    request.summary(),
+                    request.visibility(),
+                    null,
+                    request.commentsAllowed(),
+                    request.thumbnail(),
+                    request.image()
+            );
+        }
     }
 }
