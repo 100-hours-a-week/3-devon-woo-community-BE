@@ -71,19 +71,4 @@ public class CommentRepositoryImpl implements CommentQueryRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    @Override
-    public Map<Long, Long> countCommentsByPostIds(List<Long> postIds) {
-        List<Tuple> results = queryFactory
-                .select(comment.post.id, comment.count())
-                .from(comment)
-                .where(comment.post.id.in(postIds))
-                .groupBy(comment.post.id)
-                .fetch();
-
-        return results.stream()
-                .collect(Collectors.toMap(
-                        tuple -> tuple.get(comment.post.id),
-                        tuple -> tuple.get(comment.count())
-                ));
-    }
 }

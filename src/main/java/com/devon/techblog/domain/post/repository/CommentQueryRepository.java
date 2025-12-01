@@ -14,10 +14,4 @@ public interface CommentQueryRepository {
      */
     Page<CommentQueryDto> findByPostIdWithMemberAsDto(Long postId, Pageable pageable);
 
-    /**
-     * 여러 게시글의 댓글 수를 한 번의 쿼리로 조회
-     * @return Map<PostId, CommentCount>
-     */
-    Map<Long, Long> countCommentsByPostIds(List<Long> postIds);
-
 }
