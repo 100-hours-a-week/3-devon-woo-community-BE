@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import com.devon.techblog.application.member.dto.request.SignupRequest;
 import com.devon.techblog.application.member.validator.AuthValidator;
 import com.devon.techblog.application.security.dto.response.LoginResponse;
+import com.devon.techblog.application.security.service.SignupService;
 import com.devon.techblog.application.security.util.JwtTokenProvider;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.entity.Member;

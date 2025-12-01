@@ -2,8 +2,8 @@ package com.devon.techblog.application.security.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 
 import com.devon.techblog.common.dto.api.ApiResponse;
 import com.devon.techblog.config.annotation.UnitTest;

@@ -15,7 +15,6 @@ import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.CommentErrorCode;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
-import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.MemberFixture;

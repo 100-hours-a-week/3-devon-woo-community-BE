@@ -1,4 +1,4 @@
-package com.devon.techblog.application.member.service;
+package com.devon.techblog.application.security.service;
 
 import com.devon.techblog.application.member.dto.request.SignupRequest;
 import com.devon.techblog.application.member.validator.AuthValidator;
