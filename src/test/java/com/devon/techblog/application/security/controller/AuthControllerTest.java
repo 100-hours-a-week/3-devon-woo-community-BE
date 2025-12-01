@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.devon.techblog.application.auth.SignupRequestFixture;
 import com.devon.techblog.application.member.dto.request.SignupRequest;
 import com.devon.techblog.application.security.dto.response.LoginResponse;
 import com.devon.techblog.application.security.service.SignupService;
@@ -52,39 +53,17 @@ class AuthControllerTest {
     @MockitoBean
     private SignupService signupService;
 
-
     @Autowired
     private ObjectMapper objectMapper;
 
-
-    private SignupRequest request;
-
-    @BeforeEach
-    void setUp() {
-        request = new SignupRequest(
-                "user@test.com",
-                "password1234",
-                "tester",
-                "https://example.com/profile.png"
-        );
-    }
 
     @Test
     @DisplayName("회원가입 성공 - 201 Created")
     void signup_success() throws Exception {
 
         // given
-        SignupRequest request = new SignupRequest(
-                "test@example.com",
-                "password1234",
-                "devon",
-                null
-        );
-
-        LoginResponse response = new LoginResponse(
-                1L,
-                "fake-access-token"
-        );
+        SignupRequest request = SignupRequestFixture.createRequest();
+        LoginResponse response = new LoginResponse(1L, "fake-access-token");
 
         given(signupService.signup(any())).willReturn(response);
 
@@ -100,12 +79,7 @@ class AuthControllerTest {
     @DisplayName("회원가입 실패 - Validation 오류 시 400 Bad Request")
     void signup_validation_error() throws Exception {
 
-        SignupRequest invalidRequest = new SignupRequest(
-                "invalid-email-format",
-                "1234",
-                "devon",
-                null
-        );
+        SignupRequest invalidRequest = SignupRequestFixture.createRequest("invalid-email-format", "1234", "devon", null);
 
         mockMvc.perform(post("/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -116,12 +90,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("회원가입 실패 - 중복 이메일 시 409 Conflict")
     void signup_duplicateEmail_returns409() throws Exception {
-        SignupRequest request = new SignupRequest(
-                "test@example.com",
-                "password1234",
-                "devon",
-                null
-        );
+        SignupRequest request = SignupRequestFixture.createRequest();
 
         willThrow(new CustomException(MemberErrorCode.DUPLICATE_EMAIL))
                 .given(signupService).signup(any());
@@ -137,12 +106,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("회원가입 실패 - 중복 닉네임 시 409 Conflict")
     void signup_duplicateNickname_returns409() throws Exception {
-        SignupRequest request = new SignupRequest(
-                "test@example.com",
-                "password1234",
-                "devon",
-                null
-        );
+        SignupRequest request = SignupRequestFixture.createRequest();
 
         willThrow(new CustomException(MemberErrorCode.DUPLICATE_NICKNAME))
                 .given(signupService).signup(any());
