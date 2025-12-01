@@ -49,6 +49,7 @@ def configureJacocoClassDirs(task) {
         task.classDirectories.setFrom(files(task.classDirectories.files.collect {
             fileTree(dir: it, exclude: [
                 '**/Q*.class',
+                '**/entity/id/**',
                 '**/*Application.class',
                 '**/*Config*.class',
                 '**/common/aop/**',
