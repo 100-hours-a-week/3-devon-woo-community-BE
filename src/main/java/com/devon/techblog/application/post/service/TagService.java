@@ -38,7 +38,7 @@ public class TagService {
 
             tagRepository.incrementUsageCount(tag.getId());
 
-            PostTag postTag = PostTag.of(post, tag);
+            PostTag postTag = PostTag.create(post, tag);
             postTags.add(postTag);
         }
 

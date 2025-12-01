@@ -57,7 +57,7 @@ class PostTagRepositoryTest {
     @Test
     @DisplayName("PostTag를 저장하고 조회할 수 있다")
     void saveAndFind() {
-        PostTag postTag = PostTag.of(post, tag1);
+        PostTag postTag = PostTag.create(post, tag1);
         PostTag saved = postTagRepository.save(postTag);
 
         assertThat(saved.getId()).isNotNull();
@@ -68,8 +68,8 @@ class PostTagRepositoryTest {
     @Test
     @DisplayName("Post ID로 Tag와 함께 PostTag를 조회할 수 있다")
     void findByPostIdWithTag() {
-        postTagRepository.save(PostTag.of(post, tag1));
-        postTagRepository.save(PostTag.of(post, tag2));
+        postTagRepository.save(PostTag.create(post, tag1));
+        postTagRepository.save(PostTag.create(post, tag2));
 
         List<PostTag> postTags = postTagRepository.findByPostIdWithTag(post.getId());
 
@@ -81,8 +81,8 @@ class PostTagRepositoryTest {
     @Test
     @DisplayName("Post ID로 PostTag를 삭제할 수 있다")
     void deleteByPostId() {
-        postTagRepository.save(PostTag.of(post, tag1));
-        postTagRepository.save(PostTag.of(post, tag2));
+        postTagRepository.save(PostTag.create(post, tag1));
+        postTagRepository.save(PostTag.create(post, tag2));
 
         postTagRepository.deleteByPostId(post.getId());
         postTagRepository.flush();
@@ -92,18 +92,32 @@ class PostTagRepositoryTest {
     }
 
     @Test
-    @DisplayName("Post를 삭제하면 PostTag도 함께 삭제된다 (cascade)")
+    //@Disabled("H2에서는 복합키 + CASCADE가 동작하지 않는다. - 테스트 불가")
+    @DisplayName("Post 삭제 시 PostTag도 함께 삭제된다 (cascade + orphanRemoval)")
     void cascadeDeleteWithPost() {
-        postTagRepository.save(PostTag.of(post, tag1));
-        postTagRepository.save(PostTag.of(post, tag2));
-        postTagRepository.flush();
 
-        Long postId = post.getId();
-        postRepository.delete(post);
+        // given
+        PostTag pt1 = PostTag.create(post, tag1);
+        PostTag pt2 = PostTag.create(post, tag2);
+
+        // 반드시 양방향 연관관계 동기화
+        post.addPostTag(pt1);
+        post.addPostTag(pt2);
+
+        // 부모 저장만 하면 cascade = ALL 덕분에 PostTag도 저장됨
+        postRepository.save(post);
         postRepository.flush();
 
+        Long postId = post.getId();
+
+        // when
+        Post managedPost = postRepository.findById(postId).orElseThrow();
+        postRepository.delete(managedPost);
+        postRepository.flush();
+
+        // then
         List<PostTag> postTags = postTagRepository.findByPostIdWithTag(postId);
-        assertThat(postTags).isEmpty();
+        assertThat(postTags).isEmpty(); // 성공
         assertThat(tagRepository.findById(tag1.getId())).isPresent();
         assertThat(tagRepository.findById(tag2.getId())).isPresent();
     }

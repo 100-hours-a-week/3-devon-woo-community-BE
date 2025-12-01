@@ -39,7 +39,7 @@ public class PostTag {
     @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 
-    public static PostTag of(Post post, Tag tag) {
+    public static PostTag create(Post post, Tag tag) {
         validateCreate(post, tag);
         return PostTag.builder()
                 .id(PostTagId.create(post.getId(), tag.getId()))

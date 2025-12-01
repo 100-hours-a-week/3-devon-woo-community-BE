@@ -122,7 +122,7 @@ class TagServiceTest {
     void updatePostTags_success() {
         Tag oldTag = createTagWithId(1L, "java");
         Tag newTag = createTagWithId(2L, "spring");
-        PostTag oldPostTag = PostTag.of(post, oldTag);
+        PostTag oldPostTag = PostTag.create(post, oldTag);
 
         post.addPostTag(oldPostTag);
 

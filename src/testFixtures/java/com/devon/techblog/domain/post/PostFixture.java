@@ -1,5 +1,6 @@
 package com.devon.techblog.domain.post;
 
+import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.post.entity.Post;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -20,6 +21,13 @@ public final class PostFixture {
 
     public static Post create(Member member, String title, String content) {
         return Post.create(member, title, content);
+    }
+
+    public static Post createWithId(Long id){
+        Member member = MemberFixture.create();
+        Post post = Post.create(member, DEFAULT_TITLE, DEFAULT_CONTENT);
+        ReflectionTestUtils.setField(post, "id", id);
+        return post;
     }
 
     public static Post createWithId(Long id, Member member) {

@@ -4,9 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.devon.techblog.config.annotation.UnitTest;
-import com.devon.techblog.domain.member.MemberFixture;
-import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.post.PostFixture;
+import com.devon.techblog.domain.post.TagFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,15 +18,14 @@ class PostTagTest {
 
     @BeforeEach
     void setUp() {
-        Member member = MemberFixture.create();
-        post = PostFixture.create(member);
-        tag = Tag.create("java");
+        post = PostFixture.createWithId(1L);
+        tag = TagFixture.createWitId(1L);
     }
 
     @Test
     @DisplayName("of 메서드로 PostTag를 생성할 수 있다")
-    void of_createsPostTag() {
-        PostTag postTag = PostTag.of(post, tag);
+    void create_createsPostTag() {
+        PostTag postTag = PostTag.create(post, tag);
 
         assertThat(postTag.getPost()).isEqualTo(post);
         assertThat(postTag.getTag()).isEqualTo(tag);
@@ -38,16 +36,16 @@ class PostTagTest {
 
     @Test
     @DisplayName("of 메서드 호출 시 post가 null이면 예외가 발생한다")
-    void of_requiresNonNullPost() {
-        assertThatThrownBy(() -> PostTag.of(null, tag))
+    void create_requiresNonNullPost() {
+        assertThatThrownBy(() -> PostTag.create(null, tag))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("post required");
     }
 
     @Test
     @DisplayName("of 메서드 호출 시 tag가 null이면 예외가 발생한다")
-    void of_requiresNonNullTag() {
-        assertThatThrownBy(() -> PostTag.of(post, null))
+    void create_requiresNonNullTag() {
+        assertThatThrownBy(() -> PostTag.create(post, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("tag required");
     }
