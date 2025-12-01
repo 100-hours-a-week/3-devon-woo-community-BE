@@ -105,10 +105,20 @@ public class PostController {
             @RequestParam(required = false) Integer size,
 
             @Parameter(description = "정렬 기준 (필드명,방향). 다중 정렬 가능", example = "createdAt,desc")
-            @RequestParam(required = false) List<String> sort
+            @RequestParam(required = false) List<String> sort,
+
+            @Parameter(description = "태그 목록 (OR 조건 - 하나라도 포함하면 조회)", example = "Java,Spring")
+            @RequestParam(required = false) List<String> tags
     ) {
         PageSortRequest pageSortRequest = new PageSortRequest(page, size, sort);
-        PageResponse<PostSummaryResponse> response = postService.getPostPage(pageSortRequest.toPageable());
+        PageResponse<PostSummaryResponse> response;
+
+        if (tags != null && !tags.isEmpty()) {
+            response = postService.getPostPageByTags(tags, pageSortRequest.toPageable());
+        } else {
+            response = postService.getPostPage(pageSortRequest.toPageable());
+        }
+
         return ApiResponse.success(response, "posts_retrieved");
     }
 

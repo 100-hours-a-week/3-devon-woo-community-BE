@@ -33,6 +33,7 @@ public class PostService {
     private final AttachmentRepository attachmentRepository;
     private final OwnershipPolicy ownershipPolicy;
     private final PostLikeRepository postLikeRepository;
+    private final TagService tagService;
 
     /**
      * 게시글 생성
@@ -42,7 +43,34 @@ public class PostService {
         Member member = findMemberById(memberId);
 
         Post post = Post.create(member, request.title(), request.content());
+
+        if (request.summary() != null) {
+            post.updateSummary(request.summary());
+        }
+        if (request.visibility() != null) {
+            post.updateVisibility(request.visibility());
+        }
+        if (request.isDraft() != null && request.isDraft()) {
+            post.markAsDraft();
+        }
+        else if (request.isDraft() != null) {
+            post.publish();
+        }
+        if (request.commentsAllowed() != null) {
+            post.setCommentsAllowed(request.commentsAllowed());
+        }
+        if (request.thumbnail() != null) {
+            post.updateThumbnail(request.thumbnail());
+        }
+        if (request.image() != null) {
+            post.updateImageUrl(request.image());
+        }
+
         Post savedPost = postRepository.save(post);
+
+        if (request.tags() != null && !request.tags().isEmpty()) {
+            tagService.updatePostTags(savedPost, request.tags());
+        }
 
         Attachment savedAttachment = Optional.ofNullable(request.image())
                 .map(img -> attachmentRepository.save(Attachment.create(savedPost, img)))
@@ -61,7 +89,32 @@ public class PostService {
 
         ownershipPolicy.validateOwnership(post.getMember().getId(), memberId);
 
-        post.updatePost(request.title(), request.content());
+        if (request.title() != null || request.content() != null) {
+            post.updatePost(
+                    request.title() != null ? request.title() : post.getTitle(),
+                    request.content() != null ? request.content() : post.getContent()
+            );
+        }
+
+        if (request.summary() != null) {
+            post.updateSummary(request.summary());
+        }
+        if (request.tags() != null) {
+            tagService.updatePostTags(post, request.tags());
+        }
+        if (request.visibility() != null) {
+            post.updateVisibility(request.visibility());
+        }
+        if (request.commentsAllowed() != null) {
+            post.setCommentsAllowed(request.commentsAllowed());
+        }
+        if (request.thumbnail() != null) {
+            post.updateThumbnail(request.thumbnail());
+        }
+        if (request.image() != null) {
+            post.updateImageUrl(request.image());
+        }
+
         Post savedPost = postRepository.save(post);
 
         Attachment attachment = Optional.ofNullable(request.image())
@@ -108,6 +161,20 @@ public class PostService {
     @Transactional(readOnly = true)
     public PageResponse<PostSummaryResponse> getPostPage(Pageable pageable) {
         Page<PostQueryDto> postDtoPage = postRepository.findAllActiveWithMemberAsDto(pageable);
+
+        List<PostSummaryResponse> postSummaries = postDtoPage.getContent().stream()
+                .map(PostSummaryResponse::fromDto)
+                .toList();
+
+        return PageResponse.of(postSummaries, postDtoPage);
+    }
+
+    /**
+     * 태그로 게시글 필터링 조회 (+페이징 및 정렬)
+     */
+    @Transactional(readOnly = true)
+    public PageResponse<PostSummaryResponse> getPostPageByTags(List<String> tags, Pageable pageable) {
+        Page<PostQueryDto> postDtoPage = postRepository.findByTagsIn(tags, pageable);
 
         List<PostSummaryResponse> postSummaries = postDtoPage.getContent().stream()
                 .map(PostSummaryResponse::fromDto)

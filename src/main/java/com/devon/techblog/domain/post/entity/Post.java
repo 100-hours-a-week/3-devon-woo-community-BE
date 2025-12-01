@@ -2,6 +2,7 @@ package com.devon.techblog.domain.post.entity;
 
 import com.devon.techblog.domain.common.entity.BaseTimeEntity;
 import com.devon.techblog.domain.member.entity.Member;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,7 +11,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,6 +56,32 @@ public class Post extends BaseTimeEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+    @Column(name = "summary", length = 500)
+    private String summary;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PostTag> postTags = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "series_id")
+    private Series series;
+
+    @Column(name = "visibility", length = 20)
+    private String visibility;
+
+    @Column(name = "is_draft", nullable = false)
+    private Boolean isDraft;
+
+    @Column(name = "comments_allowed", nullable = false)
+    private Boolean commentsAllowed;
+
+    @Column(name = "thumbnail", length = 500)
+    private String thumbnail;
+
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     public static Post create(Member member, String title, String content) {
         validateCreate(member, title, content);
         return Post.builder()
@@ -62,6 +92,9 @@ public class Post extends BaseTimeEntity {
                 .likeCount(0L)
                 .commentCount(0L)
                 .isDeleted(false)
+                .visibility("public")
+                .isDraft(false)
+                .commentsAllowed(true)
                 .build();
     }
 
@@ -103,6 +136,69 @@ public class Post extends BaseTimeEntity {
 
     public boolean isDeleted() {
         return this.isDeleted;
+    }
+
+    public void updateSummary(String summary) {
+        if (summary != null && summary.length() > 500) {
+            throw new IllegalArgumentException("summary too long");
+        }
+        this.summary = summary;
+    }
+
+    public void addPostTag(PostTag postTag) {
+        Assert.notNull(postTag, "postTag required");
+        this.postTags.add(postTag);
+    }
+
+    public void clearPostTags() {
+        this.postTags.clear();
+    }
+
+    public List<String> getTagNames() {
+        return this.postTags.stream()
+                .map(pt -> pt.getTag().getName())
+                .toList();
+    }
+
+    public void setSeries(Series series) {
+        this.series = series;
+    }
+
+    public void removeSeries() {
+        this.series = null;
+    }
+
+    public void updateVisibility(String visibility) {
+        if (visibility != null && visibility.length() > 20) {
+            throw new IllegalArgumentException("visibility too long");
+        }
+        this.visibility = visibility;
+    }
+
+    public void markAsDraft() {
+        this.isDraft = true;
+    }
+
+    public void publish() {
+        this.isDraft = false;
+    }
+
+    public void setCommentsAllowed(Boolean commentsAllowed) {
+        this.commentsAllowed = commentsAllowed != null ? commentsAllowed : true;
+    }
+
+    public void updateThumbnail(String thumbnail) {
+        if (thumbnail != null && thumbnail.length() > 500) {
+            throw new IllegalArgumentException("thumbnail url too long");
+        }
+        this.thumbnail = thumbnail;
+    }
+
+    public void updateImageUrl(String imageUrl) {
+        if (imageUrl != null && imageUrl.length() > 500) {
+            throw new IllegalArgumentException("image url too long");
+        }
+        this.imageUrl = imageUrl;
     }
 
     private static void validateCreate(Member member, String title, String content){

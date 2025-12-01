@@ -63,7 +63,7 @@ class MemberIntegrationTest {
     @Test
     @DisplayName("통합 테스트 - 회원 정보 조회 시 ApiResponse로 감싼 정보를 반환한다")
     void getMemberProfile_returnsResponse_integration() throws Exception {
-        mockMvc.perform(get("/api/v1/members/{id}", savedMember.getId()))
+        mockMvc.perform(get("/api/v1/members/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("member_get_success"))
@@ -76,7 +76,7 @@ class MemberIntegrationTest {
     void updateMember_returnsUpdatedResponse_integration() throws Exception {
         MemberUpdateRequest request = MemberRequestFixture.updateRequest();
 
-        mockMvc.perform(patch("/api/v1/members/{id}", savedMember.getId())
+        mockMvc.perform(patch("/api/v1/members/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -95,7 +95,7 @@ class MemberIntegrationTest {
     void updatePassword_returnsNoContent_integration() throws Exception {
         PasswordUpdateRequest request = new PasswordUpdateRequest("currentPassword!", "newPassword123");
 
-        mockMvc.perform(patch("/api/v1/members/{id}/password", savedMember.getId())
+        mockMvc.perform(patch("/api/v1/members/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent());
@@ -107,7 +107,7 @@ class MemberIntegrationTest {
     @Test
     @DisplayName("통합 테스트 - 회원 탈퇴 요청 시 204 응답을 반환한다")
     void deleteMember_returnsNoContent_integration() throws Exception {
-        mockMvc.perform(delete("/api/v1/members/{id}", savedMember.getId()))
+        mockMvc.perform(delete("/api/v1/members/me"))
                 .andExpect(status().isNoContent());
 
         Member deleted = memberRepository.findById(savedMember.getId()).orElseThrow();
@@ -129,13 +129,13 @@ class MemberIntegrationTest {
         ));
 
         currentUserContext.setCurrentUserId(member2.getId());
-        mockMvc.perform(get("/api/v1/members/{id}", member2.getId()))
+        mockMvc.perform(get("/api/v1/members/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nickname").value("tester2"))
                 .andExpect(jsonPath("$.data.email").value("tester2@example.com"));
 
         currentUserContext.setCurrentUserId(member3.getId());
-        mockMvc.perform(get("/api/v1/members/{id}", member3.getId()))
+        mockMvc.perform(get("/api/v1/members/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nickname").value("tester3"))
                 .andExpect(jsonPath("$.data.email").value("tester3@example.com"));
@@ -148,12 +148,12 @@ class MemberIntegrationTest {
     void updateMemberThenGet_returnsUpdatedInfo() throws Exception {
         MemberUpdateRequest updateRequest = MemberRequestFixture.updateRequest();
 
-        mockMvc.perform(patch("/api/v1/members/{id}", savedMember.getId())
+        mockMvc.perform(patch("/api/v1/members/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/v1/members/{id}", savedMember.getId()))
+        mockMvc.perform(get("/api/v1/members/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nickname").value("newNick"))
                 .andExpect(jsonPath("$.data.profileImage").value("https://example.com/new.png"));
@@ -164,14 +164,14 @@ class MemberIntegrationTest {
     void updatePasswordTwice_succeeds() throws Exception {
         PasswordUpdateRequest firstUpdate = new PasswordUpdateRequest("currentPassword!", "newPassword123");
 
-        mockMvc.perform(patch("/api/v1/members/{id}/password", savedMember.getId())
+        mockMvc.perform(patch("/api/v1/members/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(firstUpdate)))
                 .andExpect(status().isNoContent());
 
         PasswordUpdateRequest secondUpdate = new PasswordUpdateRequest("newPassword123", "finalPassword456");
 
-        mockMvc.perform(patch("/api/v1/members/{id}/password", savedMember.getId())
+        mockMvc.perform(patch("/api/v1/members/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(secondUpdate)))
                 .andExpect(status().isNoContent());
@@ -186,7 +186,7 @@ class MemberIntegrationTest {
         Long nonExistentId = 99999L;
         currentUserContext.setCurrentUserId(nonExistentId);
 
-        mockMvc.perform(get("/api/v1/members/{id}", nonExistentId))
+        mockMvc.perform(get("/api/v1/members/me"))
                 .andExpect(status().isNotFound());
     }
 
@@ -195,7 +195,7 @@ class MemberIntegrationTest {
     void updatePassword_withWrongCurrentPassword_returns400() throws Exception {
         PasswordUpdateRequest request = new PasswordUpdateRequest("wrongPassword!", "newPassword123");
 
-        mockMvc.perform(patch("/api/v1/members/{id}/password", savedMember.getId())
+        mockMvc.perform(patch("/api/v1/members/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -206,13 +206,13 @@ class MemberIntegrationTest {
     @Test
     @DisplayName("통합 테스트 - 탈퇴한 회원 조회 시 404 예외를 던진다")
     void getDeletedMember_handlesAppropriately() throws Exception {
-        mockMvc.perform(delete("/api/v1/members/{id}", savedMember.getId()))
+        mockMvc.perform(delete("/api/v1/members/me"))
                 .andExpect(status().isNoContent());
 
         Member deleted = memberRepository.findById(savedMember.getId()).orElseThrow();
         Assertions.assertThat(deleted.getStatus()).isEqualTo(MemberStatus.WITHDRAWN);
 
-        mockMvc.perform(get("/api/v1/members/{id}", savedMember.getId()))
+        mockMvc.perform(get("/api/v1/members/me"))
                 .andExpect(status().isNotFound());
         // todo : 예외 설명도 넣으면 더 좋지 않을까?
     }

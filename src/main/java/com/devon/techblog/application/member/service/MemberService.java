@@ -46,6 +46,16 @@ public class MemberService {
             member.updateProfileImage(request.profileImage());
         }
 
+        member.updateProfile(
+                request.handle(),
+                request.bio(),
+                request.company(),
+                request.location(),
+                request.primaryStack(),
+                request.interests(),
+                request.socialLinks()
+        );
+
         memberRepository.save(member);
 
         return MemberUpdateResponse.of(member);

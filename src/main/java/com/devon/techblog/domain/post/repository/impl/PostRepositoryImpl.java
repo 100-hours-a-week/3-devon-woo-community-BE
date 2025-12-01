@@ -2,6 +2,8 @@ package com.devon.techblog.domain.post.repository.impl;
 
 import static com.devon.techblog.domain.member.entity.QMember.member;
 import static com.devon.techblog.domain.post.entity.QPost.post;
+import static com.devon.techblog.domain.post.entity.QPostTag.postTag;
+import static com.devon.techblog.domain.post.entity.QTag.tag;
 
 import com.devon.techblog.domain.common.repository.QueryDslOrderUtil;
 import com.devon.techblog.domain.post.dto.PostQueryDto;
@@ -47,7 +49,9 @@ public class PostRepositoryImpl implements PostQueryRepository {
                         post.commentCount,
                         member.id,
                         member.nickname,
-                        member.profileImageUrl
+                        member.profileImageUrl,
+                        post.summary,
+                        post.thumbnail
                 ))
                 .from(post)
                 .join(post.member, member)
@@ -79,7 +83,47 @@ public class PostRepositoryImpl implements PostQueryRepository {
                         post.commentCount,
                         member.id,
                         member.nickname,
-                        member.email
+                        member.profileImageUrl,
+                        post.summary,
+                        post.thumbnail
+                ))
+                .from(post)
+                .join(post.member, member)
+                .where(condition)
+                .orderBy(getOrderSpecifiers(pageable))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(post.count())
+                .from(post)
+                .where(condition);
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<PostQueryDto> findByTagsIn(List<String> tags, Pageable pageable) {
+        if (tags == null || tags.isEmpty()) {
+            return findAllActiveWithMemberAsDto(pageable);
+        }
+
+        BooleanExpression condition = isNotDeleted().and(hasAnyTag(tags));
+
+        List<PostQueryDto> content = queryFactory
+                .select(Projections.constructor(PostQueryDto.class,
+                        post.id,
+                        post.title,
+                        post.createdAt,
+                        post.viewsCount,
+                        post.likeCount,
+                        post.commentCount,
+                        member.id,
+                        member.nickname,
+                        member.profileImageUrl,
+                        post.summary,
+                        post.thumbnail
                 ))
                 .from(post)
                 .join(post.member, member)
@@ -120,5 +164,19 @@ public class PostRepositoryImpl implements PostQueryRepository {
 
     private BooleanExpression contentContains(String keyword) {
         return keyword != null ? post.content.containsIgnoreCase(keyword) : null;
+    }
+
+    private BooleanExpression hasAnyTag(List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return null;
+        }
+
+        return post.id.in(
+            queryFactory
+                .select(postTag.post.id)
+                .from(postTag)
+                .join(postTag.tag, tag)
+                .where(tag.name.in(tags))
+        );
     }
 }

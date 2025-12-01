@@ -2,10 +2,12 @@ package com.devon.techblog.domain.member.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.devon.techblog.application.member.dto.SocialLinks;
 import com.devon.techblog.config.annotation.RepositoryJpaTest;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.entity.MemberStatus;
 import jakarta.transaction.Transactional;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,5 +58,71 @@ class MemberRepositoryTest {
         assertThat(memberRepository.findByStatus(MemberStatus.INACTIVE))
                 .extracting(Member::getEmail)
                 .containsExactly(inactive.getEmail());
+    }
+
+    @Test
+    @DisplayName("새 필드들이 정상적으로 저장되고 조회된다")
+    void saveAndFindWithNewFields() {
+        Member member = Member.create("user@test.com", "password", "tester");
+
+        List<String> stack = Arrays.asList("Java", "Spring");
+        List<String> interests = Arrays.asList("AI", "Cloud");
+        SocialLinks links = new SocialLinks(
+                "https://github.com/user",
+                "https://user.com",
+                "https://linkedin.com/in/user",
+                null
+        );
+
+        member.updateProfile("@user", "Backend Dev", "Tech Corp", "Seoul", stack, interests, links);
+
+        Member saved = memberRepository.save(member);
+        Member found = memberRepository.findById(saved.getId()).orElseThrow();
+
+        assertThat(found.getHandle()).isEqualTo("@user");
+        assertThat(found.getBio()).isEqualTo("Backend Dev");
+        assertThat(found.getCompany()).isEqualTo("Tech Corp");
+        assertThat(found.getLocation()).isEqualTo("Seoul");
+        assertThat(found.getPrimaryStack()).containsExactly("Java", "Spring");
+        assertThat(found.getInterests()).containsExactly("AI", "Cloud");
+        assertThat(found.getSocialLinks().github()).isEqualTo("https://github.com/user");
+        assertThat(found.getSocialLinks().website()).isEqualTo("https://user.com");
+        assertThat(found.getSocialLinks().linkedin()).isEqualTo("https://linkedin.com/in/user");
+        assertThat(found.getSocialLinks().notion()).isNull();
+    }
+
+    @Test
+    @DisplayName("빈 리스트와 null 필드가 정상적으로 저장되고 조회된다")
+    void saveAndFindWithEmptyAndNullFields() {
+        Member member = Member.create("user@test.com", "password", "tester");
+        Member saved = memberRepository.save(member);
+        Member found = memberRepository.findById(saved.getId()).orElseThrow();
+
+        assertThat(found.getHandle()).isNull();
+        assertThat(found.getBio()).isNull();
+        assertThat(found.getCompany()).isNull();
+        assertThat(found.getLocation()).isNull();
+        assertThat(found.getPrimaryStack()).isEmpty();
+        assertThat(found.getInterests()).isEmpty();
+        assertThat(found.getSocialLinks()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("필드 수정 후 재조회 시 변경된 값이 반영된다")
+    void updateAndReload() {
+        Member member = memberRepository.save(Member.create("user@test.com", "password", "tester"));
+
+        member.updateHandle("@newhandle");
+        member.updateCompany("New Company");
+        member.updatePrimaryStack(Arrays.asList("Kotlin", "Spring Boot"));
+
+        memberRepository.save(member);
+        memberRepository.flush();
+
+        Member reloaded = memberRepository.findById(member.getId()).orElseThrow();
+
+        assertThat(reloaded.getHandle()).isEqualTo("@newhandle");
+        assertThat(reloaded.getCompany()).isEqualTo("New Company");
+        assertThat(reloaded.getPrimaryStack()).containsExactly("Kotlin", "Spring Boot");
     }
 }

@@ -77,6 +77,14 @@ storage:
     upload:
       preset: test-upload-preset
 
+aop:
+  api-logging:
+    enabled: false
+  service-performance:
+    enabled: false
+  transactional-query-logging:
+    enabled: false
+
 logging:
   level:
     org.hibernate.SQL: INFO

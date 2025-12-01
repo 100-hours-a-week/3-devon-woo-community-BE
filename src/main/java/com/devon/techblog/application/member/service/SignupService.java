@@ -1,8 +1,9 @@
 package com.devon.techblog.application.member.service;
 
 import com.devon.techblog.application.member.dto.request.SignupRequest;
-import com.devon.techblog.application.member.dto.response.SignupResponse;
 import com.devon.techblog.application.member.validator.AuthValidator;
+import com.devon.techblog.application.security.dto.response.LoginResponse;
+import com.devon.techblog.application.security.util.JwtTokenProvider;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class SignupService {
     private final MemberRepository memberRepository;
     private final AuthValidator authValidator;
-
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public SignupResponse signup(SignupRequest request){
+    public LoginResponse signup(SignupRequest request){
         authValidator.validateSignup(request);
 
         String email = request.email();
@@ -30,6 +31,8 @@ public class SignupService {
         member.updateProfileImage(request.profileImage());
 
         Member savedMember = memberRepository.save(member);
-        return new SignupResponse(savedMember.getId());
+
+        String accessToken = jwtTokenProvider.generateAccessToken(savedMember.getId(), savedMember.getRole().name());
+        return new LoginResponse(savedMember.getId(), accessToken);
     }
 }

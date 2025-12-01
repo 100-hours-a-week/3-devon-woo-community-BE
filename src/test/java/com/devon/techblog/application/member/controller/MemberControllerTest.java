@@ -2,6 +2,7 @@ package com.devon.techblog.application.member.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -12,8 +13,9 @@ import com.devon.techblog.application.member.MemberRequestFixture;
 import com.devon.techblog.application.member.dto.request.MemberUpdateRequest;
 import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
 import com.devon.techblog.application.member.dto.response.MemberDetailsResponse;
-import com.devon.techblog.application.member.dto.response.MemberUpdateResponse;
 import com.devon.techblog.application.member.service.MemberService;
+import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -43,12 +45,20 @@ class MemberControllerTest {
                 1L,
                 "devon",
                 "test@example.com",
-                "https://example.com/profile.png"
+                "https://example.com/profile.png",
+                "USER",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
         );
 
         given(memberService.getMemberProfile(any())).willReturn(response);
 
-        mockMvc.perform(get("/api/v1/members/{id}", 1L))
+        mockMvc.perform(get("/api/v1/members/{memberId}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.memberId").value(1L))
                 .andExpect(jsonPath("$.data.nickname").value("devon"))
@@ -61,11 +71,24 @@ class MemberControllerTest {
     void updateMember_returnsResponse() throws Exception {
 
         MemberUpdateRequest request = MemberRequestFixture.updateRequest("devon", "https://example.com/profile.png");
-        MemberUpdateResponse response = new MemberUpdateResponse("devon", "https://example.com/profile.png");
+        MemberDetailsResponse response = new MemberDetailsResponse(
+                1L,
+                "devon",
+                "test@example.com",
+                "https://example.com/profile.png",
+                "USER",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
 
-        given(memberService.updateMember(any(), any())).willReturn(response);
+        given(memberService.getMemberProfile(any())).willReturn(response);
 
-        mockMvc.perform(patch("/api/v1/members/{id}", 1L)
+        mockMvc.perform(patch("/api/v1/members/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -79,7 +102,7 @@ class MemberControllerTest {
 
         PasswordUpdateRequest request = new PasswordUpdateRequest("currentPassword!", "newPassword123");
 
-        mockMvc.perform(patch("/api/v1/members/{id}/password", 1L)
+        mockMvc.perform(patch("/api/v1/members/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isNoContent());
@@ -89,7 +112,58 @@ class MemberControllerTest {
     @DisplayName("회원 탈퇴 - 204 No Content")
     void deleteMember_returnsNoContent() throws Exception {
 
-        mockMvc.perform(delete("/api/v1/members/{id}", 1L))
+        mockMvc.perform(delete("/api/v1/members/me"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 시 잘못된 프로필 이미지 URL - 400 Bad Request")
+    void updateMember_withInvalidProfileImage_returns400() throws Exception {
+        MemberUpdateRequest request = MemberRequestFixture.updateRequestWithInvalidProfileImage("invalid-url");
+
+        mockMvc.perform(patch("/api/v1/members/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 현재 비밀번호 누락 - 400 Bad Request")
+    void updatePassword_withoutCurrentPassword_returns400() throws Exception {
+        PasswordUpdateRequest request = MemberRequestFixture.passwordUpdateRequestWithoutCurrent();
+
+        mockMvc.perform(patch("/api/v1/members/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 시 새 비밀번호가 너무 짧음 - 400 Bad Request")
+    void updatePassword_withShortNewPassword_returns400() throws Exception {
+        PasswordUpdateRequest request = MemberRequestFixture.passwordUpdateRequestWithShortNew();
+
+        mockMvc.perform(patch("/api/v1/members/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("validation_failed"));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원 조회 - 404 Not Found")
+    void getMemberProfile_notFound_returns404() throws Exception {
+        willThrow(new CustomException(MemberErrorCode.USER_NOT_FOUND))
+                .given(memberService).getMemberProfile(any());
+
+        mockMvc.perform(get("/api/v1/members/{memberId}", 999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value(MemberErrorCode.USER_NOT_FOUND.getMessage()));
     }
 }

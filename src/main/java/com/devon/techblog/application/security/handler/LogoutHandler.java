@@ -25,10 +25,8 @@ public class LogoutHandler {
 
         SecurityContextHolder.clearContext();
 
-        String refreshToken = String.valueOf(cookieProvider.getRefreshTokenFromCookie(request));
-        if (refreshToken != null) {
-            tokenBlacklistService.addToBlacklist(refreshToken);
-        }
+        cookieProvider.getRefreshTokenFromCookie(request)
+                .ifPresent(tokenBlacklistService::addToBlacklist);
 
         cookieProvider.deleteRefreshTokenCookie(response);
 

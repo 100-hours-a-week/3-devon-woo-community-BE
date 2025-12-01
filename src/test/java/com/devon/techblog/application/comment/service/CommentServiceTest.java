@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 
 import com.devon.techblog.application.comment.CommentRequestFixture;
 import com.devon.techblog.application.comment.dto.request.CommentCreateRequest;
@@ -11,6 +13,9 @@ import com.devon.techblog.application.comment.dto.request.CommentUpdateRequest;
 import com.devon.techblog.application.comment.dto.response.CommentResponse;
 import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.code.CommentErrorCode;
+import com.devon.techblog.common.exception.code.MemberErrorCode;
+import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.MemberFixture;
@@ -155,5 +160,100 @@ class CommentServiceTest {
 
         assertThatThrownBy(() -> commentService.getCommentPageByPostId(1L, pageable))
                 .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    @DisplayName("댓글 작성 시 회원이 존재하지 않으면 예외가 발생한다")
+    void createComment_memberNotFound_throwsException() {
+        CommentCreateRequest request = CommentRequestFixture.createRequest();
+        given(postRepository.existsById(1L)).willReturn(true);
+        given(postRepository.getReferenceById(1L)).willReturn(post);
+        given(memberRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> commentService.createComment(1L, request, 1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("댓글 작성 시 댓글 카운트가 증가한다")
+    void createComment_incrementsCommentCount() {
+        CommentCreateRequest request = CommentRequestFixture.createRequest();
+        given(postRepository.existsById(1L)).willReturn(true);
+        given(postRepository.getReferenceById(1L)).willReturn(post);
+        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
+        given(commentRepository.save(any(Comment.class))).willReturn(comment);
+
+        commentService.createComment(1L, request, 1L);
+
+        verify(postRepository).incrementCommentCount(1L);
+    }
+
+    @Test
+    @DisplayName("댓글 수정 시 댓글이 존재하지 않으면 예외가 발생한다")
+    void updateComment_commentNotFound_throwsException() {
+        CommentUpdateRequest request = CommentRequestFixture.updateRequest();
+        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> commentService.updateComment(1L, request, 1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(CommentErrorCode.COMMENT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("댓글 수정 시 소유자가 아니면 예외가 발생한다")
+    void updateComment_notOwner_throwsException() {
+        CommentUpdateRequest request = CommentRequestFixture.updateRequest();
+        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
+        doThrow(new CustomException(CommentErrorCode.NO_PERMISSION))
+                .when(ownershipPolicy).validateOwnership(1L, 2L);
+
+        assertThatThrownBy(() -> commentService.updateComment(1L, request, 2L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(CommentErrorCode.NO_PERMISSION.getMessage());
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 시 댓글이 존재하지 않으면 예외가 발생한다")
+    void deleteComment_commentNotFound_throwsException() {
+        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> commentService.deleteComment(1L, 1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(CommentErrorCode.COMMENT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 시 postId를 찾을 수 없으면 예외가 발생한다")
+    void deleteComment_postIdNotFound_throwsException() {
+        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
+        given(commentRepository.findPostIdByCommentId(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> commentService.deleteComment(1L, 1L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(CommentErrorCode.COMMENT_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 시 댓글 카운트가 감소한다")
+    void deleteComment_decrementsCommentCount() {
+        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
+        given(commentRepository.findPostIdByCommentId(1L)).willReturn(Optional.of(1L));
+
+        commentService.deleteComment(1L, 1L);
+
+        verify(postRepository).decrementCommentCount(1L);
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 시 소유자가 아니면 예외가 발생한다")
+    void deleteComment_notOwner_throwsException() {
+        given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
+        doThrow(new CustomException(CommentErrorCode.NO_PERMISSION))
+                .when(ownershipPolicy).validateOwnership(1L, 2L);
+
+        assertThatThrownBy(() -> commentService.deleteComment(1L, 2L))
+                .isInstanceOf(CustomException.class)
+                .hasMessageContaining(CommentErrorCode.NO_PERMISSION.getMessage());
     }
 }

@@ -15,6 +15,8 @@ public record PostQueryDto(
         Long commentCount,
         Long memberId,
         String memberNickname,
-        String memberProfileImageUrl
+        String memberProfileImageUrl,
+        String summary,
+        String thumbnail
 ) {
 }

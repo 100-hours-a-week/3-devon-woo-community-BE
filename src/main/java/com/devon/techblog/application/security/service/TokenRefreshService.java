@@ -19,6 +19,7 @@ public class TokenRefreshService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public String refreshAccessToken(String refreshToken) {
         if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
@@ -27,6 +28,10 @@ public class TokenRefreshService {
 
         if (jwtTokenProvider.isTokenExpired(refreshToken)) {
             throw new CustomException(AuthErrorCode.REFRESH_TOKEN_EXPIRED);
+        }
+
+        if (tokenBlacklistService.isBlacklisted(refreshToken)) {
+            throw new CustomException(AuthErrorCode.REFRESH_TOKEN_INVALID);
         }
 
         Long memberId = jwtTokenProvider.getUidFromToken(refreshToken);
