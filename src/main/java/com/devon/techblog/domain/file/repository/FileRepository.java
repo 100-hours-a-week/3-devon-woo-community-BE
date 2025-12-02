@@ -10,5 +10,5 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
     List<File> findByFileType(FileType fileType);
 
-    Optional<File> findByS3Key(String s3Key);
+    Optional<File> findByStorageKey(String storageKey);
 }

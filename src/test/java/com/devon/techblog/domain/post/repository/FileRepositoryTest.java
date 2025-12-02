@@ -3,6 +3,8 @@ package com.devon.techblog.domain.post.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.devon.techblog.config.annotation.RepositoryJpaTest;
+import com.devon.techblog.domain.file.entity.File;
+import com.devon.techblog.domain.file.repository.FileRepository;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;

@@ -20,24 +20,18 @@ public class FileService {
     public File createFile(
             FileType fileType,
             String originalName,
-            String s3Key,
+            String storageKey,
             String url,
             Long size,
-            String mimeType,
-            Integer width,
-            Integer height,
-            Integer duration
+            String mimeType
     ) {
         File file = File.create(
                 fileType,
                 originalName,
-                s3Key,
+                storageKey,
                 url,
                 size,
-                mimeType,
-                width,
-                height,
-                duration
+                mimeType
         );
         return fileRepository.save(file);
     }
@@ -47,9 +41,9 @@ public class FileService {
                 .orElseThrow(() -> new IllegalArgumentException("file not found: " + id));
     }
 
-    public File getFileByS3Key(String s3Key) {
-        return fileRepository.findByS3Key(s3Key)
-                .orElseThrow(() -> new IllegalArgumentException("file not found with s3Key: " + s3Key));
+    public File getFileByStorageKey(String storageKey) {
+        return fileRepository.findByStorageKey(storageKey)
+                .orElseThrow(() -> new IllegalArgumentException("file not found with storageKey: " + storageKey));
     }
 
     public List<File> getFilesByType(FileType fileType) {
@@ -79,8 +73,8 @@ public class FileService {
     }
 
     @Transactional
-    public void permanentlyDeleteFileByS3Key(String s3Key) {
-        File file = getFileByS3Key(s3Key);
+    public void permanentlyDeleteFileByStorageKey(String storageKey) {
+        File file = getFileByStorageKey(storageKey);
         fileRepository.delete(file);
     }
 }

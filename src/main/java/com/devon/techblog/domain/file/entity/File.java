@@ -35,8 +35,8 @@ public class File extends BaseTimeEntity {
     @Column(name = "original_name", length = 255, nullable = false)
     private String originalName;
 
-    @Column(name = "s3_key", length = 500, nullable = false)
-    private String s3Key;
+    @Column(name = "storage_key", length = 500, nullable = false)
+    private String storageKey;
 
     @Column(name = "url", length = 500, nullable = false)
     private String url;
@@ -47,32 +47,20 @@ public class File extends BaseTimeEntity {
     @Column(name = "mime_type", length = 100, nullable = false)
     private String mimeType;
 
-    @Column(name = "width")
-    private Integer width;
-
-    @Column(name = "height")
-    private Integer height;
-
-    @Column(name = "duration")
-    private Integer duration;
-
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
     public static File create(
             FileType fileType,
             String originalName,
-            String s3Key,
+            String storageKey,
             String url,
             Long size,
-            String mimeType,
-            Integer width,
-            Integer height,
-            Integer duration
+            String mimeType
     ) {
         Assert.notNull(fileType, "file type required");
         Assert.hasText(originalName, "original name required");
-        Assert.hasText(s3Key, "s3 key required");
+        Assert.hasText(storageKey, "storage key required");
         Assert.hasText(url, "url required");
         Assert.notNull(size, "size required");
         Assert.hasText(mimeType, "mime type required");
@@ -85,8 +73,8 @@ public class File extends BaseTimeEntity {
             throw new IllegalArgumentException("original name too long");
         }
 
-        if (s3Key.length() > 500) {
-            throw new IllegalArgumentException("s3 key too long");
+        if (storageKey.length() > 500) {
+            throw new IllegalArgumentException("storage key too long");
         }
 
         if (url.length() > 500) {
@@ -100,13 +88,10 @@ public class File extends BaseTimeEntity {
         return File.builder()
                 .fileType(fileType)
                 .originalName(originalName)
-                .s3Key(s3Key)
+                .storageKey(storageKey)
                 .url(url)
                 .size(size)
                 .mimeType(mimeType)
-                .width(width)
-                .height(height)
-                .duration(duration)
                 .isDeleted(false)
                 .build();
     }
