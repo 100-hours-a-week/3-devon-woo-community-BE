@@ -8,9 +8,11 @@
 
 ---
 
-## 0. @IntegrationTest / @IntegrationSecurityTest 메타 어노테이션
+## 0. 통합 테스트용 메타 어노테이션들
 
-`src/test/java/com/devon/techblog/config/annotation/IntegrationTest.java` 정의:
+### 0.1 @IntegrationTest / @IntegrationSecurityTest (HTTP + MockMvc)
+
+`src/test/java/com/devon/techblog/config/annotation/IntegrationTest.java`:
 
 - `@SpringBootTest` + `@AutoConfigureMockMvc`
   - 전체 스프링 컨텍스트를 로드하고, `MockMvc`를 자동 구성합니다.
@@ -25,7 +27,30 @@
 `@IntegrationSecurityTest`는 Security 쪽 통합 테스트를 위한 변형 메타 어노테이션으로,  
 토큰 발급/인증/인가 플로우에 필요한 Security 설정만 적절히 포함해 사용합니다.
 
-정리하면, 통합 테스트는 **실제 애플리케이션과 거의 동일한 컨텍스트에서 전체 플로우를 검증하는 레이어**입니다.
+### 0.2 @ServiceIntegrationTest (비HTTP 플로우용)
+
+`src/test/java/com/devon/techblog/config/annotation/ServiceIntegrationTest.java`:
+
+- `@SpringBootTest(webEnvironment = NONE)`
+  - 전체 스프링 컨텍스트를 로드하지만 웹 서버/MockMvc는 구동하지 않습니다.
+  - Service, Repository, 비동기 처리, 배치, 메시지 리스너 등 **비HTTP 플로우** 위한 통합 테스트에 사용합니다.
+- `@ActiveProfiles("test")`
+- `@Import(JpaAuditingTestConfig, ImageStorageMockConfig)`
+- `@Tag("service-integration")`
+
+### 0.3 @JobIntegrationTest (배치/잡 전용 태그)
+
+`src/test/java/com/devon/techblog/config/annotation/JobIntegrationTest.java`:
+
+- `@ServiceIntegrationTest`를 기반으로 하며, 배치/잡/메시지 리스너 플로우를 위한 통합 테스트에 사용합니다.
+- `@Tag("job-integration")`을 추가로 부여해, 잡 관련 통합 테스트만 선택 실행할 수 있습니다.
+
+정리하면:
+
+- HTTP 기반 API 플로우 → `@IntegrationTest` / `@IntegrationSecurityTest`
+- 비HTTP 서비스/배치/메시지 플로우 → `@ServiceIntegrationTest` / `@JobIntegrationTest`
+
+모두 **실제 애플리케이션과 거의 동일한 컨텍스트에서 전체 플로우를 검증하는 레이어**입니다.
 
 ---
 
@@ -154,4 +179,3 @@
 - 통합 테스트는 **전체 플로우와 인프라 협력(Controller/Service/Repository/DB/Security)**을 실제 컨텍스트에서 검증하는 레이어다.
 - HTTP 계약 세부사항, 세밀한 비즈니스 분기/경계값, JPA 구현 세부는 다른 레이어(도메인/Repository/Service/WebMvc)가 담당한다.
 - 통합 테스트는 대표적인 플로우에만 집중해, “이 기능이 실제 환경에서 처음부터 끝까지 제대로 동작하는지”를 보장하는 역할을 맡는다.
-
