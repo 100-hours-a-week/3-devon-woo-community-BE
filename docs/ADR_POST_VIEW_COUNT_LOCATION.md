@@ -77,12 +77,12 @@ public ApiResponse<PostResponse> getPost(
 public PostResponse getPostDetails(Long postId, ViewContext context) {
     Post post = findByIdWithMember(postId);
     Member member = post.getMember();
-    Attachment attachment = attachmentRepository.findByPostId(postId).orElse(null);
+    Attachment file = attachmentRepository.findByPostId(postId).orElse(null);
 
     // 조회수 증가 (비동기)
     postViewService.tryIncrementViewCount(postId, context);
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 ```
 
@@ -246,12 +246,12 @@ public class ViewCountInterceptor implements HandlerInterceptor {
 public PostResponse getPostDetails(Long postId) {
     Post post = findByIdWithMember(postId);
     Member member = post.getMember();
-    Attachment attachment = attachmentRepository.findByPostId(postId).orElse(null);
+    Attachment file = attachmentRepository.findByPostId(postId).orElse(null);
 
     // 도메인 이벤트 발행 (조회 사실만 알림)
     eventPublisher.publishEvent(PostReadEvent.of(postId));
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 
 // PostReadEvent.java
@@ -493,7 +493,7 @@ public class PostService {
         // 조회 사실만 이벤트로 알림 (HTTP 정보 없음!)
         eventPublisher.publishEvent(PostReadEvent.of(postId));
 
-        return PostResponse.of(post, member, attachment);
+        return PostResponse.of(post, member, file);
     }
 }
 ```
