@@ -1,6 +1,6 @@
 package com.devon.techblog.domain.post;
 
-import com.devon.techblog.domain.post.dto.PostQueryDto;
+import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import java.time.Instant;
 
 public final class PostQueryDtoFixture {
@@ -17,8 +17,8 @@ public final class PostQueryDtoFixture {
 
     private PostQueryDtoFixture() {}
 
-    public static PostQueryDto create() {
-        return new PostQueryDto(
+    public static PostSummaryQueryDto create() {
+        return new PostSummaryQueryDto(
                 DEFAULT_POST_ID,
                 DEFAULT_TITLE,
                 Instant.now(),
@@ -33,8 +33,8 @@ public final class PostQueryDtoFixture {
         );
     }
 
-    public static PostQueryDto create(Long postId, String title) {
-        return new PostQueryDto(
+    public static PostSummaryQueryDto create(Long postId, String title) {
+        return new PostSummaryQueryDto(
                 postId,
                 title,
                 Instant.now(),
@@ -49,7 +49,7 @@ public final class PostQueryDtoFixture {
         );
     }
 
-    public static PostQueryDto createWithAllFields(
+    public static PostSummaryQueryDto createWithAllFields(
             Long postId,
             String title,
             Instant createdAt,
@@ -62,7 +62,7 @@ public final class PostQueryDtoFixture {
             String summary,
             String thumbnail
     ) {
-        return new PostQueryDto(
+        return new PostSummaryQueryDto(
                 postId,
                 title,
                 createdAt,

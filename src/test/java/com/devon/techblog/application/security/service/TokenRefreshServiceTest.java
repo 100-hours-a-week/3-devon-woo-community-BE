@@ -4,14 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import com.devon.techblog.application.security.util.JwtTokenProvider;
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.AuthErrorCode;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.repository.MemberRepository;
-import com.devon.techblog.application.security.service.TokenBlacklistService;
-import com.devon.techblog.application.security.util.JwtTokenProvider;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

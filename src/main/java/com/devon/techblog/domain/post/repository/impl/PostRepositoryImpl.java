@@ -6,12 +6,13 @@ import static com.devon.techblog.domain.post.entity.QPostTag.postTag;
 import static com.devon.techblog.domain.post.entity.QTag.tag;
 
 import com.devon.techblog.domain.common.repository.QueryDslOrderUtil;
-import com.devon.techblog.domain.post.dto.PostQueryDto;
+import com.devon.techblog.domain.post.dto.PostSearchCondition;
+import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.repository.PostQueryRepository;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Set;
@@ -38,9 +39,16 @@ public class PostRepositoryImpl implements PostQueryRepository {
     );
 
     @Override
-    public Page<PostQueryDto> findAllActiveWithMemberAsDto(Pageable pageable) {
-        List<PostQueryDto> content = queryFactory
-                .select(Projections.constructor(PostQueryDto.class,
+    public Page<PostSummaryQueryDto> searchPosts(PostSearchCondition condition, Pageable pageable) {
+        PostSearchCondition effectiveCondition = condition != null ? condition : PostSearchCondition.empty();
+        BooleanBuilder predicate = new BooleanBuilder();
+        predicate.and(isNotDeleted());
+        addCondition(predicate, containsKeyword(effectiveCondition.keyword()));
+        addCondition(predicate, eqMemberId(effectiveCondition.memberId()));
+        addCondition(predicate, inTags(effectiveCondition.tags()));
+
+        List<PostSummaryQueryDto> content = queryFactory
+                .select(Projections.constructor(PostSummaryQueryDto.class,
                         post.id,
                         post.title,
                         post.createdAt,
@@ -55,88 +63,16 @@ public class PostRepositoryImpl implements PostQueryRepository {
                 ))
                 .from(post)
                 .join(post.member, member)
-                .where(isNotDeleted())
+                .where(predicate)
                 .orderBy(getOrderSpecifiers(pageable))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        JPAQuery<Long> countQuery = queryFactory
+        var countQuery = queryFactory
                 .select(post.count())
                 .from(post)
-                .where(isNotDeleted());
-
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-    }
-
-    @Override
-    public Page<PostQueryDto> searchByTitleOrContent(String keyword, Pageable pageable) {
-        BooleanExpression condition = isNotDeleted().and(keywordSearch(keyword));
-
-        List<PostQueryDto> content = queryFactory
-                .select(Projections.constructor(PostQueryDto.class,
-                        post.id,
-                        post.title,
-                        post.createdAt,
-                        post.viewsCount,
-                        post.likeCount,
-                        post.commentCount,
-                        member.id,
-                        member.nickname,
-                        member.profileImageUrl,
-                        post.summary,
-                        post.thumbnail
-                ))
-                .from(post)
-                .join(post.member, member)
-                .where(condition)
-                .orderBy(getOrderSpecifiers(pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        JPAQuery<Long> countQuery = queryFactory
-                .select(post.count())
-                .from(post)
-                .where(condition);
-
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-    }
-
-    @Override
-    public Page<PostQueryDto> findByTagsIn(List<String> tags, Pageable pageable) {
-        if (tags == null || tags.isEmpty()) {
-            return findAllActiveWithMemberAsDto(pageable);
-        }
-
-        BooleanExpression condition = isNotDeleted().and(hasAnyTag(tags));
-
-        List<PostQueryDto> content = queryFactory
-                .select(Projections.constructor(PostQueryDto.class,
-                        post.id,
-                        post.title,
-                        post.createdAt,
-                        post.viewsCount,
-                        post.likeCount,
-                        post.commentCount,
-                        member.id,
-                        member.nickname,
-                        member.profileImageUrl,
-                        post.summary,
-                        post.thumbnail
-                ))
-                .from(post)
-                .join(post.member, member)
-                .where(condition)
-                .orderBy(getOrderSpecifiers(pageable))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        JPAQuery<Long> countQuery = queryFactory
-                .select(post.count())
-                .from(post)
-                .where(condition);
+                .where(predicate);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
@@ -154,19 +90,20 @@ public class PostRepositoryImpl implements PostQueryRepository {
         return post.isDeleted.eq(false);
     }
 
-    private BooleanExpression keywordSearch(String keyword) {
-        return titleContains(keyword).or(contentContains(keyword));
+    private BooleanExpression containsKeyword(String keyword) {
+        if (keyword == null) {
+            return null;
+        }
+
+        return post.title.containsIgnoreCase(keyword)
+                .or(post.content.containsIgnoreCase(keyword));
     }
 
-    private BooleanExpression titleContains(String keyword) {
-        return keyword != null ? post.title.containsIgnoreCase(keyword) : null;
+    private BooleanExpression eqMemberId(Long memberId) {
+        return memberId != null ? post.member.id.eq(memberId) : null;
     }
 
-    private BooleanExpression contentContains(String keyword) {
-        return keyword != null ? post.content.containsIgnoreCase(keyword) : null;
-    }
-
-    private BooleanExpression hasAnyTag(List<String> tags) {
+    private BooleanExpression inTags(List<String> tags) {
         if (tags == null || tags.isEmpty()) {
             return null;
         }
@@ -178,5 +115,11 @@ public class PostRepositoryImpl implements PostQueryRepository {
                 .join(postTag.tag, tag)
                 .where(tag.name.in(tags))
         );
+    }
+
+    private void addCondition(BooleanBuilder builder, BooleanExpression expression) {
+        if (expression != null) {
+            builder.and(expression);
+        }
     }
 }

@@ -1,15 +1,19 @@
 package com.devon.techblog.application.security.controller;
 
+import com.devon.techblog.application.member.dto.request.SignupRequest;
 import com.devon.techblog.application.security.dto.request.LoginRequest;
 import com.devon.techblog.application.security.dto.response.CheckAvailabilityResponse;
 import com.devon.techblog.application.security.dto.response.LoginResponse;
 import com.devon.techblog.application.security.dto.response.RefreshTokenResponse;
+import com.devon.techblog.application.security.service.SignupService;
 import com.devon.techblog.application.security.service.TokenBlacklistService;
 import com.devon.techblog.application.security.service.TokenRefreshService;
 import com.devon.techblog.application.security.util.CookieProvider;
 import com.devon.techblog.common.dto.api.ApiResponse;
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.AuthErrorCode;
+import com.devon.techblog.common.swagger.CustomExceptionDescription;
+import com.devon.techblog.common.swagger.SwaggerResponseDescription;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,17 +22,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@Tag(name = "인증", description = "인증 관련 API")
+@Tag(name = "Auth", description = "인증 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
@@ -38,6 +45,22 @@ public class AuthController {
     private final TokenBlacklistService blacklistService;
     private final CookieProvider cookieProvider;
     private final MemberRepository memberRepository;
+    private final SignupService signupService;
+
+    @Operation(
+            summary = "회원가입",
+            description = "새로운 회원을 등록하고 액세스 토큰을 발급합니다."
+    )
+    @CustomExceptionDescription(SwaggerResponseDescription.AUTH_SIGNUP)
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/signup")
+    public ApiResponse<LoginResponse> signUp(
+            @RequestBody @Validated SignupRequest request
+    ){
+        LoginResponse response = signupService.signup(request);
+        return ApiResponse.success(response, "signup_success");
+    }
+
 
     @Operation(
             summary = "액세스 토큰 갱신",

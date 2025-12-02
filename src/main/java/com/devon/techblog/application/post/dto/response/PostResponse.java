@@ -6,7 +6,6 @@ import com.devon.techblog.domain.post.entity.Attachment;
 import com.devon.techblog.domain.post.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 
 @Schema(description = "게시글 응답 DTO")

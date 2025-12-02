@@ -57,7 +57,7 @@ public class CommentService {
         Comment comment = findCommentByIdWithMember(commentId);
         Member member = comment.getMember();
 
-        ownershipPolicy.validateOwnership(comment.getMember().getId(), requesterId);
+        ownershipPolicy.validateOwnership(member.getId(), requesterId);
 
         comment.updateContent(request.content());
         commentRepository.save(comment);

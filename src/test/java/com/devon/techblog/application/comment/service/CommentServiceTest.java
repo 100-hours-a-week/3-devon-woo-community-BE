@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import com.devon.techblog.application.comment.CommentRequestFixture;
@@ -14,8 +13,8 @@ import com.devon.techblog.application.comment.dto.response.CommentResponse;
 import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.CommentErrorCode;
+import com.devon.techblog.common.exception.code.CommonErrorCode;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
-import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.MemberFixture;
@@ -34,7 +33,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -53,10 +51,6 @@ class CommentServiceTest {
     @Mock
     private PostRepository postRepository;
 
-    @Mock
-    private OwnershipPolicy ownershipPolicy;
-
-    @InjectMocks
     private CommentService commentService;
 
     private Member member;
@@ -65,6 +59,10 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
+        // spy로 실제 객체 사용하기
+        OwnershipPolicy ownershipPolicy = new OwnershipPolicy();
+        commentService = new CommentService(commentRepository, memberRepository, postRepository, ownershipPolicy);
+
         member = MemberFixture.createWithId(1L);
         post = PostFixture.createWithId(1L, member);
         comment = CommentFixture.createWithId(1L, member, post);
@@ -149,7 +147,7 @@ class CommentServiceTest {
         PageResponse<CommentResponse> response = commentService.getCommentPageByPostId(1L, pageable);
 
         assertThat(response.items()).hasSize(1);
-        assertThat(response.items().get(0).commentId()).isEqualTo(1L);
+        assertThat(response.items().getFirst().commentId()).isEqualTo(1L);
     }
 
     @Test
@@ -205,12 +203,10 @@ class CommentServiceTest {
     void updateComment_notOwner_throwsException() {
         CommentUpdateRequest request = CommentRequestFixture.updateRequest();
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
-        doThrow(new CustomException(CommentErrorCode.NO_PERMISSION))
-                .when(ownershipPolicy).validateOwnership(1L, 2L);
 
         assertThatThrownBy(() -> commentService.updateComment(1L, request, 2L))
                 .isInstanceOf(CustomException.class)
-                .hasMessageContaining(CommentErrorCode.NO_PERMISSION.getMessage());
+                .hasMessageContaining(CommonErrorCode.NO_PERMISSION.getMessage());
     }
 
     @Test
@@ -249,8 +245,6 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제 시 소유자가 아니면 예외가 발생한다")
     void deleteComment_notOwner_throwsException() {
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
-        doThrow(new CustomException(CommentErrorCode.NO_PERMISSION))
-                .when(ownershipPolicy).validateOwnership(1L, 2L);
 
         assertThatThrownBy(() -> commentService.deleteComment(1L, 2L))
                 .isInstanceOf(CustomException.class)
