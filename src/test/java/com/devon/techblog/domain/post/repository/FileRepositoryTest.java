@@ -7,7 +7,6 @@ import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.PostFixture;
-import com.devon.techblog.domain.post.entity.File;
 import com.devon.techblog.domain.post.entity.Post;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;

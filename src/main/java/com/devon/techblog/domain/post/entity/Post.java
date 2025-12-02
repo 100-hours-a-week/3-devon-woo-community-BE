@@ -1,7 +1,7 @@
 package com.devon.techblog.domain.post.entity;
 
 import com.devon.techblog.domain.common.entity.BaseTimeEntity;
-import com.devon.techblog.domain.common.entity.File;
+import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.member.entity.Member;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

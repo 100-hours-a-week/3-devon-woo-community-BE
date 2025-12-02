@@ -1,4 +1,4 @@
-package com.devon.techblog.domain.common.enums;
+package com.devon.techblog.domain.file.entity;
 
 public enum FileType {
     IMAGE,

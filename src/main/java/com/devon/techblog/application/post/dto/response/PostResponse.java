@@ -1,12 +1,11 @@
 package com.devon.techblog.application.post.dto.response;
 
 import com.devon.techblog.application.member.dto.response.MemberResponse;
+import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.member.entity.Member;
-import com.devon.techblog.domain.post.entity.File;
 import com.devon.techblog.domain.post.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 
 @Schema(description = "게시글 응답 DTO")
@@ -69,7 +68,7 @@ public record PostResponse(
                 MemberResponse.of(member),
                 post.getTitle(),
                 post.getContent(),
-                post.getImageUrl() != null ? post.getImageUrl() : (file != null ? file.getAttachmentUrl() : null),
+                post.getImageUrl() != null ? post.getImageUrl() : (file != null ? file.getUrl() : null),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 post.getViewsCount(),

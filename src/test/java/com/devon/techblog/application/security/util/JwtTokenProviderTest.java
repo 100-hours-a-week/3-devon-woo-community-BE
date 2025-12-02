@@ -2,7 +2,7 @@ package com.devon.techblog.application.security.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.devon.techblog.application.security.config.JwtProperties;
+import com.devon.techblog.application.security.config.properties.JwtProperties;
 import com.devon.techblog.application.security.constants.JwtConstants;
 import com.devon.techblog.config.annotation.UnitTest;
 import org.junit.jupiter.api.BeforeEach;

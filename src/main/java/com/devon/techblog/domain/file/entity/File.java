@@ -1,6 +1,6 @@
-package com.devon.techblog.domain.common.entity;
+package com.devon.techblog.domain.file.entity;
 
-import com.devon.techblog.domain.common.enums.FileType;
+import com.devon.techblog.domain.common.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
