@@ -6,15 +6,12 @@ import static com.devon.techblog.domain.post.entity.QComment.comment;
 import com.devon.techblog.domain.common.repository.QueryDslOrderUtil;
 import com.devon.techblog.domain.post.dto.CommentQueryDto;
 import com.devon.techblog.domain.post.repository.CommentQueryRepository;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,19 +68,4 @@ public class CommentRepositoryImpl implements CommentQueryRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    @Override
-    public Map<Long, Long> countCommentsByPostIds(List<Long> postIds) {
-        List<Tuple> results = queryFactory
-                .select(comment.post.id, comment.count())
-                .from(comment)
-                .where(comment.post.id.in(postIds))
-                .groupBy(comment.post.id)
-                .fetch();
-
-        return results.stream()
-                .collect(Collectors.toMap(
-                        tuple -> tuple.get(comment.post.id),
-                        tuple -> tuple.get(comment.count())
-                ));
-    }
 }

@@ -1,7 +1,7 @@
 package com.devon.techblog.application.post.dto.response;
 
 import com.devon.techblog.application.member.dto.response.MemberResponse;
-import com.devon.techblog.domain.post.dto.PostQueryDto;
+import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
@@ -34,7 +34,7 @@ public record PostSummaryResponse(
         @Schema(description = "썸네일 URL", example = "https://picsum.photos/200/150")
         String thumbnail
 ) {
-    public static PostSummaryResponse fromDto(PostQueryDto dto) {
+    public static PostSummaryResponse fromDto(PostSummaryQueryDto dto) {
         return new PostSummaryResponse(
                 dto.postId(),
                 dto.title(),

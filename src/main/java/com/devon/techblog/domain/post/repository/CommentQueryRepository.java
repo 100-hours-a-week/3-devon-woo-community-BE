@@ -1,8 +1,6 @@
 package com.devon.techblog.domain.post.repository;
 
 import com.devon.techblog.domain.post.dto.CommentQueryDto;
-import java.util.List;
-import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,11 +11,5 @@ public interface CommentQueryRepository {
      * fetch join 대신 필요한 컬럼만 SELECT하여 N+1 문제 해결 및 성능 최적화
      */
     Page<CommentQueryDto> findByPostIdWithMemberAsDto(Long postId, Pageable pageable);
-
-    /**
-     * 여러 게시글의 댓글 수를 한 번의 쿼리로 조회
-     * @return Map<PostId, CommentCount>
-     */
-    Map<Long, Long> countCommentsByPostIds(List<Long> postIds);
 
 }

@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.devon.techblog.application.security.util.JwtTokenProvider;
-import com.devon.techblog.config.annotation.IntegrationTest;
+import com.devon.techblog.config.annotation.IntegrationSecurityTest;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-@IntegrationTest
+@IntegrationSecurityTest
 @Transactional
 @Import(FakeJwtTokenProvider.class)
 class AuthIntegrationTest {
@@ -39,11 +39,7 @@ class AuthIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        savedMember = memberRepository.save(MemberFixture.create(
-                "tester@example.com",
-                "password123",
-                "tester"
-        ));
+        savedMember = memberRepository.save(MemberFixture.create());
         refreshToken = jwtTokenProvider.generateRefreshToken(savedMember.getId());
         fakeJwtTokenProvider = new FakeJwtTokenProvider();
     }

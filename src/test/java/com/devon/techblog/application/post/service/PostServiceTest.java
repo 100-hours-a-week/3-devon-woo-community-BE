@@ -3,6 +3,7 @@ package com.devon.techblog.application.post.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 
@@ -17,12 +18,15 @@ import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
+import com.devon.techblog.domain.file.entity.File;
+import com.devon.techblog.domain.file.repository.FileRepository;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.PostFixture;
 import com.devon.techblog.domain.post.PostQueryDtoFixture;
-import com.devon.techblog.domain.post.dto.PostQueryDto;
+import com.devon.techblog.domain.post.dto.PostSearchCondition;
+import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.entity.Post;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
@@ -147,10 +151,10 @@ class PostServiceTest {
     @DisplayName("게시글 목록을 페이지로 조회할 수 있다")
     void getPostPage_success() {
         Pageable pageable = PageRequest.of(0, 10);
-        PostQueryDto dto = PostQueryDtoFixture.create();
-        Page<PostQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
+        PostSummaryQueryDto dto = PostQueryDtoFixture.create();
+        Page<PostSummaryQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
-        given(postRepository.findAllActiveWithMemberAsDto(pageable)).willReturn(page);
+        given(postRepository.searchPosts(any(PostSearchCondition.class), eq(pageable))).willReturn(page);
 
         PageResponse<PostSummaryResponse> response = postService.getPostPage(pageable);
 
@@ -235,10 +239,10 @@ class PostServiceTest {
     void getPostPageByTags_success() {
         Pageable pageable = PageRequest.of(0, 10);
         List<String> tags = List.of("Java", "Spring");
-        PostQueryDto dto = PostQueryDtoFixture.create();
-        Page<PostQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
+        PostSummaryQueryDto dto = PostQueryDtoFixture.create();
+        Page<PostSummaryQueryDto> page = new PageImpl<>(List.of(dto), pageable, 1);
 
-        given(postRepository.findByTagsIn(tags, pageable)).willReturn(page);
+        given(postRepository.searchPosts(any(PostSearchCondition.class), eq(pageable))).willReturn(page);
 
         PageResponse<PostSummaryResponse> response = postService.getPostPageByTags(tags, pageable);
 
@@ -251,9 +255,9 @@ class PostServiceTest {
     void getPostPageByTags_noResults_returnsEmptyList() {
         Pageable pageable = PageRequest.of(0, 10);
         List<String> tags = List.of("NonExistentTag");
-        Page<PostQueryDto> page = new PageImpl<>(List.of(), pageable, 0);
+        Page<PostSummaryQueryDto> page = new PageImpl<>(List.of(), pageable, 0);
 
-        given(postRepository.findByTagsIn(tags, pageable)).willReturn(page);
+        given(postRepository.searchPosts(any(PostSearchCondition.class), eq(pageable))).willReturn(page);
 
         PageResponse<PostSummaryResponse> response = postService.getPostPageByTags(tags, pageable);
 

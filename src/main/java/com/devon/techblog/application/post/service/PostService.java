@@ -13,7 +13,8 @@ import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.file.service.FileService;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
-import com.devon.techblog.domain.post.dto.PostQueryDto;
+import com.devon.techblog.domain.post.dto.PostSearchCondition;
+import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.entity.Post;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
@@ -43,33 +44,13 @@ public class PostService {
 
         Post post = Post.create(member, request.title(), request.content());
 
-        if (request.summary() != null) {
-            post.updateSummary(request.summary());
-        }
-        if (request.visibility() != null) {
-            post.updateVisibility(request.visibility());
-        }
-        if (request.isDraft() != null && request.isDraft()) {
-            post.markAsDraft();
-        }
-        else if (request.isDraft() != null) {
-            post.publish();
-        }
-        if (request.commentsAllowed() != null) {
-            post.setCommentsAllowed(request.commentsAllowed());
-        }
-        if (request.thumbnail() != null) {
-            post.updateThumbnail(request.thumbnail());
-        }
-        if (request.image() != null) {
-            post.updateImageUrl(request.image());
-        }
+        applyPostMutation(post, PostMutationData.fromCreateRequest(request));
 
         Post savedPost = postRepository.save(post);
 
-        if (request.tags() != null && !request.tags().isEmpty()) {
-            tagService.updatePostTags(savedPost, request.tags());
-        }
+        updateTags(savedPost, request.tags(), false);
+
+
 
         File savedFile = null;
 
@@ -93,28 +74,9 @@ public class PostService {
             );
         }
 
-        if (request.summary() != null) {
-            post.updateSummary(request.summary());
-        }
-        if (request.tags() != null) {
-            tagService.updatePostTags(post, request.tags());
-        }
-        if (request.visibility() != null) {
-            post.updateVisibility(request.visibility());
-        }
-        if (request.commentsAllowed() != null) {
-            post.setCommentsAllowed(request.commentsAllowed());
-        }
-        if (request.thumbnail() != null) {
-            post.updateThumbnail(request.thumbnail());
-        }
-        if (request.image() != null) {
-            post.updateImageUrl(request.image());
-        }
-
         Post savedPost = postRepository.save(post);
 
-        File file = savedPost.getAttachments().isEmpty() ? null : savedPost.getAttachments().get(0);
+        File file = savedPost.getAttachments().isEmpty() ? null : savedPost.getAttachments().getFirst();
 
         return PostResponse.of(savedPost, member, file);
     }
@@ -154,7 +116,7 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public PageResponse<PostSummaryResponse> getPostPage(Pageable pageable) {
-        Page<PostQueryDto> postDtoPage = postRepository.findAllActiveWithMemberAsDto(pageable);
+        Page<PostSummaryQueryDto> postDtoPage = postRepository.searchPosts(PostSearchCondition.empty(), pageable);
 
         List<PostSummaryResponse> postSummaries = postDtoPage.getContent().stream()
                 .map(PostSummaryResponse::fromDto)
@@ -168,7 +130,7 @@ public class PostService {
      */
     @Transactional(readOnly = true)
     public PageResponse<PostSummaryResponse> getPostPageByTags(List<String> tags, Pageable pageable) {
-        Page<PostQueryDto> postDtoPage = postRepository.findByTagsIn(tags, pageable);
+        Page<PostSummaryQueryDto> postDtoPage = postRepository.searchPosts(PostSearchCondition.forTags(tags), pageable);
 
         List<PostSummaryResponse> postSummaries = postDtoPage.getContent().stream()
                 .map(PostSummaryResponse::fromDto)
@@ -185,5 +147,73 @@ public class PostService {
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
+    }
+
+    private void applyPostMutation(Post post, PostMutationData data) {
+        if (data.summary() != null) {
+            post.updateSummary(data.summary());
+        }
+        if (data.visibility() != null) {
+            post.updateVisibility(data.visibility());
+        }
+        if (data.isDraft() != null) {
+            if (data.isDraft()) {
+                post.markAsDraft();
+            } else {
+                post.publish();
+            }
+        }
+        if (data.commentsAllowed() != null) {
+            post.setCommentsAllowed(data.commentsAllowed());
+        }
+        if (data.thumbnail() != null) {
+            post.updateThumbnail(data.thumbnail());
+        }
+        if (data.image() != null) {
+            post.updateImageUrl(data.image());
+        }
+    }
+
+    private void updateTags(Post post, List<String> tags, boolean allowEmpty) {
+        if (tags == null) {
+            return;
+        }
+        if (!allowEmpty && tags.isEmpty()) {
+            return;
+        }
+        tagService.updatePostTags(post, tags);
+    }
+
+
+    private record PostMutationData(
+            String summary,
+            String visibility,
+            Boolean isDraft,
+            Boolean commentsAllowed,
+            String thumbnail,
+            String image
+    ) {
+
+        private static PostMutationData fromCreateRequest(PostCreateRequest request) {
+            return new PostMutationData(
+                    request.summary(),
+                    request.visibility(),
+                    request.isDraft(),
+                    request.commentsAllowed(),
+                    request.thumbnail(),
+                    request.image()
+            );
+        }
+
+        private static PostMutationData fromUpdateRequest(PostUpdateRequest request) {
+            return new PostMutationData(
+                    request.summary(),
+                    request.visibility(),
+                    null,
+                    request.commentsAllowed(),
+                    request.thumbnail(),
+                    request.image()
+            );
+        }
     }
 }
