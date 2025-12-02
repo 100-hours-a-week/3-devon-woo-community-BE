@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "attachment")
-public class Attachment extends BaseTimeEntity {
+public class File extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class Attachment extends BaseTimeEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
-    public static Attachment create(Post post, String attachmentUrl) {
+    public static File create(Post post, String attachmentUrl) {
         Assert.notNull(post, "post required");
         Assert.hasText(attachmentUrl, "attachment url required");
 
@@ -47,7 +47,7 @@ public class Attachment extends BaseTimeEntity {
             throw new IllegalArgumentException("attachment url too long");
         }
 
-        return Attachment.builder()
+        return File.builder()
                 .post(post)
                 .attachmentUrl(attachmentUrl)
                 .isDeleted(false)

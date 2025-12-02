@@ -23,9 +23,9 @@ import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.PostFixture;
 import com.devon.techblog.domain.post.PostQueryDtoFixture;
 import com.devon.techblog.domain.post.dto.PostQueryDto;
-import com.devon.techblog.domain.post.entity.Attachment;
+import com.devon.techblog.domain.post.entity.File;
 import com.devon.techblog.domain.post.entity.Post;
-import com.devon.techblog.domain.post.repository.AttachmentRepository;
+import com.devon.techblog.domain.post.repository.FileRepository;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
 import java.util.List;
@@ -50,7 +50,7 @@ class PostServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private AttachmentRepository attachmentRepository;
+    private FileRepository fileRepository;
 
     @Mock
     private OwnershipPolicy ownershipPolicy;
@@ -87,10 +87,10 @@ class PostServiceTest {
     @DisplayName("게시글 생성 시 이미지가 있으면 저장된다")
     void createPost_withImage() {
         PostCreateRequest request = PostRequestFixture.createRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, PostFixture.DEFAULT_IMAGE_URL);
-        Attachment attachment = Attachment.create(post, PostFixture.DEFAULT_IMAGE_URL);
+        File file = File.create(post, PostFixture.DEFAULT_IMAGE_URL);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(any(Post.class))).willReturn(post);
-        given(attachmentRepository.save(any(Attachment.class))).willReturn(attachment);
+        given(fileRepository.save(any(File.class))).willReturn(file);
 
         PostResponse response = postService.createPost(request, 1L);
 
@@ -105,7 +105,7 @@ class PostServiceTest {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(post)).willReturn(post);
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
+        given(fileRepository.findByPostId(1L)).willReturn(Optional.empty());
 
         postService.updatePost(1L, request, 1L);
 
@@ -127,7 +127,7 @@ class PostServiceTest {
     @DisplayName("게시글 상세를 조회할 수 있다")
     void getPostDetails_success() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
+        given(fileRepository.findByPostId(1L)).willReturn(Optional.empty());
         given(postLikeRepository.existsByPostIdAndMemberId(1L, 1L)).willReturn(false);
 
         PostResponse response = postService.getPostDetails(1L, 1L);
@@ -213,7 +213,7 @@ class PostServiceTest {
     @DisplayName("게시글 조회 시 좋아요 여부를 확인한다 - memberId가 있을 때")
     void getPostDetails_withMemberId_checksLiked() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
+        given(fileRepository.findByPostId(1L)).willReturn(Optional.empty());
         given(postLikeRepository.existsByPostIdAndMemberId(1L, 1L)).willReturn(true);
 
         PostResponse response = postService.getPostDetails(1L, 1L);
@@ -225,7 +225,7 @@ class PostServiceTest {
     @DisplayName("게시글 조회 시 좋아요 여부를 확인한다 - memberId가 null일 때")
     void getPostDetails_withoutMemberId_isLikedFalse() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
+        given(fileRepository.findByPostId(1L)).willReturn(Optional.empty());
 
         PostResponse response = postService.getPostDetails(1L, null);
 

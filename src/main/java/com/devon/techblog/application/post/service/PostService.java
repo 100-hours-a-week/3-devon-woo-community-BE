@@ -12,9 +12,9 @@ import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.dto.PostQueryDto;
-import com.devon.techblog.domain.post.entity.Attachment;
+import com.devon.techblog.domain.post.entity.File;
 import com.devon.techblog.domain.post.entity.Post;
-import com.devon.techblog.domain.post.repository.AttachmentRepository;
+import com.devon.techblog.domain.post.repository.FileRepository;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final AttachmentRepository attachmentRepository;
+    private final FileRepository fileRepository;
     private final OwnershipPolicy ownershipPolicy;
     private final PostLikeRepository postLikeRepository;
     private final TagService tagService;
@@ -72,11 +72,11 @@ public class PostService {
             tagService.updatePostTags(savedPost, request.tags());
         }
 
-        Attachment savedAttachment = Optional.ofNullable(request.image())
-                .map(img -> attachmentRepository.save(Attachment.create(savedPost, img)))
+        File savedFile = Optional.ofNullable(request.image())
+                .map(img -> fileRepository.save(File.create(savedPost, img)))
                 .orElse(null);
 
-        return PostResponse.of(savedPost, member, savedAttachment);
+        return PostResponse.of(savedPost, member, savedFile);
     }
 
     /**
@@ -117,11 +117,11 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
-        Attachment attachment = Optional.ofNullable(request.image())
-                .map(img -> attachmentRepository.save(Attachment.create(savedPost, img)))
-                .orElseGet(() -> attachmentRepository.findByPostId(postId).orElse(null));
+        File file = Optional.ofNullable(request.image())
+                .map(img -> fileRepository.save(File.create(savedPost, img)))
+                .orElseGet(() -> fileRepository.findByPostId(postId).orElse(null));
 
-        return PostResponse.of(savedPost, member, attachment);
+        return PostResponse.of(savedPost, member, file);
     }
 
     /**
@@ -144,7 +144,7 @@ public class PostService {
         Post post = findByIdWithMember(postId);
 
         Member member = post.getMember();
-        Attachment attachment = attachmentRepository.findByPostId(postId)
+        File file = fileRepository.findByPostId(postId)
                 .orElse(null);
 
         boolean isLiked = false;
@@ -152,7 +152,7 @@ public class PostService {
             isLiked = true;
         }
 
-        return PostResponse.of(post, member, attachment, isLiked);
+        return PostResponse.of(post, member, file, isLiked);
     }
 
     /**
