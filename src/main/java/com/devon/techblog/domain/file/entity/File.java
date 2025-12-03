@@ -47,6 +47,10 @@ public class File extends BaseTimeEntity {
     @Column(name = "mime_type", length = 100, nullable = false)
     private String mimeType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    private FileStatus status;
+
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
@@ -92,8 +96,65 @@ public class File extends BaseTimeEntity {
                 .url(url)
                 .size(size)
                 .mimeType(mimeType)
+                .status(FileStatus.UPLOADED)
                 .isDeleted(false)
                 .build();
+    }
+
+    public static File createPending(
+            FileType fileType,
+            String originalName,
+            String storageKey,
+            String mimeType
+    ) {
+        Assert.notNull(fileType, "file type required");
+        Assert.hasText(originalName, "original name required");
+        Assert.hasText(storageKey, "storage key required");
+        Assert.hasText(mimeType, "mime type required");
+
+        if (originalName.length() > 255) {
+            throw new IllegalArgumentException("original name too long");
+        }
+
+        if (storageKey.length() > 500) {
+            throw new IllegalArgumentException("storage key too long");
+        }
+
+        if (mimeType.length() > 100) {
+            throw new IllegalArgumentException("mime type too long");
+        }
+
+        return File.builder()
+                .fileType(fileType)
+                .originalName(originalName)
+                .storageKey(storageKey)
+                .url("")
+                .size(0L)
+                .mimeType(mimeType)
+                .status(FileStatus.PENDING)
+                .isDeleted(false)
+                .build();
+    }
+
+    public void completeUpload(String url, Long size) {
+        Assert.hasText(url, "url required");
+        Assert.notNull(size, "size required");
+
+        if (size <= 0) {
+            throw new IllegalArgumentException("size must be positive");
+        }
+
+        if (url.length() > 500) {
+            throw new IllegalArgumentException("url too long");
+        }
+
+        this.url = url;
+        this.size = size;
+        this.status = FileStatus.UPLOADED;
+    }
+
+    public void markAsFailed() {
+        this.status = FileStatus.FAILED;
     }
 
     public void delete() {
