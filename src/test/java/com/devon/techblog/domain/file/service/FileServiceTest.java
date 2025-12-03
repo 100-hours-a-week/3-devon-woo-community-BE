@@ -14,6 +14,7 @@ import com.devon.techblog.domain.file.FileFixture;
 import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.file.entity.FileType;
 import com.devon.techblog.domain.file.repository.FileRepository;
+import com.devon.techblog.infra.image.ImageStorageService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +27,9 @@ class FileServiceTest {
 
     @Mock
     private FileRepository fileRepository;
+
+    @Mock
+    private ImageStorageService imageStorageService;
 
     @InjectMocks
     private FileService fileService;
@@ -168,19 +172,6 @@ class FileServiceTest {
         fileService.permanentlyDeleteFile(1L);
 
         verify(fileRepository, times(1)).findById(1L);
-        verify(fileRepository, times(1)).delete(file);
-    }
-
-    @Test
-    @DisplayName("storageKey로 파일을 영구 삭제할 수 있다")
-    void permanentlyDeleteFileByStorageKey_success() {
-        File file = FileFixture.createWithId(1L);
-        given(fileRepository.findByStorageKey(FileFixture.DEFAULT_STORAGE_KEY))
-                .willReturn(Optional.of(file));
-
-        fileService.permanentlyDeleteFileByStorageKey(FileFixture.DEFAULT_STORAGE_KEY);
-
-        verify(fileRepository, times(1)).findByStorageKey(FileFixture.DEFAULT_STORAGE_KEY);
         verify(fileRepository, times(1)).delete(file);
     }
 }

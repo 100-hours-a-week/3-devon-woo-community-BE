@@ -84,12 +84,6 @@ public class FileService {
     }
 
     @Transactional
-    public void permanentlyDeleteFileByStorageKey(String storageKey) {
-        File file = getFileByStorageKey(storageKey);
-        fileRepository.delete(file);
-    }
-
-    @Transactional
     public PresignResult presignUpload(
             FileType fileType,
             String originalName,
@@ -100,8 +94,7 @@ public class FileService {
         File file = File.createPending(fileType, originalName, storageKey, mimeType);
         File savedFile = fileRepository.save(file);
 
-        String type = fileType == FileType.IMAGE ? "post" : "post";
-        ImageSignature signature = imageStorageService.generateUploadSignature(type);
+        ImageSignature signature = imageStorageService.generateUploadSignature(getFolder(fileType));
 
         return new PresignResult(savedFile.getId(), storageKey, signature);
     }
