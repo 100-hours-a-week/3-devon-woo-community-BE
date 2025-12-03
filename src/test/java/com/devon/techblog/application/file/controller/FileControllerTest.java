@@ -1,8 +1,6 @@
 package com.devon.techblog.application.file.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.verify;
@@ -15,13 +13,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.devon.techblog.application.file.FileRequestFixture;
 import com.devon.techblog.application.file.dto.request.FileCreateRequest;
+import com.devon.techblog.application.file.dto.response.FileResponse;
+import com.devon.techblog.application.file.service.FileService;
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.FileErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
 import com.devon.techblog.domain.file.FileFixture;
 import com.devon.techblog.domain.file.entity.File;
-import com.devon.techblog.domain.file.entity.FileType;
-import com.devon.techblog.domain.file.service.FileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -48,9 +46,9 @@ class FileControllerTest {
     void createFile_success() throws Exception {
         FileCreateRequest request = FileRequestFixture.createRequest();
         File file = FileFixture.createWithId(1L);
+        FileResponse response = FileResponse.from(file);
 
-        given(fileService.createFile(any(), any(), any(), any(), any(), any()))
-                .willReturn(file);
+        given(fileService.createFile(request)).willReturn(response);
 
         mockMvc.perform(post("/api/v1/files")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -83,7 +81,8 @@ class FileControllerTest {
     @DisplayName("ID로 파일 조회 - 200 OK")
     void getFile_success() throws Exception {
         File file = FileFixture.createWithId(1L);
-        given(fileService.getFileById(1L)).willReturn(file);
+        FileResponse response = FileResponse.from(file);
+        given(fileService.getFileById(1L)).willReturn(response);
 
         mockMvc.perform(get("/api/v1/files/{id}", 1L))
                 .andExpect(status().isOk())
@@ -106,7 +105,8 @@ class FileControllerTest {
     @DisplayName("storageKey로 파일 조회 - 200 OK")
     void getFileByStorageKey_success() throws Exception {
         File file = FileFixture.createWithId(1L);
-        given(fileService.getFileByStorageKey(FileFixture.DEFAULT_STORAGE_KEY)).willReturn(file);
+        FileResponse response = FileResponse.from(file);
+        given(fileService.getFileByStorageKey(FileFixture.DEFAULT_STORAGE_KEY)).willReturn(response);
 
         mockMvc.perform(get("/api/v1/files/by-key")
                         .param("storageKey", FileFixture.DEFAULT_STORAGE_KEY))
@@ -120,7 +120,10 @@ class FileControllerTest {
     void getAllFiles_success() throws Exception {
         File file1 = FileFixture.createWithId(1L);
         File file2 = FileFixture.createWithId(2L);
-        given(fileService.getAllFiles()).willReturn(List.of(file1, file2));
+        FileResponse fileResponse1 = FileResponse.from(file1);
+        FileResponse fileResponse2 = FileResponse.from(file2);
+
+        given(fileService.getAllFiles()).willReturn(List.of(fileResponse1, fileResponse2));
 
         mockMvc.perform(get("/api/v1/files"))
                 .andExpect(status().isOk())
@@ -134,7 +137,9 @@ class FileControllerTest {
     void getFilesByType_success() throws Exception {
         File file1 = FileFixture.createWithId(1L);
         File file2 = FileFixture.createWithId(2L);
-        given(fileService.getFilesByType(FileType.IMAGE)).willReturn(List.of(file1, file2));
+        FileResponse fileResponse1 = FileResponse.from(file1);
+        FileResponse fileResponse2 = FileResponse.from(file2);
+        given(fileService.getFilesByType(any())).willReturn(List.of(fileResponse1, fileResponse2));
 
         mockMvc.perform(get("/api/v1/files")
                         .param("fileType", "IMAGE"))

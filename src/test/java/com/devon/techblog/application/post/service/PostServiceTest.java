@@ -19,7 +19,7 @@ import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.file.repository.FileRepository;
-import com.devon.techblog.domain.file.service.FileService;
+import com.devon.techblog.application.file.service.FileService;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;

@@ -9,7 +9,7 @@ import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
-import com.devon.techblog.domain.file.service.FileService;
+import com.devon.techblog.application.file.service.FileService;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.dto.PostSearchCondition;
