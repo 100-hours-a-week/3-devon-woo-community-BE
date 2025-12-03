@@ -9,15 +9,15 @@ import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
+import com.devon.techblog.application.file.service.FileService;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.dto.PostSearchCondition;
 import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
-import com.devon.techblog.domain.post.entity.Attachment;
 import com.devon.techblog.domain.post.entity.Post;
-import com.devon.techblog.domain.post.repository.AttachmentRepository;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
+import com.devon.techblog.domain.post.util.MarkdownImageExtractor;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final AttachmentRepository attachmentRepository;
+    private final FileService fileService;
     private final OwnershipPolicy ownershipPolicy;
     private final PostLikeRepository postLikeRepository;
     private final TagService tagService;
@@ -50,9 +50,7 @@ public class PostService {
 
         updateTags(savedPost, request.tags(), false);
 
-        Attachment savedAttachment = saveAttachment(savedPost, request.image(), false);
-
-        return PostResponse.of(savedPost, member, savedAttachment);
+        return PostResponse.of(savedPost, member, null);
     }
 
     /**
@@ -72,14 +70,9 @@ public class PostService {
             );
         }
 
-        applyPostMutation(post, PostMutationData.fromUpdateRequest(request));
-        updateTags(post, request.tags(), true);
-
         Post savedPost = postRepository.save(post);
 
-        Attachment attachment = saveAttachment(savedPost, request.image(), true);
-
-        return PostResponse.of(savedPost, member, attachment);
+        return PostResponse.of(savedPost, member, null);
     }
 
     /**
@@ -89,6 +82,9 @@ public class PostService {
     public void deletePost(Long postId, Long memberId) {
         Post post = findByIdWithMember(postId);
         ownershipPolicy.validateOwnership(post.getMember().getId(), memberId);
+
+        List<String> imageUrls = MarkdownImageExtractor.extractImageUrls(post.getContent());
+        imageUrls.forEach(fileService::deleteFileByUrl);
 
         post.delete();
         postRepository.save(post);
@@ -102,15 +98,13 @@ public class PostService {
         Post post = findByIdWithMember(postId);
 
         Member member = post.getMember();
-        Attachment attachment = attachmentRepository.findByPostId(postId)
-                .orElse(null);
 
         boolean isLiked = false;
         if(memberId != null && postLikeRepository.existsByPostIdAndMemberId(postId, memberId)){
             isLiked = true;
         }
 
-        return PostResponse.of(post, member, attachment, isLiked);
+        return PostResponse.of(post, member, null, isLiked);
     }
 
     /**
@@ -186,15 +180,6 @@ public class PostService {
         tagService.updatePostTags(post, tags);
     }
 
-    private Attachment saveAttachment(Post post, String imageUrl, boolean fallbackToExisting) {
-        if (imageUrl != null) {
-            return attachmentRepository.save(Attachment.create(post, imageUrl));
-        }
-        if (fallbackToExisting) {
-            return attachmentRepository.findByPostId(post.getId()).orElse(null);
-        }
-        return null;
-    }
 
     private record PostMutationData(
             String summary,

@@ -383,7 +383,7 @@ List<Post> posts = queryFactory
 queryFactory
     .selectFrom(post)
     .join(post.comments, comment).fetchJoin()
-    .join(post.attachments, attachment).fetchJoin()  // 에러!
+    .join(post.attachments, file).fetchJoin()  // 에러!
     .fetch();
 
 // Good: 한 번에 하나의 컬렉션만 fetch join

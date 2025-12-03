@@ -18,6 +18,8 @@ import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
+import com.devon.techblog.domain.file.repository.FileRepository;
+import com.devon.techblog.application.file.service.FileService;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -25,9 +27,7 @@ import com.devon.techblog.domain.post.PostFixture;
 import com.devon.techblog.domain.post.PostQueryDtoFixture;
 import com.devon.techblog.domain.post.dto.PostSearchCondition;
 import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
-import com.devon.techblog.domain.post.entity.Attachment;
 import com.devon.techblog.domain.post.entity.Post;
-import com.devon.techblog.domain.post.repository.AttachmentRepository;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
 import java.util.List;
@@ -52,13 +52,19 @@ class PostServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private AttachmentRepository attachmentRepository;
+    private FileRepository fileRepository;
 
     @Mock
     private OwnershipPolicy ownershipPolicy;
 
     @Mock
     private PostLikeRepository postLikeRepository;
+
+    @Mock
+    private FileService fileService;
+
+    @Mock
+    private TagService tagService;
 
     @InjectMocks
     private PostService postService;
@@ -85,20 +91,6 @@ class PostServiceTest {
         assertThat(response.content()).isEqualTo(PostFixture.DEFAULT_CONTENT);
     }
 
-    @Test
-    @DisplayName("게시글 생성 시 이미지가 있으면 저장된다")
-    void createPost_withImage() {
-        PostCreateRequest request = PostRequestFixture.createRequest(PostFixture.DEFAULT_TITLE, PostFixture.DEFAULT_CONTENT, PostFixture.DEFAULT_IMAGE_URL);
-        Attachment attachment = Attachment.create(post, PostFixture.DEFAULT_IMAGE_URL);
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member));
-        given(postRepository.save(any(Post.class))).willReturn(post);
-        given(attachmentRepository.save(any(Attachment.class))).willReturn(attachment);
-
-        PostResponse response = postService.createPost(request, 1L);
-
-        assertThat(response.title()).isEqualTo(PostFixture.DEFAULT_TITLE);
-        assertThat(response.imageUrl()).isNotNull();
-    }
 
     @Test
     @DisplayName("게시글을 수정할 수 있다")
@@ -107,7 +99,6 @@ class PostServiceTest {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(postRepository.save(post)).willReturn(post);
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
 
         postService.updatePost(1L, request, 1L);
 
@@ -129,7 +120,6 @@ class PostServiceTest {
     @DisplayName("게시글 상세를 조회할 수 있다")
     void getPostDetails_success() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
         given(postLikeRepository.existsByPostIdAndMemberId(1L, 1L)).willReturn(false);
 
         PostResponse response = postService.getPostDetails(1L, 1L);
@@ -215,7 +205,6 @@ class PostServiceTest {
     @DisplayName("게시글 조회 시 좋아요 여부를 확인한다 - memberId가 있을 때")
     void getPostDetails_withMemberId_checksLiked() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
         given(postLikeRepository.existsByPostIdAndMemberId(1L, 1L)).willReturn(true);
 
         PostResponse response = postService.getPostDetails(1L, 1L);
@@ -227,7 +216,6 @@ class PostServiceTest {
     @DisplayName("게시글 조회 시 좋아요 여부를 확인한다 - memberId가 null일 때")
     void getPostDetails_withoutMemberId_isLikedFalse() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        given(attachmentRepository.findByPostId(1L)).willReturn(Optional.empty());
 
         PostResponse response = postService.getPostDetails(1L, null);
 

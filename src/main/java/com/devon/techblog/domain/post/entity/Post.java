@@ -82,6 +82,7 @@ public class Post extends BaseTimeEntity {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
+
     public static Post create(Member member, String title, String content) {
         validateCreate(member, title, content);
         return Post.builder()

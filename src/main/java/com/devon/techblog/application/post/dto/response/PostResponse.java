@@ -1,8 +1,8 @@
 package com.devon.techblog.application.post.dto.response;
 
 import com.devon.techblog.application.member.dto.response.MemberResponse;
+import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.member.entity.Member;
-import com.devon.techblog.domain.post.entity.Attachment;
 import com.devon.techblog.domain.post.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -58,17 +58,17 @@ public record PostResponse(
         @Schema(description = "공개 범위", example = "public")
         String visibility
 ) {
-    public static PostResponse of(Post post, Member member, Attachment attachment) {
-        return of(post, member, attachment, false);
+    public static PostResponse of(Post post, Member member, File file) {
+        return of(post, member, file, false);
     }
 
-    public static PostResponse of(Post post, Member member, Attachment attachment, boolean isLiked) {
+    public static PostResponse of(Post post, Member member, File file, boolean isLiked) {
         return new PostResponse(
                 post.getId(),
                 MemberResponse.of(member),
                 post.getTitle(),
                 post.getContent(),
-                post.getImageUrl() != null ? post.getImageUrl() : (attachment != null ? attachment.getAttachmentUrl() : null),
+                post.getImageUrl() != null ? post.getImageUrl() : (file != null ? file.getUrl() : null),
                 post.getCreatedAt(),
                 post.getUpdatedAt(),
                 post.getViewsCount(),

@@ -20,7 +20,7 @@ public PostResponse getPostDetails(Long postId) {
     post.incrementViews();         // ❌ 쓰기 작업
     postRepository.save(post);     // ❌ readOnly 트랜잭션 내에서 save
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 ```
 
@@ -43,7 +43,7 @@ public PostResponse getPostDetails(Long postId) {
     post.incrementViews();
     // 트랜잭션 커밋 시 자동 flush
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 ```
 
@@ -69,7 +69,7 @@ public PostResponse getPostDetails(Long postId) {
 public PostResponse getPostDetails(Long postId) {
     Post post = findByIdWithMember(postId);
     // 조회 로직만
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 
 // PostViewService.java (별도 서비스)
@@ -111,7 +111,7 @@ public PostResponse getPostDetails(Long postId) {
     // 이벤트 발행 (비동기)
     eventPublisher.publishEvent(new PostViewedEvent(postId));
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 
 // PostViewEventListener.java
@@ -179,7 +179,7 @@ public PostResponse getPostDetails(Long postId) {
     // 비동기 메서드 호출
     postViewService.incrementViewCountAsync(postId);
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 
 // PostViewService.java
@@ -214,7 +214,7 @@ public PostResponse getPostDetails(Long postId) {
     // Redis에 조회수 증가
     redisTemplate.opsForValue().increment("post:view:" + postId);
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 
 // PostViewSyncScheduler.java
@@ -370,12 +370,12 @@ public class PostViewEventListener {
 public PostResponse getPostDetails(Long postId) {
     Post post = findByIdWithMember(postId);
     Member member = post.getMember();
-    Attachment attachment = attachmentRepository.findByPostId(postId).orElse(null);
+    Attachment file = attachmentRepository.findByPostId(postId).orElse(null);
 
     // 비동기 이벤트 발행
     eventPublisher.publishEvent(PostViewedEvent.of(postId));
 
-    return PostResponse.of(post, member, attachment);
+    return PostResponse.of(post, member, file);
 }
 
 // 5. Async 설정
