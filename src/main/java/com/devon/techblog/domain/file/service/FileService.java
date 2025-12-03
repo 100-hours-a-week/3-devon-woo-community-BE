@@ -67,6 +67,11 @@ public class FileService {
     }
 
     @Transactional
+    public void deleteFileByUrl(String url) {
+        fileRepository.findByUrl(url).ifPresent(File::delete);
+    }
+
+    @Transactional
     public void restoreFile(Long id) {
         File file = getFileById(id);
         file.restore();

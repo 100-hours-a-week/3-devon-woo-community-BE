@@ -195,8 +195,57 @@ PENDING → UPLOADED → COMPLETED
 3. **빠른 업로드**: 클라이언트 ↔ Cloudinary 직접 통신
 4. **유연한 후처리**: 비동기로 썸네일 생성 등 가능
 
+## Post-File 관계 처리
+
+### 설계 원칙
+게시글(Post)와 파일(File)은 **명시적인 JPA 관계를 맺지 않습니다**. 대신 **content가 단일 진실 소스(Single Source of Truth)**가 됩니다.
+
+### 이유
+1. 프론트엔드는 이미 복잡한 업로드 플로우를 처리 중 (presign → Cloudinary 업로드 → complete)
+2. 추가로 fileId 목록을 관리하고 전달하는 것은 불필요한 복잡도 증가
+3. 마크다운 content에 이미 모든 이미지 정보가 포함되어 있음
+4. 동기화 이슈 방지 (attachments 리스트 vs. content URL 불일치 가능성)
+
+### 게시글 삭제 시 파일 처리
+게시글이 삭제되면 자동으로 연관된 파일도 soft delete 처리됩니다.
+
+**처리 과정:**
+1. `MarkdownImageExtractor`가 content에서 이미지 URL 추출
+2. 추출된 각 URL에 해당하는 File을 조회
+3. 해당 File들을 soft delete (`isDeleted = true`)
+
+**구현 코드:**
+```java
+// PostService.deletePost()
+List<String> imageUrls = MarkdownImageExtractor.extractImageUrls(post.getContent());
+imageUrls.forEach(fileService::deleteFileByUrl);
+post.delete();
+```
+
+### 고아 파일 처리
+사용자가 게시글 작성 중 파일을 업로드했지만:
+- 게시글을 저장하지 않고 취소한 경우
+- 업로드 후 마크다운에서 URL을 삭제한 경우
+
+이러한 파일들은 `PENDING` 또는 `UPLOADED` 상태로 남게 됩니다.
+
+**정리 방법:**
+주기적인 배치 작업으로 오래된 고아 파일을 삭제합니다.
+
+```sql
+-- 24시간 이상 된 PENDING 파일 삭제
+DELETE FROM file
+WHERE status = 'PENDING'
+  AND created_at < NOW() - INTERVAL 24 HOUR;
+
+-- 30일 이상 된 soft deleted 파일 영구 삭제
+DELETE FROM file
+WHERE is_deleted = true
+  AND updated_at < NOW() - INTERVAL 30 DAY;
+```
+
 ## 주의사항
 
-1. 사용자가 게시글 작성을 취소하면 업로드된 파일이 고아 파일로 남을 수 있음
-2. 마크다운 content를 파싱하여 실제 사용 중인 이미지와 사용되지 않는 이미지를 구분하는 로직 필요
-3. 보안: Presigned URL의 유효 시간 제한 (기본 1시간)
+1. 사용자가 게시글 작성을 취소하면 업로드된 파일이 고아 파일로 남을 수 있음 → 배치 작업으로 정리
+2. 보안: Presigned URL의 유효 시간 제한 (기본 1시간)
+3. File 엔티티와 Post 엔티티 간 명시적 JPA 관계 없음 (content 파싱 기반)

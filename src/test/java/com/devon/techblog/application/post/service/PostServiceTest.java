@@ -18,8 +18,8 @@ import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
-import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.file.repository.FileRepository;
+import com.devon.techblog.domain.file.service.FileService;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -59,6 +59,12 @@ class PostServiceTest {
 
     @Mock
     private PostLikeRepository postLikeRepository;
+
+    @Mock
+    private FileService fileService;
+
+    @Mock
+    private TagService tagService;
 
     @InjectMocks
     private PostService postService;

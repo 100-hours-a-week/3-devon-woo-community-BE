@@ -9,7 +9,6 @@ import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
-import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.file.service.FileService;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -18,6 +17,7 @@ import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.entity.Post;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
+import com.devon.techblog.domain.post.util.MarkdownImageExtractor;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -50,11 +50,7 @@ public class PostService {
 
         updateTags(savedPost, request.tags(), false);
 
-
-
-        File savedFile = null;
-
-        return PostResponse.of(savedPost, member, savedFile);
+        return PostResponse.of(savedPost, member, null);
     }
 
     /**
@@ -76,9 +72,7 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
-        File file = savedPost.getAttachments().isEmpty() ? null : savedPost.getAttachments().getFirst();
-
-        return PostResponse.of(savedPost, member, file);
+        return PostResponse.of(savedPost, member, null);
     }
 
     /**
@@ -88,6 +82,9 @@ public class PostService {
     public void deletePost(Long postId, Long memberId) {
         Post post = findByIdWithMember(postId);
         ownershipPolicy.validateOwnership(post.getMember().getId(), memberId);
+
+        List<String> imageUrls = MarkdownImageExtractor.extractImageUrls(post.getContent());
+        imageUrls.forEach(fileService::deleteFileByUrl);
 
         post.delete();
         postRepository.save(post);
@@ -101,14 +98,13 @@ public class PostService {
         Post post = findByIdWithMember(postId);
 
         Member member = post.getMember();
-        File file = post.getAttachments().isEmpty() ? null : post.getAttachments().get(0);
 
         boolean isLiked = false;
         if(memberId != null && postLikeRepository.existsByPostIdAndMemberId(postId, memberId)){
             isLiked = true;
         }
 
-        return PostResponse.of(post, member, file, isLiked);
+        return PostResponse.of(post, member, null, isLiked);
     }
 
     /**

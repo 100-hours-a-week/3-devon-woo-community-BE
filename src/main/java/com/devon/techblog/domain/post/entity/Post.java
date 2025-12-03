@@ -1,7 +1,6 @@
 package com.devon.techblog.domain.post.entity;
 
 import com.devon.techblog.domain.common.entity.BaseTimeEntity;
-import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.member.entity.Member;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,8 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -85,14 +82,6 @@ public class Post extends BaseTimeEntity {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
-    @ManyToMany
-    @JoinTable(
-            name = "post_file",
-            joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "file_id")
-    )
-    @Builder.Default
-    private List<File> attachments = new ArrayList<>();
 
     public static Post create(Member member, String title, String content) {
         validateCreate(member, title, content);
@@ -211,20 +200,6 @@ public class Post extends BaseTimeEntity {
             throw new IllegalArgumentException("image url too long");
         }
         this.imageUrl = imageUrl;
-    }
-
-    public void addAttachment(File file) {
-        Assert.notNull(file, "file required");
-        this.attachments.add(file);
-    }
-
-    public void removeAttachment(File file) {
-        Assert.notNull(file, "file required");
-        this.attachments.remove(file);
-    }
-
-    public void clearAttachments() {
-        this.attachments.clear();
     }
 
     private static void validateCreate(Member member, String title, String content){
