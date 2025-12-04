@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
 import com.devon.techblog.common.exception.CustomException;
 import com.devon.techblog.config.annotation.UnitTest;
+import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +33,7 @@ class MemberValidatorTest {
 
     @BeforeEach
     void setUp() {
-        member = Member.create("user@test.com", "password1234", "tester");
-        ReflectionTestUtils.setField(member, "id", 1L);
+        member = MemberFixture.createWithId(1L, "user@test.com", "password1234", "tester");
     }
 
     @Test
