@@ -26,8 +26,6 @@ public class AiController {
     @GetMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> chatStream(@RequestParam String prompt) {
         return aiService.chatStream(prompt)
-                .map(content -> ServerSentEvent.<String>builder()
-                        .data(content.isEmpty() ? " " : content)
-                        .build());
+                .map(content -> ServerSentEvent.<String>builder().data(content).build());
     }
 }
