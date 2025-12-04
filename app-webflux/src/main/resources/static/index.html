@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Features Client</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 20px; background: #f5f5f5; }
@@ -23,6 +24,18 @@
         .response { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 60px; white-space: pre-wrap; line-height: 1.6; }
         .loading { color: #666; font-style: italic; }
         .error { color: #dc3545; }
+        .review-container { margin-top: 15px; }
+        .review-card { background: #ffffff; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out; }
+        .review-card.loading { background: #f8f9fa; border-color: #e0e0e0; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .review-content { white-space: pre-wrap; line-height: 1.6; color: #333; }
+        .review-content p { margin-bottom: 10px; }
+        .review-content ul, .review-content ol { margin-left: 20px; margin-bottom: 10px; }
+        .review-content li { margin-bottom: 5px; }
+        .review-content code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        .review-content pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; margin-bottom: 10px; }
+        .review-content strong { font-weight: 600; }
+        .review-content em { font-style: italic; }
     </style>
 </head>
 <body>
@@ -69,7 +82,7 @@
                 <button onclick="review()">리뷰</button>
                 <button class="stream" onclick="reviewStream()">스트리밍 리뷰</button>
             </div>
-            <div class="response" id="reviewResponse">응답이 여기에 표시됩니다.</div>
+            <div class="review-container" id="reviewResponse"></div>
         </div>
     </div>
 
@@ -118,7 +131,31 @@
                 alert('텍스트를 입력하세요');
                 return;
             }
-            await sendRequest('/ai/review', { text }, 'reviewResponse');
+            const responseDiv = document.getElementById('reviewResponse');
+            responseDiv.innerHTML = '<div class="response loading">응답을 기다리는 중...</div>';
+
+            try {
+                const response = await fetch('/ai/review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const result = await response.text();
+
+                responseDiv.innerHTML = '';
+                const items = result.split('<<<REVIEW_ITEM>>>').filter(item => item.trim());
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'review-card';
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'review-content';
+                    contentDiv.innerHTML = marked.parse(item.trim());
+                    card.appendChild(contentDiv);
+                    responseDiv.appendChild(card);
+                });
+            } catch (error) {
+                responseDiv.innerHTML = `<div class="response error">Error: ${error.message}</div>`;
+            }
         }
 
         function reviewStream() {
@@ -127,7 +164,74 @@
                 alert('텍스트를 입력하세요');
                 return;
             }
-            sendStreamRequest('/ai/review/stream', { text }, 'reviewResponse');
+
+            const responseDiv = document.getElementById('reviewResponse');
+            responseDiv.innerHTML = '';
+
+            let buffer = '';
+            let currentCard = null;
+
+            fetch('/ai/review/stream', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            }).then(response => {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                function read() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            if (currentCard && buffer.trim()) {
+                                currentCard.querySelector('.review-content').innerHTML = marked.parse(buffer.trim());
+                                currentCard.classList.remove('loading');
+                            }
+                            return;
+                        }
+
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+
+                        lines.forEach(line => {
+                            if (line.startsWith('data:')) {
+                                const data = line.substring(5);
+                                if (data.trim()) {
+                                    buffer += data;
+
+                                    const delimiterIndex = buffer.indexOf('<<<REVIEW_ITEM>>>');
+                                    if (delimiterIndex !== -1) {
+                                        if (currentCard) {
+                                            const content = buffer.substring(0, delimiterIndex).trim();
+                                            currentCard.querySelector('.review-content').innerHTML = marked.parse(content);
+                                            currentCard.classList.remove('loading');
+                                        }
+
+                                        currentCard = document.createElement('div');
+                                        currentCard.className = 'review-card loading';
+                                        currentCard.innerHTML = '<div class="review-content"></div>';
+                                        responseDiv.appendChild(currentCard);
+
+                                        buffer = buffer.substring(delimiterIndex + 19);
+                                    } else if (currentCard) {
+                                        currentCard.querySelector('.review-content').textContent = buffer.trim();
+                                    } else {
+                                        currentCard = document.createElement('div');
+                                        currentCard.className = 'review-card loading';
+                                        currentCard.innerHTML = '<div class="review-content"></div>';
+                                        responseDiv.appendChild(currentCard);
+                                    }
+                                }
+                            }
+                        });
+
+                        read();
+                    });
+                }
+
+                read();
+            }).catch(error => {
+                responseDiv.innerHTML = `<div class="response error">Error: ${error.message}</div>`;
+            });
         }
 
         async function sendRequest(url, body, responseId) {
