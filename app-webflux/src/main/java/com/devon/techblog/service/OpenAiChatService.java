@@ -2,7 +2,6 @@ package com.devon.techblog.service;
 
 import com.devon.techblog.config.OpenAiProperties;
 import com.devon.techblog.dto.ChatRequest;
-import com.devon.techblog.dto.ChatResponse;
 import com.devon.techblog.util.OpenAiStreamParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,25 +11,27 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@Service
+@Service("openAiChatService")
 @RequiredArgsConstructor
-public class AiService {
+public class OpenAiChatService implements ChatService {
 
     private final WebClient openaiWebClient;
     private final OpenAiStreamParser streamParser;
     private final OpenAiProperties openAiProperties;
 
-    public Mono<String> chatMono(String prompt) {
+    @Override
+    public Mono<String> chat(String prompt) {
         ChatRequest request = buildChatRequest(prompt, false);
 
         return openaiWebClient.post()
                 .uri(openAiProperties.getApi().getChatCompletionsUri())
                 .bodyValue(request)
                 .retrieve()
-                .bodyToMono(ChatResponse.class)
+                .bodyToMono(com.devon.techblog.dto.ChatResponse.class)
                 .map(streamParser::extractMessageContent);
     }
 
+    @Override
     public Flux<String> chatStream(String prompt) {
         ChatRequest request = buildChatRequest(prompt, true);
 
