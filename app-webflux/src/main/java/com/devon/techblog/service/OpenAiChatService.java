@@ -2,14 +2,14 @@ package com.devon.techblog.service;
 
 import com.devon.techblog.config.OpenAiProperties;
 import com.devon.techblog.dto.ChatRequest;
+import com.devon.techblog.strategy.PromptStrategy;
 import com.devon.techblog.util.OpenAiStreamParser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service("openAiChatService")
 @RequiredArgsConstructor
@@ -18,10 +18,22 @@ public class OpenAiChatService implements ChatService {
     private final WebClient openaiWebClient;
     private final OpenAiStreamParser streamParser;
     private final OpenAiProperties openAiProperties;
+    private final ApplicationContext applicationContext;
 
     @Override
     public Mono<String> chat(String prompt) {
-        ChatRequest request = buildChatRequest(prompt, false);
+        return chat(prompt, "defaultPrompt");
+    }
+
+    @Override
+    public Flux<String> chatStream(String prompt) {
+        return chatStream(prompt, "defaultPrompt");
+    }
+
+    @Override
+    public Mono<String> chat(String prompt, String strategyName) {
+        PromptStrategy strategy = applicationContext.getBean(strategyName, PromptStrategy.class);
+        ChatRequest request = buildChatRequest(strategy.buildMessages(prompt), false);
 
         return openaiWebClient.post()
                 .uri(openAiProperties.getApi().getChatCompletionsUri())
@@ -32,8 +44,9 @@ public class OpenAiChatService implements ChatService {
     }
 
     @Override
-    public Flux<String> chatStream(String prompt) {
-        ChatRequest request = buildChatRequest(prompt, true);
+    public Flux<String> chatStream(String prompt, String strategyName) {
+        PromptStrategy strategy = applicationContext.getBean(strategyName, PromptStrategy.class);
+        ChatRequest request = buildChatRequest(strategy.buildMessages(prompt), true);
 
         return openaiWebClient.post()
                 .uri(openAiProperties.getApi().getChatCompletionsUri())
@@ -45,15 +58,10 @@ public class OpenAiChatService implements ChatService {
                 .filter(content -> !content.isEmpty());
     }
 
-    private ChatRequest buildChatRequest(String prompt, boolean stream) {
+    private ChatRequest buildChatRequest(java.util.List<ChatRequest.Message> messages, boolean stream) {
         return ChatRequest.builder()
                 .model(openAiProperties.getModel())
-                .messages(List.of(
-                        ChatRequest.Message.builder()
-                                .role("user")
-                                .content(prompt)
-                                .build()
-                ))
+                .messages(messages)
                 .stream(stream)
                 .build();
     }

@@ -21,13 +21,23 @@ public class AiController {
     private final ChatService chatService;
 
     @GetMapping("/chat")
-    public Mono<String> chat(@RequestParam String prompt) {
+    public Mono<String> chat(
+            @RequestParam String prompt,
+            @RequestParam(required = false) String strategy) {
+        if (strategy != null) {
+            return chatService.chat(prompt, strategy + "Prompt");
+        }
         return chatService.chat(prompt);
     }
 
     @GetMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> chatStream(@RequestParam String prompt) {
-        return chatService.chatStream(prompt)
-                .map(content -> ServerSentEvent.<String>builder().data(content).build());
+    public Flux<ServerSentEvent<String>> chatStream(
+            @RequestParam String prompt,
+            @RequestParam(required = false) String strategy) {
+        Flux<String> stream = strategy != null
+                ? chatService.chatStream(prompt, strategy + "Prompt")
+                : chatService.chatStream(prompt);
+
+        return stream.map(content -> ServerSentEvent.<String>builder().data(content).build());
     }
 }
