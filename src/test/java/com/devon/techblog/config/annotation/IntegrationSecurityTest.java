@@ -1,5 +1,6 @@
 package com.devon.techblog.config.annotation;
 
+import com.devon.techblog.config.EmbeddedRedisConfig;
 import com.devon.techblog.config.ImageStorageMockConfig;
 import com.devon.techblog.config.JpaAuditingTestConfig;
 import java.lang.annotation.ElementType;
@@ -20,7 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
-@Import({JpaAuditingTestConfig.class, ImageStorageMockConfig.class})
+@Import({JpaAuditingTestConfig.class, ImageStorageMockConfig.class, EmbeddedRedisConfig.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 @Tag("integration-security")
