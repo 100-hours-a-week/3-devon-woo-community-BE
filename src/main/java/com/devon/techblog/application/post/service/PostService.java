@@ -33,7 +33,7 @@ public class PostService {
     private final FileService fileService;
     private final OwnershipPolicy ownershipPolicy;
     private final PostLikeRepository postLikeRepository;
-    private final TagService tagService;
+    private final PostTagService postTagService;
 
     /**
      * 게시글 생성
@@ -68,7 +68,7 @@ public class PostService {
         }
 
         Post savedPost = postRepository.save(post);
-        tagService.createPostTags(savedPost, request.tags());
+        postTagService.createPostTags(savedPost, request.tags());
 
         return PostResponse.of(savedPost, member, null);
     }
@@ -108,7 +108,7 @@ public class PostService {
 
         Post savedPost = postRepository.save(post);
 
-        tagService.updatePostTags(savedPost, request.tags());
+        postTagService.updatePostTags(savedPost, request.tags());
 
         return PostResponse.of(savedPost, member, null);
     }

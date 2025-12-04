@@ -1,8 +1,7 @@
 package com.devon.techblog.application.post.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,7 +16,7 @@ import com.devon.techblog.domain.post.entity.Tag;
 import com.devon.techblog.domain.post.repository.TagRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,13 +24,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 @UnitTest
-class TagServiceTest {
+class PostTagServiceTest {
 
     @Mock
     private TagRepository tagRepository;
 
     @InjectMocks
-    private TagService tagService;
+    private PostTagService postTagService;
 
     private Post post;
 
@@ -48,17 +47,14 @@ class TagServiceTest {
         Tag javaTag = createTagWithId(1L, "java");
         Tag springTag = createTagWithId(2L, "spring");
 
-        given(tagRepository.findByName("java")).willReturn(Optional.empty());
-        given(tagRepository.findByName("spring")).willReturn(Optional.empty());
-        given(tagRepository.save(any(Tag.class)))
-                .willReturn(javaTag)
-                .willReturn(springTag);
+        given(tagRepository.findByNameIn(anyList())).willReturn(Collections.emptyList());
+        given(tagRepository.saveAll(anyList())).willReturn(List.of(javaTag, springTag));
 
-        List<PostTag> postTags = tagService.createPostTags(post, tagNames);
+        List<PostTag> postTags = postTagService.createPostTags(post, tagNames);
 
         assertThat(postTags).hasSize(2);
-        verify(tagRepository, times(2)).save(any(Tag.class));
-        verify(tagRepository, times(2)).incrementUsageCount(anyLong());
+        verify(tagRepository, times(1)).saveAll(anyList());
+        verify(tagRepository, times(1)).bulkIncrementUsageCount(anyList());
     }
 
     @Test
@@ -67,13 +63,13 @@ class TagServiceTest {
         List<String> tagNames = List.of("java");
         Tag existingTag = createTagWithId(1L, "java");
 
-        given(tagRepository.findByName("java")).willReturn(Optional.of(existingTag));
+        given(tagRepository.findByNameIn(anyList())).willReturn(List.of(existingTag));
 
-        List<PostTag> postTags = tagService.createPostTags(post, tagNames);
+        List<PostTag> postTags = postTagService.createPostTags(post, tagNames);
 
         assertThat(postTags).hasSize(1);
-        verify(tagRepository, times(0)).save(any(Tag.class));
-        verify(tagRepository, times(1)).incrementUsageCount(1L);
+        verify(tagRepository, times(0)).saveAll(anyList());
+        verify(tagRepository, times(1)).bulkIncrementUsageCount(anyList());
     }
 
     @Test
@@ -82,12 +78,12 @@ class TagServiceTest {
         List<String> tagNames = List.of("JAVA", "Java", "java");
         Tag javaTag = createTagWithId(1L, "java");
 
-        given(tagRepository.findByName("java")).willReturn(Optional.of(javaTag));
+        given(tagRepository.findByNameIn(anyList())).willReturn(List.of(javaTag));
 
-        List<PostTag> postTags = tagService.createPostTags(post, tagNames);
+        List<PostTag> postTags = postTagService.createPostTags(post, tagNames);
 
-        assertThat(postTags).hasSize(3);
-        verify(tagRepository, times(3)).findByName("java");
+        assertThat(postTags).hasSize(1);
+        verify(tagRepository, times(1)).findByNameIn(anyList());
     }
 
     @Test
@@ -97,21 +93,19 @@ class TagServiceTest {
         Tag javaTag = createTagWithId(1L, "java");
         Tag springTag = createTagWithId(2L, "spring");
 
-        given(tagRepository.findByName("java")).willReturn(Optional.of(javaTag));
-        given(tagRepository.findByName("spring")).willReturn(Optional.of(springTag));
+        given(tagRepository.findByNameIn(anyList())).willReturn(List.of(javaTag, springTag));
 
-        List<PostTag> postTags = tagService.createPostTags(post, tagNames);
+        List<PostTag> postTags = postTagService.createPostTags(post, tagNames);
 
         assertThat(postTags).hasSize(2);
-        verify(tagRepository, times(1)).findByName("java");
-        verify(tagRepository, times(1)).findByName("spring");
+        verify(tagRepository, times(1)).findByNameIn(anyList());
     }
 
     @Test
     @DisplayName("null 또는 빈 리스트를 전달하면 빈 PostTag 리스트를 반환한다")
     void createPostTags_handlesNullAndEmptyList() {
-        List<PostTag> nullResult = tagService.createPostTags(post, null);
-        List<PostTag> emptyResult = tagService.createPostTags(post, new ArrayList<>());
+        List<PostTag> nullResult = postTagService.createPostTags(post, null);
+        List<PostTag> emptyResult = postTagService.createPostTags(post, new ArrayList<>());
 
         assertThat(nullResult).isEmpty();
         assertThat(emptyResult).isEmpty();
@@ -126,12 +120,45 @@ class TagServiceTest {
 
         post.addPostTag(oldPostTag);
 
-        given(tagRepository.findByName("spring")).willReturn(Optional.of(newTag));
+        given(tagRepository.findByNameIn(anyList())).willReturn(List.of(newTag));
 
-        tagService.updatePostTags(post, List.of("spring"));
+        postTagService.updatePostTags(post, List.of("spring"));
 
-        verify(tagRepository, times(1)).decrementUsageCount(1L);
-        verify(tagRepository, times(1)).incrementUsageCount(2L);
+        verify(tagRepository, times(1)).bulkDecrementUsageCount(anyList());
+        verify(tagRepository, times(1)).bulkIncrementUsageCount(anyList());
+    }
+
+    @Test
+    @DisplayName("동일한 태그로 업데이트하면 변경사항이 없다")
+    void updatePostTags_noChange() {
+        Tag javaTag = createTagWithId(1L, "java");
+        PostTag postTag = PostTag.create(post, javaTag);
+
+        post.addPostTag(postTag);
+
+        postTagService.updatePostTags(post, List.of("java"));
+
+        verify(tagRepository, times(0)).bulkDecrementUsageCount(anyList());
+        verify(tagRepository, times(0)).bulkIncrementUsageCount(anyList());
+        assertThat(post.getPostTags()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("일부 태그만 변경할 수 있다")
+    void updatePostTags_partialChange() {
+        Tag javaTag = createTagWithId(1L, "java");
+        Tag springTag = createTagWithId(2L, "spring");
+        Tag kotlinTag = createTagWithId(3L, "kotlin");
+
+        post.addPostTag(PostTag.create(post, javaTag));
+        post.addPostTag(PostTag.create(post, springTag));
+
+        given(tagRepository.findByNameIn(anyList())).willReturn(List.of(springTag, kotlinTag));
+
+        postTagService.updatePostTags(post, List.of("spring", "kotlin"));
+
+        verify(tagRepository, times(1)).bulkDecrementUsageCount(anyList());
+        verify(tagRepository, times(1)).bulkIncrementUsageCount(anyList());
     }
 
     @Test
@@ -143,7 +170,7 @@ class TagServiceTest {
 
         given(tagRepository.findTopByUsageCount(10)).willReturn(topTags);
 
-        List<Tag> result = tagService.getTopTags(10);
+        List<Tag> result = postTagService.getTopTags(10);
 
         assertThat(result).hasSize(2);
         assertThat(result).containsExactly(tag1, tag2);
