@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: tech-blog-webflux
+
+server:
+  port: 8081
