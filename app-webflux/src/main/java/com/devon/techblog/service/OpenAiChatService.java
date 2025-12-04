@@ -22,12 +22,12 @@ public class OpenAiChatService implements ChatService {
 
     @Override
     public Mono<String> chat(String prompt) {
-        return chat(prompt, "defaultPrompt");
+        return chat(prompt, "");
     }
 
     @Override
     public Flux<String> chatStream(String prompt) {
-        return chatStream(prompt, "defaultPrompt");
+        return chatStream(prompt, "");
     }
 
     @Override
