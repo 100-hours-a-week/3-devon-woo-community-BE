@@ -33,7 +33,7 @@ public class PostService {
     private final FileService fileService;
     private final OwnershipPolicy ownershipPolicy;
     private final PostLikeRepository postLikeRepository;
-    private final TagService tagService;
+    private final PostTagService postTagService;
 
     /**
      * 게시글 생성
@@ -44,11 +44,31 @@ public class PostService {
 
         Post post = Post.create(member, request.title(), request.content());
 
-        applyPostMutation(post, PostMutationData.fromCreateRequest(request));
+        if (request.summary() != null) {
+            post.updateSummary(request.summary());
+        }
+        if (request.visibility() != null) {
+            post.updateVisibility(request.visibility());
+        }
+        if (request.isDraft() != null) {
+            if (request.isDraft()) {
+                post.markAsDraft();
+            } else {
+                post.publish();
+            }
+        }
+        if (request.commentsAllowed() != null) {
+            post.setCommentsAllowed(request.commentsAllowed());
+        }
+        if (request.thumbnail() != null) {
+            post.updateThumbnail(request.thumbnail());
+        }
+        if (request.image() != null) {
+            post.updateImageUrl(request.image());
+        }
 
         Post savedPost = postRepository.save(post);
-
-        updateTags(savedPost, request.tags(), false);
+        postTagService.createPostTags(savedPost, request.tags());
 
         return PostResponse.of(savedPost, member, null);
     }
@@ -70,7 +90,25 @@ public class PostService {
             );
         }
 
+        if (request.summary() != null) {
+            post.updateSummary(request.summary());
+        }
+        if (request.visibility() != null) {
+            post.updateVisibility(request.visibility());
+        }
+        if (request.commentsAllowed() != null) {
+            post.setCommentsAllowed(request.commentsAllowed());
+        }
+        if (request.thumbnail() != null) {
+            post.updateThumbnail(request.thumbnail());
+        }
+        if (request.image() != null) {
+            post.updateImageUrl(request.image());
+        }
+
         Post savedPost = postRepository.save(post);
+
+        postTagService.updatePostTags(savedPost, request.tags());
 
         return PostResponse.of(savedPost, member, null);
     }
@@ -143,73 +181,5 @@ public class PostService {
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
-    }
-
-    private void applyPostMutation(Post post, PostMutationData data) {
-        if (data.summary() != null) {
-            post.updateSummary(data.summary());
-        }
-        if (data.visibility() != null) {
-            post.updateVisibility(data.visibility());
-        }
-        if (data.isDraft() != null) {
-            if (data.isDraft()) {
-                post.markAsDraft();
-            } else {
-                post.publish();
-            }
-        }
-        if (data.commentsAllowed() != null) {
-            post.setCommentsAllowed(data.commentsAllowed());
-        }
-        if (data.thumbnail() != null) {
-            post.updateThumbnail(data.thumbnail());
-        }
-        if (data.image() != null) {
-            post.updateImageUrl(data.image());
-        }
-    }
-
-    private void updateTags(Post post, List<String> tags, boolean allowEmpty) {
-        if (tags == null) {
-            return;
-        }
-        if (!allowEmpty && tags.isEmpty()) {
-            return;
-        }
-        tagService.updatePostTags(post, tags);
-    }
-
-
-    private record PostMutationData(
-            String summary,
-            String visibility,
-            Boolean isDraft,
-            Boolean commentsAllowed,
-            String thumbnail,
-            String image
-    ) {
-
-        private static PostMutationData fromCreateRequest(PostCreateRequest request) {
-            return new PostMutationData(
-                    request.summary(),
-                    request.visibility(),
-                    request.isDraft(),
-                    request.commentsAllowed(),
-                    request.thumbnail(),
-                    request.image()
-            );
-        }
-
-        private static PostMutationData fromUpdateRequest(PostUpdateRequest request) {
-            return new PostMutationData(
-                    request.summary(),
-                    request.visibility(),
-                    null,
-                    request.commentsAllowed(),
-                    request.thumbnail(),
-                    request.image()
-            );
-        }
     }
 }

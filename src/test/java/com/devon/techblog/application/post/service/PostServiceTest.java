@@ -64,7 +64,7 @@ class PostServiceTest {
     private FileService fileService;
 
     @Mock
-    private TagService tagService;
+    private PostTagService postTagService;
 
     @InjectMocks
     private PostService postService;
