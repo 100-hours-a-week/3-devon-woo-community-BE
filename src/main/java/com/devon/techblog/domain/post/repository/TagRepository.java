@@ -25,4 +25,12 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Tag t SET t.usageCount = t.usageCount - 1 WHERE t.id = :tagId AND t.usageCount > 0")
     int decrementUsageCount(@Param("tagId") Long tagId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Tag t SET t.usageCount = t.usageCount + 1 WHERE t.id IN :tagIds")
+    int bulkIncrementUsageCount(@Param("tagIds") List<Long> tagIds);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Tag t SET t.usageCount = t.usageCount - 1 WHERE t.id IN :tagIds AND t.usageCount > 0")
+    int bulkDecrementUsageCount(@Param("tagIds") List<Long> tagIds);
 }
