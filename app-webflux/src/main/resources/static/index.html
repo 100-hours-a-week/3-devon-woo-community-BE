@@ -173,8 +173,8 @@
 
                         lines.forEach(line => {
                             if (line.startsWith('data:')) {
-                                const data = line.substring(5).trim();
-                                if (data) {
+                                const data = line.substring(5);
+                                if (data.trim()) {
                                     fullResponse += data;
                                     responseDiv.textContent = fullResponse;
                                     responseDiv.className = 'response';

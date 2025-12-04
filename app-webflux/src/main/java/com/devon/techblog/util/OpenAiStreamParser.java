@@ -45,7 +45,7 @@ public class OpenAiStreamParser {
 
     private Optional<String> extractContentFromLine(String line) {
         try {
-            String json = line.substring(6).trim();
+            String json = line.substring(6);
             ChatResponse response = objectMapper.readValue(json, ChatResponse.class);
 
             if (response.getChoices() != null && !response.getChoices().isEmpty()) {
