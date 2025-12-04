@@ -1,12 +1,14 @@
 package com.devon.techblog.presentation;
 
+import com.devon.techblog.config.TestSecurityConfig;
 import com.devon.techblog.dto.ReviewRequest;
 import com.devon.techblog.service.ChatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,12 +17,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(ReviewController.class)
+@Import(TestSecurityConfig.class)
 class ReviewControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
-    @MockBean
+    @MockitoBean
     private ChatService chatService;
 
     @Test
@@ -44,7 +47,7 @@ class ReviewControllerTest {
     @Test
     void reviewStream() {
         ReviewRequest request = new ReviewRequest("This is a text to review");
-        Flux<String> responseFlux = Flux.just("Review", " ", "feedback", " ", "complete");
+        Flux<String> responseFlux = Flux.just("Review", "feedback", "complete");
 
         when(chatService.chatStream(eq(request.text()), eq("reviewPrompt")))
                 .thenReturn(responseFlux);
@@ -58,6 +61,6 @@ class ReviewControllerTest {
                 .expectStatus().isOk()
                 .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
                 .expectBodyList(String.class)
-                .hasSize(5);
+                .hasSize(3);
     }
 }

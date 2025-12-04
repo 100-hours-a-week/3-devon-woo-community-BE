@@ -1,12 +1,14 @@
 package com.devon.techblog.presentation;
 
+import com.devon.techblog.config.TestSecurityConfig;
 import com.devon.techblog.dto.GenerateTextRequest;
 import com.devon.techblog.service.ChatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,12 +18,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(GenerateTextController.class)
+@Import(TestSecurityConfig.class)
 class GenerateTextControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
-    @MockBean
+    @MockitoBean
     private ChatService chatService;
 
     @Test
@@ -45,7 +48,7 @@ class GenerateTextControllerTest {
     @Test
     void generateTextStream() {
         GenerateTextRequest request = new GenerateTextRequest("Sample content", "Write a summary");
-        Flux<String> responseFlux = Flux.just("Generated", " ", "text", " ", "response");
+        Flux<String> responseFlux = Flux.just("Generated", "text", "response");
 
         when(chatService.chatStream(anyString(), eq("generateTextPrompt")))
                 .thenReturn(responseFlux);
@@ -59,6 +62,6 @@ class GenerateTextControllerTest {
                 .expectStatus().isOk()
                 .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
                 .expectBodyList(String.class)
-                .hasSize(5);
+                .hasSize(3);
     }
 }

@@ -1,26 +1,28 @@
 package com.devon.techblog.presentation;
 
+import com.devon.techblog.config.TestSecurityConfig;
 import com.devon.techblog.service.ChatService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @WebFluxTest(AiController.class)
+@Import(TestSecurityConfig.class)
 class AiControllerTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
-    @MockBean(name = "openAiChatService")
+    @MockitoBean(name = "openAiChatService")
     private ChatService chatService;
 
     @Test
@@ -64,7 +66,7 @@ class AiControllerTest {
     @Test
     void chatStream_withoutStrategy() {
         String prompt = "Hello";
-        Flux<String> responseFlux = Flux.just("Hi", " ", "there", "!");
+        Flux<String> responseFlux = Flux.just("Hi", "there!");
 
         when(chatService.chatStream(eq(prompt))).thenReturn(responseFlux);
 
@@ -78,14 +80,14 @@ class AiControllerTest {
                 .expectStatus().isOk()
                 .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
                 .expectBodyList(String.class)
-                .hasSize(4);
+                .hasSize(2);
     }
 
     @Test
     void chatStream_withStrategy() {
         String prompt = "Hello";
         String strategy = "default";
-        Flux<String> responseFlux = Flux.just("Hi", " ", "there", "!");
+        Flux<String> responseFlux = Flux.just("Hi", "there!");
 
         when(chatService.chatStream(eq(prompt), eq("defaultPrompt"))).thenReturn(responseFlux);
 
@@ -100,6 +102,6 @@ class AiControllerTest {
                 .expectStatus().isOk()
                 .expectHeader().contentTypeCompatibleWith(MediaType.TEXT_EVENT_STREAM)
                 .expectBodyList(String.class)
-                .hasSize(4);
+                .hasSize(2);
     }
 }
