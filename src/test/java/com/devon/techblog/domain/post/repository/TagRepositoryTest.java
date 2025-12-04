@@ -3,6 +3,7 @@ package com.devon.techblog.domain.post.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.devon.techblog.config.annotation.RepositoryJpaTest;
+import com.devon.techblog.domain.post.TagFixture;
 import com.devon.techblog.domain.post.entity.Tag;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ class TagRepositoryTest {
     @Test
     @DisplayName("태그를 저장하고 조회할 수 있다")
     void saveAndFind() {
-        Tag tag = Tag.create("java");
+        Tag tag = TagFixture.create("java");
         Tag saved = tagRepository.save(tag);
 
         assertThat(saved.getId()).isNotNull();
@@ -36,7 +37,7 @@ class TagRepositoryTest {
     @Test
     @DisplayName("태그명으로 태그를 조회할 수 있다")
     void findByName() {
-        Tag tag = Tag.create("spring");
+        Tag tag = TagFixture.create("spring");
         tagRepository.save(tag);
 
         Optional<Tag> found = tagRepository.findByName("spring");
@@ -56,9 +57,9 @@ class TagRepositoryTest {
     @Test
     @DisplayName("여러 태그명으로 태그를 조회할 수 있다")
     void findByNameIn() {
-        tagRepository.save(Tag.create("java"));
-        tagRepository.save(Tag.create("spring"));
-        tagRepository.save(Tag.create("jpa"));
+        tagRepository.save(TagFixture.create("java"));
+        tagRepository.save(TagFixture.create("spring"));
+        tagRepository.save(TagFixture.create("jpa"));
 
         List<Tag> tags = tagRepository.findByNameIn(List.of("java", "spring"));
 
@@ -70,7 +71,7 @@ class TagRepositoryTest {
     @Test
     @DisplayName("usageCount를 증가시킬 수 있다")
     void incrementUsageCount() {
-        Tag tag = tagRepository.save(Tag.create("kotlin"));
+        Tag tag = tagRepository.save(TagFixture.create("kotlin"));
 
         int updated = tagRepository.incrementUsageCount(tag.getId());
         tagRepository.flush();
@@ -83,7 +84,7 @@ class TagRepositoryTest {
     @Test
     @DisplayName("usageCount를 감소시킬 수 있다")
     void decrementUsageCount() {
-        Tag tag = tagRepository.save(Tag.create("python"));
+        Tag tag = tagRepository.save(TagFixture.create("python"));
         tagRepository.incrementUsageCount(tag.getId());
         tagRepository.flush();
 
@@ -98,7 +99,7 @@ class TagRepositoryTest {
     @Test
     @DisplayName("usageCount가 0일 때 감소시키면 음수가 되지 않는다")
     void decrementUsageCount_notBelowZero() {
-        Tag tag = tagRepository.save(Tag.create("rust"));
+        Tag tag = tagRepository.save(TagFixture.create("rust"));
 
         int updated = tagRepository.decrementUsageCount(tag.getId());
         tagRepository.flush();
@@ -111,9 +112,9 @@ class TagRepositoryTest {
     @Test
     @DisplayName("usageCount 내림차순으로 상위 태그를 조회할 수 있다")
     void findTopByUsageCount() {
-        Tag tag1 = tagRepository.save(Tag.create("java"));
-        Tag tag2 = tagRepository.save(Tag.create("spring"));
-        Tag tag3 = tagRepository.save(Tag.create("jpa"));
+        Tag tag1 = tagRepository.save(TagFixture.create("java"));
+        Tag tag2 = tagRepository.save(TagFixture.create("spring"));
+        Tag tag3 = tagRepository.save(TagFixture.create("jpa"));
 
         tagRepository.incrementUsageCount(tag1.getId());
         tagRepository.incrementUsageCount(tag1.getId());

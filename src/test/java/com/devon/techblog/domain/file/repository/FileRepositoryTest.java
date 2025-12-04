@@ -27,24 +27,17 @@ class FileRepositoryTest {
     @Test
     @DisplayName("파일을 저장하고 조회할 수 있다")
     void saveAndFind() {
-        File file = File.create(
-                FileType.IMAGE,
-                "test.jpg",
-                "uploads/test.jpg",
-                "https://example.com/test.jpg",
-                1024L,
-                "image/jpeg"
-        );
+        File file = FileFixture.createImage();
 
         File saved = fileRepository.save(file);
 
         assertThat(saved.getId()).isNotNull();
         assertThat(saved.getFileType()).isEqualTo(FileType.IMAGE);
-        assertThat(saved.getOriginalName()).isEqualTo("test.jpg");
-        assertThat(saved.getStorageKey()).isEqualTo("uploads/test.jpg");
-        assertThat(saved.getUrl()).isEqualTo("https://example.com/test.jpg");
-        assertThat(saved.getSize()).isEqualTo(1024L);
-        assertThat(saved.getMimeType()).isEqualTo("image/jpeg");
+        assertThat(saved.getOriginalName()).isEqualTo(FileFixture.DEFAULT_ORIGINAL_NAME);
+        assertThat(saved.getStorageKey()).isEqualTo(FileFixture.DEFAULT_STORAGE_KEY);
+        assertThat(saved.getUrl()).isEqualTo(FileFixture.DEFAULT_URL);
+        assertThat(saved.getSize()).isEqualTo(FileFixture.DEFAULT_SIZE);
+        assertThat(saved.getMimeType()).isEqualTo(FileFixture.DEFAULT_MIME_TYPE);
         assertThat(saved.isDeleted()).isFalse();
     }
 
@@ -138,20 +131,12 @@ class FileRepositoryTest {
     @Test
     @DisplayName("새로운 필드들이 저장되고 조회된다")
     void saveAndFind_newFields() {
-        File file = File.create(
-                FileType.VIDEO,
-                "vacation.mp4",
-                "uploads/2024/vacation-uuid.mp4",
-                "https://cdn.example.com/uploads/2024/vacation-uuid.mp4",
-                10485760L,
-                "video/mp4"
-        );
+        File file = FileFixture.createVideo();
 
         File saved = fileRepository.save(file);
 
         assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getStorageKey()).isEqualTo("uploads/2024/vacation-uuid.mp4");
-        assertThat(saved.getUrl()).isEqualTo("https://cdn.example.com/uploads/2024/vacation-uuid.mp4");
-        assertThat(saved.getSize()).isEqualTo(10485760L);
+        assertThat(saved.getStorageKey()).isEqualTo(FileFixture.VIDEO_STORAGE_KEY);
+        assertThat(saved.getUrl()).isEqualTo(FileFixture.VIDEO_URL);
     }
 }

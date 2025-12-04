@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.devon.techblog.application.file.FileRequestFixture;
 import com.devon.techblog.application.file.dto.request.CompleteUploadRequest;
 import com.devon.techblog.application.file.dto.request.FileCreateRequest;
 import com.devon.techblog.application.file.dto.request.PresignRequest;
@@ -43,31 +44,16 @@ class FileServiceTest {
     @Test
     @DisplayName("파일을 생성할 수 있다")
     void createFile_success() {
-        File file = FileFixture.createWithId(
-                1L,
-                FileType.IMAGE,
-                "test.jpg",
-                "uploads/test.jpg",
-                "https://example.com/test.jpg",
-                1024L,
-                "image/jpeg"
-        );
+        File file = FileFixture.createWithId(1L);
         given(fileRepository.save(any(File.class))).willReturn(file);
 
-        FileCreateRequest request = new FileCreateRequest(
-                FileType.IMAGE,
-                "test.jpg",
-                "uploads/test.jpg",
-                "https://example.com/test.jpg",
-                1024L,
-                "image/jpeg"
-        );
+        FileCreateRequest request = FileRequestFixture.createRequest();
 
         FileResponse response = fileService.createFile(request);
 
         assertThat(response.id()).isEqualTo(1L);
         assertThat(response.fileType()).isEqualTo(FileType.IMAGE);
-        assertThat(response.originalName()).isEqualTo("test.jpg");
+        assertThat(response.originalName()).isEqualTo(FileFixture.DEFAULT_ORIGINAL_NAME);
         verify(fileRepository, times(1)).save(any(File.class));
     }
 

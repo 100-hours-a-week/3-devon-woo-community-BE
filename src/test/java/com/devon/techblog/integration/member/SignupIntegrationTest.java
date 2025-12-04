@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.devon.techblog.application.auth.SignupRequestFixture;
 import com.devon.techblog.application.member.dto.request.SignupRequest;
 import com.devon.techblog.config.annotation.IntegrationTest;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -38,9 +39,9 @@ class SignupIntegrationTest {
     @Test
     @DisplayName("통합 테스트 - 회원가입 시 201과 생성된 회원 ID를 반환한다")
     void signup_returnsCreated_integration() throws Exception {
-        SignupRequest request = new SignupRequest(
+        SignupRequest request = SignupRequestFixture.createRequest(
                 "newuser@example.com",
-                "password123",
+                "password1234",
                 "newuser",
                 "https://example.com/profile.jpg"
         );
@@ -60,9 +61,9 @@ class SignupIntegrationTest {
     @Test
     @DisplayName("통합 테스트 - 프로필 이미지 없이 회원가입 시 201을 반환한다")
     void signup_withoutProfileImage_returnsCreated() throws Exception {
-        SignupRequest request = new SignupRequest(
+        SignupRequest request = SignupRequestFixture.createRequest(
                 "user@example.com",
-                "password123",
+                "password1234",
                 "user",
                 null
         );
@@ -80,16 +81,16 @@ class SignupIntegrationTest {
     @Test
     @DisplayName("통합 테스트 - 여러 회원 가입 시 각각 저장된다")
     void signupMultipleUsers_savesEach() throws Exception {
-        SignupRequest request1 = new SignupRequest(
+        SignupRequest request1 = SignupRequestFixture.createRequest(
                 "user1@example.com",
-                "password123",
+                "password1234",
                 "user1",
                 null
         );
 
-        SignupRequest request2 = new SignupRequest(
+        SignupRequest request2 = SignupRequestFixture.createRequest(
                 "user2@example.com",
-                "password123",
+                "password1234",
                 "user2",
                 null
         );

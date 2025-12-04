@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.devon.techblog.application.member.dto.SocialLinks;
 import com.devon.techblog.config.annotation.RepositoryJpaTest;
+import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.entity.MemberStatus;
 import jakarta.transaction.Transactional;
@@ -29,7 +30,7 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("이메일로 회원을 조회하고 존재 여부를 확인할 수 있다")
     void findByEmailAndExists() {
-        Member member = memberRepository.save(Member.create("member@test.com", "password", "tester"));
+        Member member = memberRepository.save(MemberFixture.create("member@test.com", "password", "tester"));
 
         assertThat(memberRepository.findByEmail("member@test.com"))
                 .isPresent()
@@ -44,8 +45,8 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("상태별 조회는 ACTIVE 회원만 반환한다")
     void findByStatus_returnsActiveMembersOnly() {
-        Member active = memberRepository.save(Member.create("active@test.com", "password", "active"));
-        Member inactive = Member.create("inactive@test.com", "password", "inactive");
+        Member active = memberRepository.save(MemberFixture.create("active@test.com", "password", "active"));
+        Member inactive = MemberFixture.create("inactive@test.com", "password", "inactive");
         inactive.deactivate();
         memberRepository.save(inactive);
 
@@ -63,7 +64,7 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("새 필드들이 정상적으로 저장되고 조회된다")
     void saveAndFindWithNewFields() {
-        Member member = Member.create("user@test.com", "password", "tester");
+        Member member = MemberFixture.create("user@test.com", "password", "tester");
 
         List<String> stack = Arrays.asList("Java", "Spring");
         List<String> interests = Arrays.asList("AI", "Cloud");
@@ -94,7 +95,7 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("빈 리스트와 null 필드가 정상적으로 저장되고 조회된다")
     void saveAndFindWithEmptyAndNullFields() {
-        Member member = Member.create("user@test.com", "password", "tester");
+        Member member = MemberFixture.create("user@test.com", "password", "tester");
         Member saved = memberRepository.save(member);
         Member found = memberRepository.findById(saved.getId()).orElseThrow();
 
@@ -110,7 +111,7 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("필드 수정 후 재조회 시 변경된 값이 반영된다")
     void updateAndReload() {
-        Member member = memberRepository.save(Member.create("user@test.com", "password", "tester"));
+        Member member = memberRepository.save(MemberFixture.create("user@test.com", "password", "tester"));
 
         member.updateHandle("@newhandle");
         member.updateCompany("New Company");
