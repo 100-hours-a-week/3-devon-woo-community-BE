@@ -19,48 +19,50 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostTagService {
 
     private final TagRepository tagRepository;
+    
+    private record TagDiff(Set<String> tagsToAdd, Set<String> tagsToRemove) {}
 
     /**
-     * 게시글의 Tag들을 저장합니다 (Bulk Update)
+     * 게시글의 태그를 생성하고 사용 횟수를 갱신합니다.
      */
     @Transactional
     public List<PostTag> createPostTags(Post post, List<String> tagNames) {
-        if (tagNames == null || tagNames.isEmpty()) {
-            return new ArrayList<>();
-        }
-
         List<String> normalizedNames = normalizeTagNames(tagNames);
         if (normalizedNames.isEmpty()) {
             return new ArrayList<>();
         }
 
-        Map<String, Tag> tags = getOrCreateTags(normalizedNames);
-
-        List<Long> tagIds = normalizedNames.stream()
-                .map(tags::get)
-                .map(Tag::getId)
-                .toList();
-
-        if (!tagIds.isEmpty()) {
-            tagRepository.bulkIncrementUsageCount(tagIds);
-        }
-
-        return normalizedNames.stream()
-                .map(tags::get)
-                .map(tag -> PostTag.create(post, tag))
-                .collect(Collectors.toList());
+        return createPostTagsForNormalizedNames(post, normalizedNames);
     }
 
     /**
-     * 게시글의 Tag들을 저장합니다 (Bulk Update)
+     * 게시글의 태그를 변경하고 사용 횟수를 일괄 갱신합니다.
      */
     @Transactional
     public void updatePostTags(Post post, List<String> newTagNames) {
+        TagDiff tagDiff = calculateTagDiff(post, newTagNames);
+
+        handleRemovedTags(post, tagDiff.tagsToRemove());
+        handleAddedTags(post, tagDiff.tagsToAdd());
+    }
+
+    /**
+     * 가장 많이 조회된 Top 태그
+     */
+    @Transactional(readOnly = true)
+    public List<Tag> getTopTags(int limit) {
+        return tagRepository.findTopByUsageCount(limit);
+    }
+
+    /// =========== Private 메서드 ============ ///
+
+    /// 게시글에 이미 연결된 태그 이름과 새 태그 이름을 비교하여 변경 사항을 계산합니다
+    private TagDiff calculateTagDiff(Post post, List<String> newTagNames) {
         Set<String> oldTagNames = post.getPostTags().stream()
                 .map(postTag -> postTag.getTag().getName())
                 .collect(Collectors.toSet());
 
-        List<String> normalizedNewNames = normalizeTagNames(newTagNames != null ? newTagNames : List.of());
+        List<String> normalizedNewNames = normalizeTagNames(newTagNames);
         Set<String> newTagNameSet = new HashSet<>(normalizedNewNames);
 
         Set<String> tagsToRemove = new HashSet<>(oldTagNames);
@@ -69,6 +71,11 @@ public class PostTagService {
         Set<String> tagsToAdd = new HashSet<>(newTagNameSet);
         tagsToAdd.removeAll(oldTagNames);
 
+        return new TagDiff(tagsToAdd, tagsToRemove);
+    }
+
+    /// 제거 대상 태그를 Post에서 삭제하고 사용 횟수를 감소시킵니다.
+    private void handleRemovedTags(Post post, Set<String> tagsToRemove) {
         if (!tagsToRemove.isEmpty()) {
             List<Long> tagIdsToDecrement = post.getPostTags().stream()
                     .filter(postTag -> tagsToRemove.contains(postTag.getTag().getName()))
@@ -82,6 +89,10 @@ public class PostTagService {
             post.getPostTags().removeIf(postTag -> tagsToRemove.contains(postTag.getTag().getName()));
         }
 
+    }
+
+    /// 추가 대상 태그를 생성하거나 조회하고 Post에 연결한 뒤 사용 횟수를 증가시킵니다.
+    private void handleAddedTags(Post post, Set<String> tagsToAdd) {
         if (!tagsToAdd.isEmpty()) {
             List<String> addNames = new ArrayList<>(tagsToAdd);
             Map<String, Tag> tags = getOrCreateTags(addNames);
@@ -102,15 +113,12 @@ public class PostTagService {
         }
     }
 
-    /**
-     * 가장 많이 조회된 Top 태그
-     */
-    @Transactional(readOnly = true)
-    public List<Tag> getTopTags(int limit) {
-        return tagRepository.findTopByUsageCount(limit);
-    }
-
+    /// 태그 이름 리스트를 정규화하여 공백 제거, 소문자 변환 및 중복 제거를 수행합니다.
     private List<String> normalizeTagNames(List<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return List.of();
+        }
+
         return tagNames.stream()
                 .map(name -> name.trim().toLowerCase())
                 .filter(name -> !name.isEmpty())
@@ -118,6 +126,7 @@ public class PostTagService {
                 .toList();
     }
 
+    /// 정규화된 태그 이름을 기준으로 기존 태그를 조회하고, 없으면 새 태그를 생성합니다.
     private Map<String, Tag> getOrCreateTags(List<String> normalizedNames) {
         Map<String, Tag> existingTags = tagRepository.findByNameIn(normalizedNames).stream()
                 .collect(Collectors.toMap(Tag::getName, tag -> tag));
@@ -133,5 +142,24 @@ public class PostTagService {
         }
 
         return existingTags;
+    }
+
+    /// 정규화된 태그 이름 목록을 기반으로 PostTag를 생성하고 사용 횟수를 갱신합니다.
+    private List<PostTag> createPostTagsForNormalizedNames(Post post, List<String> normalizedNames) {
+        Map<String, Tag> tags = getOrCreateTags(normalizedNames);
+
+        List<Long> tagIds = normalizedNames.stream()
+                .map(tags::get)
+                .map(Tag::getId)
+                .toList();
+
+        if (!tagIds.isEmpty()) {
+            tagRepository.bulkIncrementUsageCount(tagIds);
+        }
+
+        return normalizedNames.stream()
+                .map(tags::get)
+                .map(tag -> PostTag.create(post, tag))
+                .collect(Collectors.toList());
     }
 }
