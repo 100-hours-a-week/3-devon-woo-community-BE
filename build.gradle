@@ -1,104 +1,26 @@
 plugins {
 	id 'java'
-	id 'java-test-fixtures'
-	id 'org.springframework.boot' version '3.4.10'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'com.diffplug.spotless' version '8.1.0'
-	id 'jacoco'
+	id 'org.springframework.boot' version '3.4.10' apply false
+	id 'io.spring.dependency-management' version '1.1.7' apply false
+	id 'com.diffplug.spotless' version '8.1.0' apply false
 }
 
 group = 'com.devon'
 version = '0.0.1-SNAPSHOT'
 description = 'Tech Blog Web Application'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'org.springframework.boot'
+	apply plugin: 'io.spring.dependency-management'
+
+	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(21)
+		}
+	}
+
+	repositories {
+		mavenCentral()
 	}
 }
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-
-	// Spring Boot 스타터
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
-	// MySQL
-	runtimeOnly 'com.mysql:mysql-connector-j'
-
-	// Swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
-
-    // AoP
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-
-	// QueryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
-	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
-    // Redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // JWT
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
-
-    // Lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-
-	// Spring Boot Configuration Processor
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-
-    // 이지미 스토리지
-    implementation 'com.cloudinary:cloudinary-http44:1.32.0'
-
-	// 테스트
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation 'com.h2database:h2'
-	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-	testImplementation 'org.testcontainers:testcontainers:1.19.3'
-	testImplementation 'org.testcontainers:junit-jupiter:1.19.3'
-
-	// 테스트 픽스처
-	testFixturesImplementation 'org.springframework:spring-test'
-}
-
-
-// QueryDSL Q-class 생성 경로
-def querydslDir = "$buildDir/generated/querydsl"
-
-// QueryDSL 설정
-sourceSets {
-	main.java.srcDirs += [querydslDir]
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.generatedSourceOutputDirectory = file(querydslDir)
-}
-
-clean {
-	delete file(querydslDir)
-}
-
-
-// 테스트 설정은 별도 파일로 분리
-apply from: 'gradle/test.gradle'

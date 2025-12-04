@@ -5,6 +5,7 @@ on:
 
 env:
   BUILD_DIR: "."
+  MODULE_NAME: "app-api"
   DOCKER_IMAGE_NAME: "techblog"
 
 jobs:
@@ -32,7 +33,7 @@ jobs:
 
       - name: 빌드 실행
         working-directory: ${{ env.BUILD_DIR }}
-        run: ./gradlew build -x test
+        run: ./gradlew :${{ env.MODULE_NAME }}:build -x test
 
       - name: Docker Hub 로그인
         uses: docker/login-action@v3
@@ -52,7 +53,7 @@ jobs:
       - name: Docker 이미지 빌드 및 푸시
         uses: docker/build-push-action@v5
         with:
-          context: ${{ env.BUILD_DIR }}
+          context: ${{ env.BUILD_DIR }}/${{ env.MODULE_NAME }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
