@@ -28,7 +28,7 @@ public class GenerateTextController {
                 Content: %s
 
                 Instruction: %s
-                """, request.getContent(), request.getInstruction());
+                """, request.content(), request.instruction());
 
         return chatService.chat(userPrompt, "generateTextPrompt");
     }
@@ -42,7 +42,7 @@ public class GenerateTextController {
                 Content: %s
 
                 Instruction: %s
-                """, request.getContent(), request.getInstruction());
+                """, request.content(), request.instruction());
 
         return chatService.chatStream(userPrompt, "generateTextPrompt")
                 .map(content -> ServerSentEvent.<String>builder().data(content).build());

@@ -24,7 +24,7 @@ public class SummarizeController {
      */
     @PostMapping
     public Mono<String> summarize(@RequestBody SummarizeRequest request) {
-        return chatService.chat(request.getText(), "summarizePrompt");
+        return chatService.chat(request.text(), "summarizePrompt");
     }
 
     /**
@@ -32,7 +32,7 @@ public class SummarizeController {
      */
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> summarizeStream(@RequestBody SummarizeRequest request) {
-        return chatService.chatStream(request.getText(), "summarizePrompt")
+        return chatService.chatStream(request.text(), "summarizePrompt")
                 .map(content -> ServerSentEvent.<String>builder().data(content).build());
     }
 }

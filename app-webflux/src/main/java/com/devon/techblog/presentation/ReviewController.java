@@ -24,7 +24,7 @@ public class ReviewController {
      */
     @PostMapping
     public Mono<String> review(@RequestBody ReviewRequest request) {
-        return chatService.chat(request.getText(), "reviewPrompt");
+        return chatService.chat(request.text(), "reviewPrompt");
     }
 
     /**
@@ -32,7 +32,7 @@ public class ReviewController {
      */
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<String>> reviewStream(@RequestBody ReviewRequest request) {
-        return chatService.chatStream(request.getText(), "reviewPrompt")
+        return chatService.chatStream(request.text(), "reviewPrompt")
                 .map(content -> ServerSentEvent.<String>builder().data(content).build());
     }
 }
