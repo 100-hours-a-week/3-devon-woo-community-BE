@@ -3,6 +3,10 @@ name: CD
 on:
   workflow_dispatch:
 
+env:
+  BUILD_DIR: "."
+  DOCKER_IMAGE_NAME: "techblog"
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -19,12 +23,15 @@ jobs:
           cache: 'gradle'
 
       - name: Gradlew 실행 권한 부여
+        working-directory: ${{ env.BUILD_DIR }}
         run: chmod +x gradlew
 
       - name: 테스트 실행
+        working-directory: ${{ env.BUILD_DIR }}
         run: ./gradlew test
 
       - name: 빌드 실행
+        working-directory: ${{ env.BUILD_DIR }}
         run: ./gradlew build -x test
 
       - name: Docker Hub 로그인
@@ -37,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKER_HUB_USERNAME }}/techblog
+          images: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}
           tags: |
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
@@ -45,7 +52,7 @@ jobs:
       - name: Docker 이미지 빌드 및 푸시
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ${{ env.BUILD_DIR }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
