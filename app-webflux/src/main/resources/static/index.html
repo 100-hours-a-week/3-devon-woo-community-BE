@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Features Client</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 20px; color: #333; }
+        .feature-section { margin-bottom: 30px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 6px; }
+        .feature-section h2 { font-size: 18px; margin-bottom: 15px; color: #555; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #666; }
+        input[type="text"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        textarea { min-height: 80px; resize: vertical; }
+        .button-group { display: flex; gap: 10px; margin-top: 10px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #0056b3; }
+        button.stream { background: #28a745; }
+        button.stream:hover { background: #218838; }
+        .response { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 4px; min-height: 60px; white-space: pre-wrap; line-height: 1.6; }
+        .loading { color: #666; font-style: italic; }
+        .error { color: #dc3545; }
+        .review-container { margin-top: 15px; }
+        .review-card { background: #ffffff; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out; }
+        .review-card.loading { background: #f8f9fa; border-color: #e0e0e0; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .review-content { white-space: pre-wrap; line-height: 1.6; color: #333; }
+        .review-content p { margin-bottom: 10px; }
+        .review-content ul, .review-content ol { margin-left: 20px; margin-bottom: 10px; }
+        .review-content li { margin-bottom: 5px; }
+        .review-content code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        .review-content pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; margin-bottom: 10px; }
+        .review-content strong { font-weight: 600; }
+        .review-content em { font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Features Client</h1>
+
+        <div class="feature-section">
+            <h2>1. 텍스트 요약 (50-100자)</h2>
+            <div class="input-group">
+                <label>텍스트 입력:</label>
+                <textarea id="summarizeText" placeholder="요약할 텍스트를 입력하세요..."></textarea>
+            </div>
+            <div class="button-group">
+                <button onclick="summarize()">요약</button>
+                <button class="stream" onclick="summarizeStream()">스트리밍 요약</button>
+            </div>
+            <div class="response" id="summarizeResponse">응답이 여기에 표시됩니다.</div>
+        </div>
+
+        <div class="feature-section">
+            <h2>2. 텍스트 생성 ({텍스트 작성} 채우기)</h2>
+            <div class="input-group">
+                <label>본문 ({텍스트 작성} 포함):</label>
+                <textarea id="generateContent" placeholder="Hello! {텍스트 작성} Thank you!"></textarea>
+            </div>
+            <div class="input-group">
+                <label>명령:</label>
+                <input type="text" id="generateInstruction" placeholder="소개글 작성해줘" />
+            </div>
+            <div class="button-group">
+                <button onclick="generateText()">생성</button>
+                <button class="stream" onclick="generateTextStream()">스트리밍 생성</button>
+            </div>
+            <div class="response" id="generateResponse">응답이 여기에 표시됩니다.</div>
+        </div>
+
+        <div class="feature-section">
+            <h2>3. 텍스트 리뷰 (문법, 구조 검토)</h2>
+            <div class="input-group">
+                <label>텍스트 입력:</label>
+                <textarea id="reviewText" placeholder="검토할 텍스트를 입력하세요..."></textarea>
+            </div>
+            <div class="button-group">
+                <button onclick="review()">리뷰</button>
+                <button class="stream" onclick="reviewStream()">스트리밍 리뷰</button>
+            </div>
+            <div class="review-container" id="reviewResponse"></div>
+        </div>
+    </div>
+
+    <script>
+        async function summarize() {
+            const text = document.getElementById('summarizeText').value.trim();
+            if (!text) {
+                alert('텍스트를 입력하세요');
+                return;
+            }
+            await sendRequest('/ai/summarize', { text }, 'summarizeResponse');
+        }
+
+        function summarizeStream() {
+            const text = document.getElementById('summarizeText').value.trim();
+            if (!text) {
+                alert('텍스트를 입력하세요');
+                return;
+            }
+            sendStreamRequest('/ai/summarize/stream', { text }, 'summarizeResponse');
+        }
+
+        async function generateText() {
+            const content = document.getElementById('generateContent').value.trim();
+            const instruction = document.getElementById('generateInstruction').value.trim();
+            if (!content || !instruction) {
+                alert('본문과 명령을 모두 입력하세요');
+                return;
+            }
+            await sendRequest('/ai/generate', { content, instruction }, 'generateResponse');
+        }
+
+        function generateTextStream() {
+            const content = document.getElementById('generateContent').value.trim();
+            const instruction = document.getElementById('generateInstruction').value.trim();
+            if (!content || !instruction) {
+                alert('본문과 명령을 모두 입력하세요');
+                return;
+            }
+            sendStreamRequest('/ai/generate/stream', { content, instruction }, 'generateResponse');
+        }
+
+        async function review() {
+            const text = document.getElementById('reviewText').value.trim();
+            if (!text) {
+                alert('텍스트를 입력하세요');
+                return;
+            }
+            const responseDiv = document.getElementById('reviewResponse');
+            responseDiv.innerHTML = '<div class="response loading">응답을 기다리는 중...</div>';
+
+            try {
+                const response = await fetch('/ai/review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const result = await response.text();
+
+                responseDiv.innerHTML = '';
+                const items = result.split('<<<REVIEW_ITEM>>>').filter(item => item.trim());
+                items.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'review-card';
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'review-content';
+                    contentDiv.innerHTML = marked.parse(item.trim());
+                    card.appendChild(contentDiv);
+                    responseDiv.appendChild(card);
+                });
+            } catch (error) {
+                responseDiv.innerHTML = `<div class="response error">Error: ${error.message}</div>`;
+            }
+        }
+
+        function reviewStream() {
+            const text = document.getElementById('reviewText').value.trim();
+            if (!text) {
+                alert('텍스트를 입력하세요');
+                return;
+            }
+
+            const responseDiv = document.getElementById('reviewResponse');
+            responseDiv.innerHTML = '';
+
+            let buffer = '';
+            let currentCard = null;
+
+            fetch('/ai/review/stream', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            }).then(response => {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                function read() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) {
+                            if (currentCard && buffer.trim()) {
+                                currentCard.querySelector('.review-content').innerHTML = marked.parse(buffer.trim());
+                                currentCard.classList.remove('loading');
+                            }
+                            return;
+                        }
+
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+
+                        lines.forEach(line => {
+                            if (line.startsWith('data:')) {
+                                const data = line.substring(5);
+                                if (data.trim()) {
+                                    buffer += data;
+
+                                    const delimiterIndex = buffer.indexOf('<<<REVIEW_ITEM>>>');
+                                    if (delimiterIndex !== -1) {
+                                        if (currentCard) {
+                                            const content = buffer.substring(0, delimiterIndex).trim();
+                                            currentCard.querySelector('.review-content').innerHTML = marked.parse(content);
+                                            currentCard.classList.remove('loading');
+                                        }
+
+                                        currentCard = document.createElement('div');
+                                        currentCard.className = 'review-card loading';
+                                        currentCard.innerHTML = '<div class="review-content"></div>';
+                                        responseDiv.appendChild(currentCard);
+
+                                        buffer = buffer.substring(delimiterIndex + 19);
+                                    } else if (currentCard) {
+                                        currentCard.querySelector('.review-content').textContent = buffer.trim();
+                                    } else {
+                                        currentCard = document.createElement('div');
+                                        currentCard.className = 'review-card loading';
+                                        currentCard.innerHTML = '<div class="review-content"></div>';
+                                        responseDiv.appendChild(currentCard);
+                                    }
+                                }
+                            }
+                        });
+
+                        read();
+                    });
+                }
+
+                read();
+            }).catch(error => {
+                responseDiv.innerHTML = `<div class="response error">Error: ${error.message}</div>`;
+            });
+        }
+
+        async function sendRequest(url, body, responseId) {
+            const responseDiv = document.getElementById(responseId);
+            responseDiv.textContent = '응답을 기다리는 중...';
+            responseDiv.className = 'response loading';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const text = await response.text();
+                responseDiv.textContent = text;
+                responseDiv.className = 'response';
+            } catch (error) {
+                responseDiv.textContent = 'Error: ' + error.message;
+                responseDiv.className = 'response error';
+            }
+        }
+
+        function sendStreamRequest(url, body, responseId) {
+            const responseDiv = document.getElementById(responseId);
+            responseDiv.textContent = '스트리밍 중...';
+            responseDiv.className = 'response loading';
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            }).then(response => {
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullResponse = '';
+
+                function read() {
+                    reader.read().then(({ done, value }) => {
+                        if (done) return;
+
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+
+                        lines.forEach(line => {
+                            if (line.startsWith('data:')) {
+                                const data = line.substring(5);
+                                if (data.trim()) {
+                                    fullResponse += data;
+                                    responseDiv.textContent = fullResponse;
+                                    responseDiv.className = 'response';
+                                }
+                            }
+                        });
+
+                        read();
+                    });
+                }
+
+                read();
+            }).catch(error => {
+                responseDiv.textContent = 'Error: ' + error.message;
+                responseDiv.className = 'response error';
+            });
+        }
+    </script>
+</body>
+</html>

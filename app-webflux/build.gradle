@@ -26,3 +26,7 @@ dependencies {
 	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
