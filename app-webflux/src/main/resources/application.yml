@@ -1,9 +1,9 @@
+server:
+  port: ${APP_WEBFLUX_SERVER_PORT:8081}
+
 spring:
   application:
     name: tech-blog-webflux
-
-server:
-  port: 8081
 
 openai:
   model: gpt-3.5-turbo
