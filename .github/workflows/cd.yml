@@ -57,3 +57,23 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Slack 알림 전송 (CD)
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL is not set. Skip Slack notification."
+            exit 0
+          fi
+
+          STATUS="${{ job.status }}"
+          REPO="${{ github.repository }}"
+          RUN_URL="https://github.com/${REPO}/actions/runs/${{ github.run_id }}"
+
+          TEXT="[${REPO}] CD ${STATUS} - Docker 이미지 빌드/푸시 완료\n${RUN_URL}"
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${TEXT}\"}" \
+            "$SLACK_WEBHOOK_URL"
