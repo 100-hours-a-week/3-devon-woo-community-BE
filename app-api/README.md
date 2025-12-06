@@ -22,7 +22,29 @@ T-Log의 **메인 REST API (Spring MVC) 애플리케이션**입니다.
 
 ---
 
-## 2. 패키지 구조 (레이어 기준)
+## 2. 디렉터리 / 패키지 구조
+
+### 2-1. 디렉터리 구조 (요약)
+
+```text
+app-api/
+ ├── build.gradle
+ ├── Dockerfile
+ └── src
+     ├── main
+     │   ├── java/com/devon/techblog
+     │   │   ├── application   # 유스케이스 / 컨트롤러 / 서비스 / 시큐리티
+     │   │   ├── domain        # 엔티티 / 리포지토리 / 정책 / QueryDSL 설정
+     │   │   ├── infra         # Redis, 이미지 스토리지 등 외부 연동
+     │   │   └── common        # 예외, 공통 DTO, AOP, Swagger, validation 등
+     │   └── resources
+     │       └── application.yml
+     └── test
+         └── java/com/devon/techblog
+             └── ... 테스트 코드 (계층별 컨벤션 문서 참조)
+```
+
+### 2-2. 패키지 구조 (레이어 기준)
 
 `com.devon.techblog` 하위에 레이어/도메인별 패키지를 구성합니다.
 
@@ -208,4 +230,3 @@ app-api 모듈과 직접적으로 연관된 주요 문서를 한 번 더 모아�
   - [REPOSITORY_TEST_CONVENTION.md](../docs/test/REPOSITORY_TEST_CONVENTION.md)
   - [CONTROLLER_WEBMVC_TEST_CONVENTION.md](../docs/test/CONTROLLER_WEBMVC_TEST_CONVENTION.md)
   - [INTEGRATION_TEST_CONVENTION.md](../docs/test/INTEGRATION_TEST_CONVENTION.md)
-

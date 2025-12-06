@@ -70,3 +70,11 @@
 ![T-Log ERD](docs/image/T-Log-ERD.png)
 
 파일/첨부 도메인 ERD 설계 및 상세 설명은 [FILE-ARCHITECTURE.md](docs/architecture/FILE-ARCHITECTURE.md) 를 참고할 수 있습니다.
+
+---
+
+## 6. 관련 모듈 & 프론트엔드
+
+- API 서버 (Spring MVC): [app-api/README.md](app-api/README.md)
+- WebFlux AI 서버: [app-webflux/README.md](app-webflux/README.md)
+- 프론트엔드 (Next.js / React): https://github.com/100-hours-a-week/3-devon-woo-community-FE

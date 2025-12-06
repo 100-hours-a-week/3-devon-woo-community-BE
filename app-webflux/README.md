@@ -22,7 +22,32 @@ LLM 기반 텍스트 생성·요약·리뷰 기능을 제공하며, `/webflux/**
 
 ---
 
-## 2. 아키텍처 개요
+## 2. 디렉터리 / 패키지 구조
+
+### 2-1. 디렉터리 구조 (요약)
+
+```text
+app-webflux/
+ ├── build.gradle
+ ├── Dockerfile
+ └── src
+     ├── main
+     │   ├── java/com/devon/techblog
+     │   │   ├── presentation  # WebFlux 컨트롤러 (AI, 요약, 리뷰, 헬스 체크)
+     │   │   ├── service       # ChatService, OpenAiChatService 등 비즈니스 로직
+     │   │   ├── strategy      # PromptStrategy 및 프롬프트 구현체
+     │   │   ├── dto           # 요청 DTO
+     │   │   ├── config        # WebFlux, Security, WebClient, CORS 설정
+     │   │   └── util          # OpenAI 스트림 파서 등 유틸
+     │   └── resources
+     │       ├── application.yml
+     │       └── static/index.html
+     └── test
+         └── java/com/devon/techblog
+             └── ... WebFlux 관련 테스트
+```
+
+## 3. 아키텍처 개요
 
 패키지 기준으로 역할을 나누어 설계합니다.
 
@@ -48,7 +73,7 @@ LLM 기반 텍스트 생성·요약·리뷰 기능을 제공하며, `/webflux/**
 
 ---
 
-## 3. 주요 의존성
+## 4. 주요 의존성
 
 `app-webflux/build.gradle` 기준 핵심 의존성입니다.
 
@@ -78,7 +103,7 @@ LLM 기반 텍스트 생성·요약·리뷰 기능을 제공하며, `/webflux/**
 
 ---
 
-## 4. 컨벤션
+## 5. 컨벤션
 
 ### 4-1. 컨트롤러
 
@@ -109,11 +134,10 @@ LLM 기반 텍스트 생성·요약·리뷰 기능을 제공하며, `/webflux/**
 
 ---
 
-## 5. 관련 문서
+## 6. 관련 문서
 
 이 모듈과 직접 관련된 문서는 아래를 참고할 수 있습니다.
 
 - WebFlux API 명세: [docs/api/API.md](../../docs/api/API.md)
 - 전체 아키텍처/레이어 구조: [docs/architecture/CLEAN_ARCHITECTURE.md](../../docs/architecture/CLEAN_ARCHITECTURE.md)
 - Nginx 라우팅 설정 (`/webflux/**`): [infra/nginx/nginx.conf](../../infra/nginx/nginx.conf)
-
