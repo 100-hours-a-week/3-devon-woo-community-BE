@@ -19,18 +19,19 @@
 2025.03, 1인 개인 프로젝트 <br>
 백엔드 전체 설계·구현 (아키텍처, 도메인 모델, MVC/WebFlux API, 인증/인가, 파일 업로드, 테스트·CI)
 
+
+<br>
+
 ---
 
 ## 2. 사용 스킬
 
-**Tech Stack**
-
-<img src="https://skillicons.dev/icons?i=java,spring,gradle,mysql,redis,aws,docker,nginx,githubactions&theme=light" height="30" />
-<br>
-<img src="https://skillicons.dev/icons?i=git,idea&theme=light" height="30" />
+<img src="https://skillicons.dev/icons?i=java,spring,gradle,mysql,redis,aws,docker,nginx,githubactions&theme=light" height="45" />
 
 - Spring WebFlux + R2DBC, Spring Security + JWT + OAuth2
 - JPA + QueryDSL, Testcontainers, springdoc-openapi, JaCoCo
+
+<br>
 
 ---
 
@@ -55,6 +56,8 @@
 - [QUERYDSL_DECISIONS.md](docs/querydsl/QUERYDSL_DECISIONS.md)
 - [FILE-UPLOAD-PRESIGNED-VS-MULTIPART.md](docs/file-upload/FILE-UPLOAD-PRESIGNED-VS-MULTIPART.md)
 
+<br>
+
 ---
 
 ## 4. 아키텍처
@@ -63,12 +66,16 @@
 
 자세한 설계 배경 및 레이어 구조는 [CLEAN_ARCHITECTURE.md](docs/architecture/CLEAN_ARCHITECTURE.md) 를 참고할 수 있습니다.
 
+<br>
+
 ---
 
 ## 5. ERD
 
 ![T-Log ERD](docs/image/T-Log-ERD.png)
 
+
+<br>
 
 ---
 
