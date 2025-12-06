@@ -19,6 +19,7 @@ bin/
 
 ### IntelliJ IDEA ###
 .idea
+.run
 *.iws
 *.iml
 *.ipr
@@ -59,4 +60,3 @@ logs/
 ### spring app env ###
 *application-local.yml
 *.env
-

@@ -41,4 +41,24 @@ jobs:
           CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          bash scripts/deploy.sh
+          bash infra/deploy/deploy.sh
+
+      - name: Slack 알림 전송 (Deploy)
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL is not set. Skip Slack notification."
+            exit 0
+          fi
+
+          STATUS="${{ job.status }}"
+          REPO="${{ github.repository }}"
+          RUN_URL="https://github.com/${REPO}/actions/runs/${{ github.run_id }}"
+
+          TEXT="[${REPO}] Deploy ${STATUS} (main) - docker-compose 배포\n${RUN_URL}"
+
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${TEXT}\"}" \
+            "$SLACK_WEBHOOK_URL"
