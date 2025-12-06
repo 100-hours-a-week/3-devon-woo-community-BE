@@ -50,21 +50,21 @@
   - Testcontainers와 GitHub Actions를 활용해 **실제와 유사한 환경에서 자동 테스트·빌드·커버리지 수집** 구성
 
 자세한 설계 배경 및 트레이드오프는 다음 문서를 참고할 수 있습니다.
-- `docs/architecture/CLEAN_ARCHITECTURE.md`
-- `docs/architecture/FILE-ARCHITECTURE.md`
-- `docs/querydsl/QUERYDSL_DECISIONS.md`
-- `docs/file-upload/FILE-UPLOAD-PRESIGNED-VS-MULTIPART.md`
+- [CLEAN_ARCHITECTURE.md](docs/architecture/CLEAN_ARCHITECTURE.md)
+- [FILE-ARCHITECTURE.md](docs/architecture/FILE-ARCHITECTURE.md)
+- [QUERYDSL_DECISIONS.md](docs/querydsl/QUERYDSL_DECISIONS.md)
+- [FILE-UPLOAD-PRESIGNED-VS-MULTIPART.md](docs/file-upload/FILE-UPLOAD-PRESIGNED-VS-MULTIPART.md)
 
 ---
 
 ## 4. 아키텍처
 
 아키텍처 다이어그램 및 상세 구조 그림은 별도 문서/이미지로 정리 예정입니다.  
-자세한 설계 배경은 `docs/architecture/CLEAN_ARCHITECTURE.md` 를 참고할 수 있습니다.
+자세한 설계 배경은 [CLEAN_ARCHITECTURE.md](docs/architecture/CLEAN_ARCHITECTURE.md) 를 참고할 수 있습니다.
 
 ---
 
 ## 5. ERD
 
 ERD 다이어그램은 별도 그림으로 작성 예정입니다.  
-파일/첨부 도메인 ERD 설계는 `docs/architecture/FILE-ARCHITECTURE.md` 를 참고할 수 있습니다.
+파일/첨부 도메인 ERD 설계는 [FILE-ARCHITECTURE.md](docs/architecture/FILE-ARCHITECTURE.md) 를 참고할 수 있습니다.
