@@ -66,5 +66,6 @@
 
 ## 5. ERD
 
-ERD 다이어그램은 별도 그림으로 작성 예정입니다.  
-파일/첨부 도메인 ERD 설계는 [FILE-ARCHITECTURE.md](docs/architecture/FILE-ARCHITECTURE.md) 를 참고할 수 있습니다.
+![T-Log ERD](docs/image/T-Log-ERD.png)
+
+파일/첨부 도메인 ERD 설계 및 상세 설명은 [FILE-ARCHITECTURE.md](docs/architecture/FILE-ARCHITECTURE.md) 를 참고할 수 있습니다.
