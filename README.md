@@ -21,8 +21,12 @@ https://github.com/user-attachments/assets/f6b0157d-95c2-4073-b254-dcc95a34561e
 - 멀티 모듈/멀티 런타임 구조를 통해 **일반 API와 AI 기능을 분리 배포**할 수 있는 패턴 제시
 
 **개발 기간 / 인원**  
-2025.03, 1인 개인 프로젝트 <br>
+2025.10~2025.11 (1개월) - 1인 개인 프로젝트 <br>
 백엔드 전체 설계·구현 (아키텍처, 도메인 모델, MVC/WebFlux API, 인증/인가, 파일 업로드, 테스트·CI)
+
+#### API 서버 (Spring MVC): [app-api/README.md](app-api/README.md) 
+#### WebFlux AI 서버: [app-webflux/README.md](app-webflux/README.md) 
+#### 프론트엔드 (React): https://github.com/100-hours-a-week/3-devon-woo-community-FE
 
 
 <br>
@@ -81,10 +85,5 @@ https://github.com/user-attachments/assets/f6b0157d-95c2-4073-b254-dcc95a34561e
 
 <br>
 
----
 
-## 6. 관련 모듈 & 프론트엔드
 
-- API 서버 (Spring MVC): [app-api/README.md](app-api/README.md)
-- WebFlux AI 서버: [app-webflux/README.md](app-webflux/README.md)
-- 프론트엔드 (Next.js / React): https://github.com/100-hours-a-week/3-devon-woo-community-FE
