@@ -69,4 +69,3 @@
 
 ![T-Log ERD](docs/image/T-Log-ERD.png)
 
-파일/첨부 도메인 ERD 설계 및 상세 설명은 [FILE-ARCHITECTURE.md](docs/architecture/FILE-ARCHITECTURE.md) 를 참고할 수 있습니다.
