@@ -64,7 +64,6 @@
 
 ![T-Log System Architecture](docs/image/서비스-아키택처.png)
 
-자세한 설계 배경 및 레이어 구조는 [CLEAN_ARCHITECTURE.md](docs/architecture/CLEAN_ARCHITECTURE.md) 를 참고할 수 있습니다.
 
 <br>
 
