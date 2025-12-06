@@ -23,7 +23,7 @@ jobs:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ env.DOCKERHUB_TOKEN }}
 
-      - name: Build and run with Docker Compose
+      - name: Build and run with Docker Compose (deploy.sh)
         env:
           DB_PORT: ${{ secrets.DB_PORT }}
           DB_NAME: ${{ secrets.DB_NAME }}
@@ -41,7 +41,4 @@ jobs:
           CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          docker compose pull || true
-          docker compose build
-          docker compose up -d
-
+          bash scripts/deploy.sh
