@@ -59,8 +59,9 @@
 
 ## 4. 아키텍처
 
-아키텍처 다이어그램 및 상세 구조 그림은 별도 문서/이미지로 정리 예정입니다.  
-자세한 설계 배경은 [CLEAN_ARCHITECTURE.md](docs/architecture/CLEAN_ARCHITECTURE.md) 를 참고할 수 있습니다.
+![T-Log System Architecture](docs/image/서비스-아키택처.png)
+
+자세한 설계 배경 및 레이어 구조는 [CLEAN_ARCHITECTURE.md](docs/architecture/CLEAN_ARCHITECTURE.md) 를 참고할 수 있습니다.
 
 ---
 
