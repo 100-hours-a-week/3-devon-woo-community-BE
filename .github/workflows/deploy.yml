@@ -41,4 +41,4 @@ jobs:
           CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          bash scripts/deploy.sh
+          bash infra/deploy/deploy.sh
