@@ -14,9 +14,8 @@ public class NoOpImageStorageService implements ImageStorageService {
     private static final Logger log = LoggerFactory.getLogger(NoOpImageStorageService.class);
 
     @Override
-    public ImageSignature generateUploadSignature(String type) {
+    public ImageSignature generateUploadSignature(String folder) {
         log.warn("CloudinaryConfig 또는 ImageStorageService 구현이 없어 파일 업로드 기능이 비활성화되었습니다.");
         throw new BusinessException(FileErrorCode.FILE_STORAGE_NOT_CONFIGURED);
     }
 }
-

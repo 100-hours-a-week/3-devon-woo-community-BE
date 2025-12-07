@@ -56,6 +56,7 @@ class FileUploadIntegrationTest {
                 .andExpect(jsonPath("$.data.uploadSignature.cloudName").value(notNullValue()))
                 .andExpect(jsonPath("$.data.uploadSignature.timestamp").value(notNullValue()))
                 .andExpect(jsonPath("$.data.uploadSignature.signature").value(notNullValue()))
+                .andExpect(jsonPath("$.data.uploadSignature.folder").value("images"))
                 .andReturn();
 
         String responseBody = presignResult.getResponse().getContentAsString();

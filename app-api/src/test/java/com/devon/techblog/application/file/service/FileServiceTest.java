@@ -195,6 +195,7 @@ class FileServiceTest {
         assertThat(response.fileId()).isEqualTo(1L);
         assertThat(response.storageKey()).contains("images/");
         assertThat(response.uploadSignature().apiKey()).isEqualTo("api-key");
+        assertThat(response.uploadSignature().folder()).isEqualTo("images");
         verify(fileRepository, times(1)).save(any(File.class));
         verify(imageStorageService, times(1)).generateUploadSignature("images");
     }
