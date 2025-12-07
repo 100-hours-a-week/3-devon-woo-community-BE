@@ -75,14 +75,14 @@ spring:
 
 storage:
   cloudinary:
+    enabled: false
     api:
-      key: ${CLOUDINARY_API_KEY}
-      secret: ${CLOUDINARY_API_SECRET}
+      key: ${CLOUDINARY_API_KEY:}
+      secret: ${CLOUDINARY_API_SECRET:}
     cloud:
-      name: ${CLOUDINARY_CLOUD_NAME}
+      name: ${CLOUDINARY_CLOUD_NAME:}
     upload:
       preset: ${CLOUDINARY_UPLOAD_PRESET:ml_default}
-
 
 
 

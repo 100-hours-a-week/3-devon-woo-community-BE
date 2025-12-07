@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(prefix = "storage.cloudinary", name = "enabled", havingValue = "true")
 public class CloudinaryImageStorageService implements ImageStorageService {
 
     @Value("${storage.cloudinary.api.key}")

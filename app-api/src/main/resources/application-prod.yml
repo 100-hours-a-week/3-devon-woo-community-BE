@@ -1,8 +1,19 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB_URL:?[prod] DB_URL 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
+    username: ${DB_USERNAME:?[prod] DB_USERNAME 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
+    password: ${DB_PASSWORD:?[prod] DB_PASSWORD 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:?[prod] REDIS_HOST 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
+      port: ${REDIS_PORT:?[prod] REDIS_PORT 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
+
+  security:
+    jwt:
+      secret: ${JWT_SECRET:?[prod] JWT_SECRET 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
+      access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:?[prod] JWT_ACCESS_TOKEN_EXPIRATION 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
+      refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:?[prod] JWT_REFRESH_TOKEN_EXPIRATION 환경 변수가 설정되지 않아 서버를 시작할 수 없습니다.}
 
 aop:
   api-logging:

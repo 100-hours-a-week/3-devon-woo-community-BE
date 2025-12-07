@@ -1,8 +1,8 @@
 package com.devon.techblog.domain.common.converter;
 
-import com.devon.techblog.application.member.dto.SocialLinks;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.devon.techblog.application.member.dto.SocialLinks;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

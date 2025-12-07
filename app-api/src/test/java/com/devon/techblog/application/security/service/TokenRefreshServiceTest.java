@@ -5,11 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import com.devon.techblog.application.security.util.JwtTokenProvider;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.AuthErrorCode;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
+import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ class TokenRefreshServiceTest {
     @InjectMocks
     private TokenRefreshService tokenRefreshService;
 
-    private com.devon.techblog.domain.member.entity.Member activeMember;
+    private Member activeMember;
 
     @BeforeEach
     void setUp() {
@@ -66,8 +67,8 @@ class TokenRefreshServiceTest {
         given(jwtTokenProvider.isRefreshToken(INVALID_TOKEN)).willReturn(false);
 
         assertThatThrownBy(() -> tokenRefreshService.refreshAccessToken(INVALID_TOKEN))
-                .isInstanceOf(CustomException.class)
-                .satisfies(exception -> assertThat(((CustomException) exception).getErrorCode())
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception -> assertThat(((BusinessException) exception).getErrorCode())
                         .isEqualTo(AuthErrorCode.REFRESH_TOKEN_INVALID));
     }
 
@@ -78,8 +79,8 @@ class TokenRefreshServiceTest {
         given(jwtTokenProvider.isTokenExpired(VALID_REFRESH_TOKEN)).willReturn(true);
 
         assertThatThrownBy(() -> tokenRefreshService.refreshAccessToken(VALID_REFRESH_TOKEN))
-                .isInstanceOf(CustomException.class)
-                .satisfies(exception -> assertThat(((CustomException) exception).getErrorCode())
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception -> assertThat(((BusinessException) exception).getErrorCode())
                         .isEqualTo(AuthErrorCode.REFRESH_TOKEN_EXPIRED));
     }
 
@@ -92,8 +93,8 @@ class TokenRefreshServiceTest {
         given(memberRepository.findById(999L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> tokenRefreshService.refreshAccessToken(VALID_REFRESH_TOKEN))
-                .isInstanceOf(CustomException.class)
-                .satisfies(exception -> assertThat(((CustomException) exception).getErrorCode())
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception -> assertThat(((BusinessException) exception).getErrorCode())
                         .isEqualTo(MemberErrorCode.USER_NOT_FOUND));
     }
 
@@ -109,8 +110,8 @@ class TokenRefreshServiceTest {
         given(memberRepository.findById(inactiveMember.getId())).willReturn(Optional.of(inactiveMember));
 
         assertThatThrownBy(() -> tokenRefreshService.refreshAccessToken(VALID_REFRESH_TOKEN))
-                .isInstanceOf(CustomException.class)
-                .satisfies(exception -> assertThat(((CustomException) exception).getErrorCode())
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception -> assertThat(((BusinessException) exception).getErrorCode())
                         .isEqualTo(MemberErrorCode.MEMBER_INACTIVE));
     }
 
@@ -122,8 +123,8 @@ class TokenRefreshServiceTest {
         given(tokenBlacklistService.isBlacklisted(VALID_REFRESH_TOKEN)).willReturn(true);
 
         assertThatThrownBy(() -> tokenRefreshService.refreshAccessToken(VALID_REFRESH_TOKEN))
-                .isInstanceOf(CustomException.class)
-                .satisfies(exception -> assertThat(((CustomException) exception).getErrorCode())
+                .isInstanceOf(BusinessException.class)
+                .satisfies(exception -> assertThat(((BusinessException) exception).getErrorCode())
                         .isEqualTo(AuthErrorCode.REFRESH_TOKEN_INVALID));
     }
 }

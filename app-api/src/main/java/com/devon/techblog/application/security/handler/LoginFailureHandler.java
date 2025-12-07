@@ -1,7 +1,6 @@
 package com.devon.techblog.application.security.handler;
 
-import com.devon.techblog.common.dto.api.ApiResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.devon.techblog.application.security.util.SecurityResponseSender;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoginFailureHandler implements AuthenticationFailureHandler {
 
-    private final ObjectMapper objectMapper;
+    private final SecurityResponseSender securityResponseSender;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -24,11 +23,6 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
         log.info("로그인 실패: {}", exception.getMessage());
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        ApiResponse<Void> apiResponse = ApiResponse.failure("로그인이 실패했습니다");
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        securityResponseSender.sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "로그인이 실패했습니다");
     }
 }

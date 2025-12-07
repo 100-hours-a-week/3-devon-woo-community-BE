@@ -1,9 +1,9 @@
 package com.devon.techblog.application.comment.dto.response;
 
 import com.devon.techblog.application.member.dto.response.MemberResponse;
+import com.devon.techblog.domain.comment.dto.CommentQueryDto;
+import com.devon.techblog.domain.comment.entity.Comment;
 import com.devon.techblog.domain.member.entity.Member;
-import com.devon.techblog.domain.post.dto.CommentQueryDto;
-import com.devon.techblog.domain.post.entity.Comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 

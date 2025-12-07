@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
@@ -67,7 +67,7 @@ class PostLikeServiceTest {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> postLikeService.likePost(1L, 1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -77,7 +77,7 @@ class PostLikeServiceTest {
         given(memberRepository.existsById(1L)).willReturn(false);
 
         assertThatThrownBy(() -> postLikeService.likePost(1L, 1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -85,10 +85,10 @@ class PostLikeServiceTest {
     void likePost_alreadyLiked() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
         given(memberRepository.existsById(1L)).willReturn(true);
-        doThrow(new CustomException(PostErrorCode.ALREADY_LIKED)).when(postLikePolicy).validateCanLike(1L, 1L);
+        doThrow(new BusinessException(PostErrorCode.ALREADY_LIKED)).when(postLikePolicy).validateCanLike(1L, 1L);
 
         assertThatThrownBy(() -> postLikeService.likePost(1L, 1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -106,16 +106,16 @@ class PostLikeServiceTest {
         given(postRepository.existsById(1L)).willReturn(false);
 
         assertThatThrownBy(() -> postLikeService.unlikePost(1L, 1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
     @DisplayName("좋아요하지 않은 게시글의 좋아요 취소 시 예외가 발생한다")
     void unlikePost_notLiked() {
         given(postRepository.existsById(1L)).willReturn(true);
-        doThrow(new CustomException(PostErrorCode.LIKE_NOT_FOUND)).when(postLikePolicy).validateCanUnlike(1L, 1L);
+        doThrow(new BusinessException(PostErrorCode.LIKE_NOT_FOUND)).when(postLikePolicy).validateCanUnlike(1L, 1L);
 
         assertThatThrownBy(() -> postLikeService.unlikePost(1L, 1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 }

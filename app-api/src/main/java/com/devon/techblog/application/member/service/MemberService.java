@@ -5,7 +5,7 @@ import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
 import com.devon.techblog.application.member.dto.response.MemberDetailsResponse;
 import com.devon.techblog.application.member.dto.response.MemberUpdateResponse;
 import com.devon.techblog.application.member.validator.MemberValidator;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.entity.MemberStatus;
@@ -88,6 +88,6 @@ public class MemberService {
 
     private Member findMemberById(Long id) {
         return memberRepository.findByIdAndStatus(id, MemberStatus.ACTIVE)
-                .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(MemberErrorCode.USER_NOT_FOUND));
     }
 }

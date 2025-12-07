@@ -8,16 +8,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConditionalOnProperty(prefix = "cloudinary", name = "cloud_name")
+@ConditionalOnProperty(prefix = "storage.cloudinary", name = "enabled", havingValue = "true")
 public class CloudinaryConfig {
 
-    @Value("${cloudinary.cloud_name}")
+    @Value("${storage.cloudinary.cloud.name}")
     private String cloudName;
 
-    @Value("${cloudinary.api_key}")
+    @Value("${storage.cloudinary.api.key}")
     private String apiKey;
 
-    @Value("${cloudinary.api_secret}")
+    @Value("${storage.cloudinary.api.secret}")
     private String apiSecret;
 
     @Bean

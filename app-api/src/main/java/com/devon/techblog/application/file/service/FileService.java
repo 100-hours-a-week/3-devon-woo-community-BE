@@ -5,7 +5,7 @@ import com.devon.techblog.application.file.dto.request.FileCreateRequest;
 import com.devon.techblog.application.file.dto.request.PresignRequest;
 import com.devon.techblog.application.file.dto.response.FileResponse;
 import com.devon.techblog.application.file.dto.response.PresignResponse;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.FileErrorCode;
 import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.file.entity.FileType;
@@ -41,13 +41,13 @@ public class FileService {
 
     public FileResponse getFileById(Long id) {
         File file = fileRepository.findById(id)
-                .orElseThrow(() -> new CustomException(FileErrorCode.FILE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(FileErrorCode.FILE_NOT_FOUND));
         return FileResponse.from(file);
     }
 
     public FileResponse getFileByStorageKey(String storageKey) {
         File file = fileRepository.findByStorageKey(storageKey)
-                .orElseThrow(() -> new CustomException(FileErrorCode.FILE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(FileErrorCode.FILE_NOT_FOUND));
         return FileResponse.from(file);
     }
 
@@ -119,6 +119,6 @@ public class FileService {
 
     private File findFileById(Long id) {
         return fileRepository.findById(id)
-                .orElseThrow(() -> new CustomException(FileErrorCode.FILE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(FileErrorCode.FILE_NOT_FOUND));
     }
 }

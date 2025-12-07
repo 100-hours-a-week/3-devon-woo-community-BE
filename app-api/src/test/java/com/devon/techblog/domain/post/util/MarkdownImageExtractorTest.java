@@ -2,6 +2,7 @@ package com.devon.techblog.domain.post.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.devon.techblog.common.utils.MarkdownImageExtractor;
 import com.devon.techblog.config.annotation.UnitTest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

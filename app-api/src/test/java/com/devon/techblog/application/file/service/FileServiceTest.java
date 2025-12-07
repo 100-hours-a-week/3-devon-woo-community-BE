@@ -13,7 +13,7 @@ import com.devon.techblog.application.file.dto.request.FileCreateRequest;
 import com.devon.techblog.application.file.dto.request.PresignRequest;
 import com.devon.techblog.application.file.dto.response.FileResponse;
 import com.devon.techblog.application.file.dto.response.PresignResponse;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.FileErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.file.FileFixture;
@@ -76,7 +76,7 @@ class FileServiceTest {
         given(fileRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> fileService.getFileById(1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FileErrorCode.FILE_NOT_FOUND);
     }
 
@@ -99,7 +99,7 @@ class FileServiceTest {
         given(fileRepository.findByStorageKey("nonexistent-key")).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> fileService.getFileByStorageKey("nonexistent-key"))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", FileErrorCode.FILE_NOT_FOUND);
     }
 

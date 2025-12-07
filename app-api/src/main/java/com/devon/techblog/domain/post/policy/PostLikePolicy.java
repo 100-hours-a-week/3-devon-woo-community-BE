@@ -1,6 +1,6 @@
 package com.devon.techblog.domain.post.policy;
 
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class PostLikePolicy {
      */
     public void validateCanLike(Long postId, Long memberId) {
         if (postLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new CustomException(PostErrorCode.ALREADY_LIKED);
+            throw new BusinessException(PostErrorCode.ALREADY_LIKED);
         }
     }
 
@@ -26,7 +26,7 @@ public class PostLikePolicy {
      */
     public void validateCanUnlike(Long postId, Long memberId) {
         if (!postLikeRepository.existsByPostIdAndMemberId(postId, memberId)) {
-            throw new CustomException(PostErrorCode.LIKE_NOT_FOUND);
+            throw new BusinessException(PostErrorCode.LIKE_NOT_FOUND);
         }
     }
 }

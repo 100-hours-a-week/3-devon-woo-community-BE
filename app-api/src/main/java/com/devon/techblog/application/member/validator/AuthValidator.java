@@ -1,7 +1,7 @@
 package com.devon.techblog.application.member.validator;
 
 import com.devon.techblog.application.member.dto.request.SignupRequest;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +23,13 @@ public class AuthValidator {
 
     private void validateEmailNotDuplicated(String email) {
         if (memberRepository.existsByEmail(email)) {
-            throw new CustomException(MemberErrorCode.DUPLICATE_EMAIL);
+            throw new BusinessException(MemberErrorCode.DUPLICATE_EMAIL);
         }
     }
 
     private void validateNicknameNotDuplicated(String nickname) {
         if (memberRepository.existsByNickname(nickname)) {
-            throw new CustomException(MemberErrorCode.DUPLICATE_NICKNAME);
+            throw new BusinessException(MemberErrorCode.DUPLICATE_NICKNAME);
         }
     }
 }

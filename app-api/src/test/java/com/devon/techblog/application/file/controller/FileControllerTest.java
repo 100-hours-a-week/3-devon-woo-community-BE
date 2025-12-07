@@ -11,16 +11,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.file.FileRequestFixture;
 import com.devon.techblog.application.file.dto.request.FileCreateRequest;
 import com.devon.techblog.application.file.dto.response.FileResponse;
 import com.devon.techblog.application.file.service.FileService;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.FileErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
 import com.devon.techblog.domain.file.FileFixture;
 import com.devon.techblog.domain.file.entity.File;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -95,7 +95,7 @@ class FileControllerTest {
     @DisplayName("존재하지 않는 파일 조회 - 예외 발생")
     void getFile_notFound_throwsException() throws Exception {
         given(fileService.getFileById(999L))
-                .willThrow(new CustomException(FileErrorCode.FILE_NOT_FOUND));
+                .willThrow(new BusinessException(FileErrorCode.FILE_NOT_FOUND));
 
         mockMvc.perform(get("/api/v1/files/{id}", 999L))
                 .andExpect(status().isNotFound());
@@ -179,7 +179,7 @@ class FileControllerTest {
     @Test
     @DisplayName("존재하지 않는 파일 삭제 시도 - 예외 발생")
     void deleteFile_notFound_throwsException() throws Exception {
-        willThrow(new CustomException(FileErrorCode.FILE_NOT_FOUND))
+        willThrow(new BusinessException(FileErrorCode.FILE_NOT_FOUND))
                 .given(fileService).deleteFile(999L);
 
         mockMvc.perform(delete("/api/v1/files/{id}", 999L))

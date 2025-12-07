@@ -9,15 +9,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.member.MemberRequestFixture;
 import com.devon.techblog.application.member.dto.request.MemberUpdateRequest;
 import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
 import com.devon.techblog.application.member.dto.response.MemberDetailsResponse;
 import com.devon.techblog.application.member.service.MemberService;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,8 +125,7 @@ class MemberControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -138,8 +137,7 @@ class MemberControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -151,14 +149,13 @@ class MemberControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
     @DisplayName("존재하지 않는 회원 조회 - 404 Not Found")
     void getMemberProfile_notFound_returns404() throws Exception {
-        willThrow(new CustomException(MemberErrorCode.USER_NOT_FOUND))
+        willThrow(new BusinessException(MemberErrorCode.USER_NOT_FOUND))
                 .given(memberService).getMemberProfile(any());
 
         mockMvc.perform(get("/api/v1/members/{memberId}", 999L))

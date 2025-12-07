@@ -2,9 +2,10 @@ package com.devon.techblog.application.security.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.devon.techblog.config.annotation.UnitTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.devon.techblog.application.security.util.SecurityResponseSender;
+import com.devon.techblog.config.annotation.UnitTest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +22,8 @@ class CustomAccessDeniedHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new CustomAccessDeniedHandler(objectMapper);
+        SecurityResponseSender securityResponseSender = new SecurityResponseSender(objectMapper);
+        handler = new CustomAccessDeniedHandler(securityResponseSender);
     }
 
     @Test

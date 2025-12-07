@@ -4,8 +4,7 @@ import com.devon.techblog.application.security.dto.response.LoginResponse;
 import com.devon.techblog.application.security.dto.user.CustomUserDetails;
 import com.devon.techblog.application.security.util.CookieProvider;
 import com.devon.techblog.application.security.util.JwtTokenProvider;
-import com.devon.techblog.common.dto.api.ApiResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.devon.techblog.application.security.util.SecurityResponseSender;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final ObjectMapper objectMapper;
+    private final SecurityResponseSender securityResponseSender;
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieProvider cookieProvider;
 
@@ -39,12 +38,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         cookieProvider.addRefreshTokenCookie(response, refreshToken);
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
         LoginResponse loginResponse = new LoginResponse(userId, accessToken);
-        ApiResponse<LoginResponse> apiResponse = ApiResponse.success(loginResponse, "로그인이 성공했습니다");
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        securityResponseSender.sendSuccess(response, HttpServletResponse.SC_OK, loginResponse, "로그인이 성공했습니다");
     }
 }

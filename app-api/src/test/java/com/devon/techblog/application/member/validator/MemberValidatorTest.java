@@ -8,7 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
@@ -49,7 +49,7 @@ class MemberValidatorTest {
         given(memberRepository.existsByNickname("newNick")).willReturn(true);
 
         assertThatThrownBy(() -> memberValidator.validateNicknameNotDuplicated("newNick", member))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -67,7 +67,7 @@ class MemberValidatorTest {
         PasswordUpdateRequest request = new PasswordUpdateRequest("wrong", "newPassword123");
 
         assertThatThrownBy(() -> memberValidator.validatePasswordUpdate(request, member))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -76,7 +76,7 @@ class MemberValidatorTest {
         PasswordUpdateRequest request = new PasswordUpdateRequest("password1234", "password1234");
 
         assertThatThrownBy(() -> memberValidator.validatePasswordUpdate(request, member))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
