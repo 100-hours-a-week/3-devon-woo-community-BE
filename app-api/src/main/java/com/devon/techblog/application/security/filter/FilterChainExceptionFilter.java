@@ -1,7 +1,7 @@
 package com.devon.techblog.application.security.filter;
 
-import com.devon.techblog.common.dto.api.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.devon.techblog.common.dto.api.ErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,8 +36,8 @@ public class FilterChainExceptionFilter extends OncePerRequestFilter {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
 
-            ApiResponse<Object> apiResponse = ApiResponse.failure("서버 오류가 발생했습니다");
-            response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+            ErrorResponse errorResponse = ErrorResponse.of("서버 오류가 발생했습니다");
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         }
     }
 }

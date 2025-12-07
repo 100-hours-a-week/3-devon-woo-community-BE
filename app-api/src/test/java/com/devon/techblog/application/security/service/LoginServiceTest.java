@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import com.devon.techblog.application.security.dto.user.CustomUserDetails;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
@@ -35,7 +36,7 @@ class LoginServiceTest {
         var userDetails = loginService.loadUserByUsername(member.getEmail());
 
         assertThat(userDetails.getUsername()).isEqualTo(member.getId().toString());
-        assertThat(userDetails).isInstanceOf(com.devon.techblog.application.security.dto.user.CustomUserDetails.class);
+        assertThat(userDetails).isInstanceOf(CustomUserDetails.class);
     }
 
     @Test

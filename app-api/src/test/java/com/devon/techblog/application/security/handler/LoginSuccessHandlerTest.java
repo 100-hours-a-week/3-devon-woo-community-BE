@@ -7,13 +7,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.security.dto.user.CustomUserDetails;
 import com.devon.techblog.application.security.util.CookieProvider;
 import com.devon.techblog.application.security.util.JwtTokenProvider;
+import com.devon.techblog.application.security.util.SecurityResponseSender;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.entity.MemberRole;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +39,8 @@ class LoginSuccessHandlerTest {
 
     @BeforeEach
     void setUp() {
-        loginSuccessHandler = new LoginSuccessHandler(objectMapper, jwtTokenProvider, cookieProvider);
+        SecurityResponseSender securityResponseSender = new SecurityResponseSender(objectMapper);
+        loginSuccessHandler = new LoginSuccessHandler(securityResponseSender, jwtTokenProvider, cookieProvider);
     }
 
     @Test

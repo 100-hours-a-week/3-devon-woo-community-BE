@@ -5,10 +5,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.security.service.TokenBlacklistService;
 import com.devon.techblog.application.security.util.CookieProvider;
+import com.devon.techblog.application.security.util.SecurityResponseSender;
 import com.devon.techblog.config.annotation.UnitTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
@@ -34,7 +35,8 @@ class LogoutHandlerTest {
 
     @BeforeEach
     void setUp() {
-        logoutHandler = new LogoutHandler(objectMapper, cookieProvider, tokenBlacklistService);
+        SecurityResponseSender securityResponseSender = new SecurityResponseSender(objectMapper);
+        logoutHandler = new LogoutHandler(securityResponseSender, cookieProvider, tokenBlacklistService);
     }
 
     @Test

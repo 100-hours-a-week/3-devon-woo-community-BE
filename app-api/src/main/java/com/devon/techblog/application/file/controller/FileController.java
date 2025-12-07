@@ -1,5 +1,6 @@
 package com.devon.techblog.application.file.controller;
 
+import com.devon.techblog.application.file.controller.docs.FileApiDocs;
 import com.devon.techblog.application.file.dto.request.CompleteUploadRequest;
 import com.devon.techblog.application.file.dto.request.FileCreateRequest;
 import com.devon.techblog.application.file.dto.request.PresignRequest;
@@ -8,9 +9,6 @@ import com.devon.techblog.application.file.dto.response.PresignResponse;
 import com.devon.techblog.application.file.service.FileService;
 import com.devon.techblog.common.dto.api.ApiResponse;
 import com.devon.techblog.domain.file.entity.FileType;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,97 +24,87 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "File", description = "파일 관련 API")
 @RestController
 @RequestMapping("/api/v1/files")
 @RequiredArgsConstructor
-public class FileController {
+public class FileController implements FileApiDocs {
 
     private final FileService fileService;
 
-    @Operation(summary = "파일 업로드를 위한 Presigned URL 발급", description = "파일 업로드를 위한 Presigned URL을 발급합니다.")
     @PostMapping("/presign")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<PresignResponse> presignUpload(
             @RequestBody @Validated PresignRequest request
     ) {
         PresignResponse response = fileService.presignUpload(request);
-        return ApiResponse.success(response, "presign_url_created");
+        return ApiResponse.success(response);
     }
 
-    @Operation(summary = "파일 업로드 완료", description = "파일 업로드가 완료되었음을 서버에 알립니다.")
     @PostMapping("/{fileId}/complete")
     public ApiResponse<FileResponse> completeUpload(
-            @Parameter(description = "파일 ID") @PathVariable Long fileId,
+            @PathVariable Long fileId,
             @RequestBody @Validated CompleteUploadRequest request
     ) {
         FileResponse response = fileService.completeUpload(fileId, request);
-        return ApiResponse.success(response, "upload_completed");
+        return ApiResponse.success(response);
     }
 
-    @Operation(summary = "파일 메타데이터 생성", description = "파일 메타데이터를 직접 생성합니다. (레거시)")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<FileResponse> createFile(
             @RequestBody @Validated FileCreateRequest request
     ) {
         FileResponse response = fileService.createFile(request);
-        return ApiResponse.success(response, "file_created");
+        return ApiResponse.success(response);
     }
 
-    @Operation(summary = "파일 조회", description = "파일 ID로 파일 정보를 조회합니다.")
     @GetMapping("/{id}")
     public ApiResponse<FileResponse> getFile(
-            @Parameter(description = "파일 ID") @PathVariable Long id
+            @PathVariable Long id
     ) {
         FileResponse response = fileService.getFileById(id);
-        return ApiResponse.success(response, "file_retrieved");
+        return ApiResponse.success(response);
     }
 
-    @Operation(summary = "storageKey로 파일 조회", description = "storageKey로 파일 정보를 조회합니다.")
     @GetMapping("/by-key")
     public ApiResponse<FileResponse> getFileByStorageKey(
-            @Parameter(description = "Storage Key") @RequestParam String storageKey
+            @RequestParam String storageKey
     ) {
         FileResponse response = fileService.getFileByStorageKey(storageKey);
-        return ApiResponse.success(response, "file_retrieved");
+        return ApiResponse.success(response);
     }
 
-    @Operation(summary = "파일 목록 조회", description = "전체 파일 목록을 조회합니다.")
     @GetMapping
     public ApiResponse<List<FileResponse>> getAllFiles(
-            @Parameter(description = "파일 타입 필터") @RequestParam(required = false) FileType fileType
+            @RequestParam(required = false) FileType fileType
     ) {
         List<FileResponse> responses = fileType != null
                 ? fileService.getFilesByType(fileType)
                 : fileService.getAllFiles();
 
-        return ApiResponse.success(responses, "files_retrieved");
+        return ApiResponse.success(responses);
     }
 
-    @Operation(summary = "파일 삭제", description = "파일을 soft delete 처리합니다.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFile(
-            @Parameter(description = "파일 ID") @PathVariable Long id
+            @PathVariable Long id
     ) {
         fileService.deleteFile(id);
     }
 
-    @Operation(summary = "파일 복구", description = "삭제된 파일을 복구합니다.")
     @PatchMapping("/{id}/restore")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void restoreFile(
-            @Parameter(description = "파일 ID") @PathVariable Long id
+            @PathVariable Long id
     ) {
         fileService.restoreFile(id);
     }
 
-    @Operation(summary = "파일 영구 삭제", description = "파일을 데이터베이스에서 영구 삭제합니다.")
     @DeleteMapping("/{id}/permanent")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void permanentlyDeleteFile(
-            @Parameter(description = "파일 ID") @PathVariable Long id
+            @PathVariable Long id
     ) {
         fileService.permanentlyDeleteFile(id);
     }

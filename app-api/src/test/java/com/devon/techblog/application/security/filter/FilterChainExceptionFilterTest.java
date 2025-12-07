@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-import com.devon.techblog.common.dto.api.ApiResponse;
-import com.devon.techblog.config.annotation.UnitTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.devon.techblog.common.dto.api.ErrorResponse;
+import com.devon.techblog.config.annotation.UnitTest;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +40,7 @@ class FilterChainExceptionFilterTest {
 
         assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         assertThat(response.getContentAsString()).contains("서버 오류가 발생했습니다");
-        ApiResponse<?> settled = new ObjectMapper().readValue(response.getContentAsString(), ApiResponse.class);
+        ErrorResponse settled = new ObjectMapper().readValue(response.getContentAsString(), ErrorResponse.class);
         assertThat(settled.isSuccess()).isFalse();
     }
 

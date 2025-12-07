@@ -1,7 +1,7 @@
 package com.devon.techblog.application.member.validator;
 
 import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -23,7 +23,7 @@ public class MemberValidator {
     public void validateNicknameNotDuplicated(String nickname, Member currentMember) {
         if (nickname != null && !nickname.equals(currentMember.getNickname())) {
             if (memberRepository.existsByNickname(nickname)) {
-                throw new CustomException(MemberErrorCode.DUPLICATE_NICKNAME);
+                throw new BusinessException(MemberErrorCode.DUPLICATE_NICKNAME);
             }
         }
     }
@@ -38,13 +38,13 @@ public class MemberValidator {
 
     private void validateCurrentPassword(String inputPassword, String storedPassword) {
         if (!inputPassword.equals(storedPassword)) {
-            throw new CustomException(MemberErrorCode.INVALID_CURRENT_PASSWORD);
+            throw new BusinessException(MemberErrorCode.INVALID_CURRENT_PASSWORD);
         }
     }
 
     private void validateNewPasswordDifferent(String newPassword, String currentPassword) {
         if (newPassword.equals(currentPassword)) {
-            throw new CustomException(MemberErrorCode.SAME_AS_CURRENT_PASSWORD);
+            throw new BusinessException(MemberErrorCode.SAME_AS_CURRENT_PASSWORD);
         }
     }
 }

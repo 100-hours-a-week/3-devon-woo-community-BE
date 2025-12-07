@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "aop.transactional-query-logging.enabled", havingValue = "true", matchIfMissing = true)
 public class TransactionalQueryLoggingAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("techblog.aop.Transaction");
+    private static final Logger log = LoggerFactory.getLogger("spring.aop.Transaction");
     private static final AtomicLong TX_ID_COUNTER = new AtomicLong(0);
 
     private final EntityManager entityManager;

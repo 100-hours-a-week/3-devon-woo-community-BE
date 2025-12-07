@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "aop.service-performance.enabled", havingValue = "true", matchIfMissing = true)
 public class ServicePerformanceAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("techblog.aop.Service");
+    private static final Logger log = LoggerFactory.getLogger("spring.aop.Service");
     private static final AtomicLong EXEC_ID_COUNTER = new AtomicLong(0);
 
     @Pointcut("execution(* com.devon.techblog.application.*.service.*.*(..))")

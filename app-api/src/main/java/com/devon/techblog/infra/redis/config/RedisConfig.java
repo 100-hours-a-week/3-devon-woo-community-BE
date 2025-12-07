@@ -1,6 +1,5 @@
 package com.devon.techblog.infra.redis.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,17 +15,17 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableRedisRepositories(basePackages = "com.devon.techblog.infra.redis.repository")
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}")
-    private String host;
+    private final RedisProperties redisProperties;
 
-    @Value("${spring.data.redis.port}")
-    private int port;
+    public RedisConfig(RedisProperties redisProperties) {
+        this.redisProperties = redisProperties;
+    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName(host);
-        config.setPort(port);
+        config.setHostName(redisProperties.getHost());
+        config.setPort(redisProperties.getPort());
         return new LettuceConnectionFactory(config);
     }
 

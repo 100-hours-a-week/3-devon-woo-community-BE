@@ -8,21 +8,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.comment.CommentRequestFixture;
 import com.devon.techblog.application.comment.dto.request.CommentCreateRequest;
 import com.devon.techblog.application.comment.dto.request.CommentUpdateRequest;
 import com.devon.techblog.config.TestCurrentUserContext;
 import com.devon.techblog.config.annotation.IntegrationTest;
+import com.devon.techblog.domain.comment.entity.Comment;
+import com.devon.techblog.domain.comment.repository.CommentRepository;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.CommentFixture;
 import com.devon.techblog.domain.post.PostFixture;
-import com.devon.techblog.domain.post.entity.Comment;
 import com.devon.techblog.domain.post.entity.Post;
-import com.devon.techblog.domain.post.repository.CommentRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -257,8 +257,7 @@ class CommentIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test

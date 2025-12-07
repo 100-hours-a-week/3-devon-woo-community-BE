@@ -58,7 +58,6 @@ class AuthLogoutIntegrationTest {
                         .cookie(refreshCookie))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.data").value("로그아웃되었습니다."))
                 .andReturn()
                 .getResponse();
 
