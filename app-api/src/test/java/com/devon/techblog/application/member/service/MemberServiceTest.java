@@ -11,7 +11,7 @@ import com.devon.techblog.application.member.dto.request.PasswordUpdateRequest;
 import com.devon.techblog.application.member.dto.response.MemberDetailsResponse;
 import com.devon.techblog.application.member.dto.response.MemberUpdateResponse;
 import com.devon.techblog.application.member.validator.MemberValidator;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
 import com.devon.techblog.domain.member.MemberFixture;
@@ -62,7 +62,7 @@ class MemberServiceTest {
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> memberService.getMemberProfile(1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -107,7 +107,7 @@ class MemberServiceTest {
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> memberService.updateMember(1L, request))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
     }
 
@@ -116,11 +116,11 @@ class MemberServiceTest {
     void updateMember_duplicateNickname_throwsException() {
         MemberUpdateRequest request = MemberRequestFixture.updateRequest();
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
-        doThrow(new CustomException(MemberErrorCode.DUPLICATE_NICKNAME))
+        doThrow(new BusinessException(MemberErrorCode.DUPLICATE_NICKNAME))
                 .when(memberValidator).validateNicknameNotDuplicated(request.nickname(), member);
 
         assertThatThrownBy(() -> memberService.updateMember(1L, request))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.DUPLICATE_NICKNAME.getMessage());
     }
 
@@ -165,7 +165,7 @@ class MemberServiceTest {
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> memberService.updatePassword(1L, request))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
     }
 
@@ -174,11 +174,11 @@ class MemberServiceTest {
     void updatePassword_invalidCurrentPassword_throwsException() {
         PasswordUpdateRequest request = new PasswordUpdateRequest("wrongPassword", "newPassword123");
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
-        doThrow(new CustomException(MemberErrorCode.INVALID_CURRENT_PASSWORD))
+        doThrow(new BusinessException(MemberErrorCode.INVALID_CURRENT_PASSWORD))
                 .when(memberValidator).validatePasswordUpdate(request, member);
 
         assertThatThrownBy(() -> memberService.updatePassword(1L, request))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.INVALID_CURRENT_PASSWORD.getMessage());
     }
 
@@ -187,11 +187,11 @@ class MemberServiceTest {
     void updatePassword_sameAsCurrentPassword_throwsException() {
         PasswordUpdateRequest request = new PasswordUpdateRequest("password1234", "password1234");
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.of(member));
-        doThrow(new CustomException(MemberErrorCode.SAME_AS_CURRENT_PASSWORD))
+        doThrow(new BusinessException(MemberErrorCode.SAME_AS_CURRENT_PASSWORD))
                 .when(memberValidator).validatePasswordUpdate(request, member);
 
         assertThatThrownBy(() -> memberService.updatePassword(1L, request))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.SAME_AS_CURRENT_PASSWORD.getMessage());
     }
 
@@ -201,7 +201,7 @@ class MemberServiceTest {
         given(memberRepository.findByIdAndStatus(1L, MemberStatus.ACTIVE)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> memberService.deleteMember(1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
     }
 }

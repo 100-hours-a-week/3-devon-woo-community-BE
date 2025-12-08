@@ -1,7 +1,7 @@
 package com.devon.techblog.domain.post;
 
+import com.devon.techblog.domain.comment.entity.Comment;
 import com.devon.techblog.domain.member.entity.Member;
-import com.devon.techblog.domain.post.entity.Comment;
 import com.devon.techblog.domain.post.entity.Post;
 import org.springframework.test.util.ReflectionTestUtils;
 

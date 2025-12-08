@@ -13,12 +13,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * API 호출에 대한 공통 Request/Response 로깅 Aspect.
+ * <p>
+ * 예외에 대한 상세 로깅 및 알림은 {@code ExceptionLoggingAspect}에서 처리한다.
+ */
 @Aspect
 @Component
 @ConditionalOnProperty(name = "aop.api-logging.enabled", havingValue = "true", matchIfMissing = true)
 public class ApiLoggingAspect {
 
-    private static final Logger log = LoggerFactory.getLogger("techblog.aop.API");
+    private static final Logger log = LoggerFactory.getLogger("spring.aop.API");
 
     private static final AtomicLong REQUEST_ID_COUNTER = new AtomicLong(0);
 
@@ -49,15 +54,12 @@ public class ApiLoggingAspect {
             Object result = joinPoint.proceed();
             long duration = System.currentTimeMillis() - startTime;
 
-            // Response 로그
+            // Response 로그 (정상 처리)
             log.info("ID={} | Time={}ms", id, duration);
 
             return result;
-        } catch (Exception e) {
-            long duration = System.currentTimeMillis() - startTime;
-
-            log.error("ID={} | Time={}ms | Error={}", id, duration, e.getMessage());
-            throw e;
+        } finally {
+            // 예외가 발생해도 실행 시간 측정은 유지된다.
         }
     }
 }

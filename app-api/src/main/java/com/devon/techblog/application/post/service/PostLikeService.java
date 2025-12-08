@@ -1,6 +1,6 @@
 package com.devon.techblog.application.post.service;
 
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.domain.member.entity.Member;
@@ -29,10 +29,10 @@ public class PostLikeService {
     @Transactional
     public void likePost(Long postId, Long memberId) {
         Post post = postRepository.findByIdWithMember(postId)
-                .orElseThrow(() -> new CustomException(PostErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(PostErrorCode.POST_NOT_FOUND));
 
         if (!memberRepository.existsById(memberId)) {
-            throw new CustomException(MemberErrorCode.USER_NOT_FOUND);
+            throw new BusinessException(MemberErrorCode.USER_NOT_FOUND);
         }
 
         postLikePolicy.validateCanLike(postId, memberId);
@@ -48,7 +48,7 @@ public class PostLikeService {
     @Transactional
     public void unlikePost(Long postId, Long memberId) {
         if(!postRepository.existsById(postId)){
-            throw new CustomException(PostErrorCode.POST_NOT_FOUND);
+            throw new BusinessException(PostErrorCode.POST_NOT_FOUND);
         }
         postLikePolicy.validateCanUnlike(postId, memberId);
 

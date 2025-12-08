@@ -2,7 +2,7 @@ package com.devon.techblog.domain.common.policy;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.config.annotation.UnitTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +22,6 @@ class OwnershipPolicyTest {
     @DisplayName("소유자 ID와 요청자 ID가 다르면 예외가 발생한다")
     void validateOwnership_throwsException() {
         assertThatThrownBy(() -> ownershipPolicy.validateOwnership(1L, 2L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 }

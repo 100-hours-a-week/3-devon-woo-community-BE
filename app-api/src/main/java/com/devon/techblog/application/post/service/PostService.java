@@ -6,9 +6,10 @@ import com.devon.techblog.application.post.dto.request.PostCreateRequest;
 import com.devon.techblog.application.post.dto.request.PostUpdateRequest;
 import com.devon.techblog.application.post.dto.response.PostResponse;
 import com.devon.techblog.application.post.dto.response.PostSummaryResponse;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
+import com.devon.techblog.common.utils.MarkdownImageExtractor;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
@@ -17,7 +18,6 @@ import com.devon.techblog.domain.post.dto.PostSummaryQueryDto;
 import com.devon.techblog.domain.post.entity.Post;
 import com.devon.techblog.domain.post.repository.PostLikeRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
-import com.devon.techblog.domain.post.util.MarkdownImageExtractor;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -175,11 +175,11 @@ public class PostService {
 
     private Post findByIdWithMember(Long postId) {
         return postRepository.findByIdWithMember(postId)
-                .orElseThrow(() -> new CustomException(PostErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(PostErrorCode.POST_NOT_FOUND));
     }
 
     private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(MemberErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(MemberErrorCode.USER_NOT_FOUND));
     }
 }

@@ -11,21 +11,21 @@ import com.devon.techblog.application.comment.dto.request.CommentCreateRequest;
 import com.devon.techblog.application.comment.dto.request.CommentUpdateRequest;
 import com.devon.techblog.application.comment.dto.response.CommentResponse;
 import com.devon.techblog.application.common.dto.response.PageResponse;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.CommentErrorCode;
 import com.devon.techblog.common.exception.code.CommonErrorCode;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
+import com.devon.techblog.domain.comment.dto.CommentQueryDto;
+import com.devon.techblog.domain.comment.entity.Comment;
+import com.devon.techblog.domain.comment.repository.CommentRepository;
 import com.devon.techblog.domain.common.policy.OwnershipPolicy;
 import com.devon.techblog.domain.member.MemberFixture;
 import com.devon.techblog.domain.member.entity.Member;
 import com.devon.techblog.domain.member.repository.MemberRepository;
 import com.devon.techblog.domain.post.CommentFixture;
 import com.devon.techblog.domain.post.PostFixture;
-import com.devon.techblog.domain.post.dto.CommentQueryDto;
-import com.devon.techblog.domain.post.entity.Comment;
 import com.devon.techblog.domain.post.entity.Post;
-import com.devon.techblog.domain.post.repository.CommentRepository;
 import com.devon.techblog.domain.post.repository.PostRepository;
 import java.time.Instant;
 import java.util.List;
@@ -89,7 +89,7 @@ class CommentServiceTest {
         given(postRepository.existsById(1L)).willReturn(false);
 
         assertThatThrownBy(() -> commentService.createComment(1L, request, 1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -131,7 +131,7 @@ class CommentServiceTest {
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> commentService.getCommentsDetails(1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -157,7 +157,7 @@ class CommentServiceTest {
         given(postRepository.existsById(1L)).willReturn(false);
 
         assertThatThrownBy(() -> commentService.getCommentPageByPostId(1L, pageable))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -169,7 +169,7 @@ class CommentServiceTest {
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> commentService.createComment(1L, request, 1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
     }
 
@@ -194,7 +194,7 @@ class CommentServiceTest {
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> commentService.updateComment(1L, request, 1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(CommentErrorCode.COMMENT_NOT_FOUND.getMessage());
     }
 
@@ -205,7 +205,7 @@ class CommentServiceTest {
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
 
         assertThatThrownBy(() -> commentService.updateComment(1L, request, 2L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(CommonErrorCode.NO_PERMISSION.getMessage());
     }
 
@@ -215,7 +215,7 @@ class CommentServiceTest {
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> commentService.deleteComment(1L, 1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(CommentErrorCode.COMMENT_NOT_FOUND.getMessage());
     }
 
@@ -226,7 +226,7 @@ class CommentServiceTest {
         given(commentRepository.findPostIdByCommentId(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> commentService.deleteComment(1L, 1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(CommentErrorCode.COMMENT_NOT_FOUND.getMessage());
     }
 
@@ -247,7 +247,7 @@ class CommentServiceTest {
         given(commentRepository.findByIdWithMember(1L)).willReturn(Optional.of(comment));
 
         assertThatThrownBy(() -> commentService.deleteComment(1L, 2L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(CommentErrorCode.NO_PERMISSION.getMessage());
     }
 }

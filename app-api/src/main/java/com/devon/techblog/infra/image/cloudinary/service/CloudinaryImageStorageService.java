@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(prefix = "storage.cloudinary", name = "enabled", havingValue = "true")
 public class CloudinaryImageStorageService implements ImageStorageService {
 
     @Value("${storage.cloudinary.api.key}")
@@ -24,13 +26,13 @@ public class CloudinaryImageStorageService implements ImageStorageService {
     private String uploadPreset;
 
     @Override
-    public ImageSignature generateUploadSignature(String type) {
+    public ImageSignature generateUploadSignature(String folder) {
         long timestamp = System.currentTimeMillis() / 1000L;
 
-        String folder = "profile".equals(type) ? "profiles" : "posts";
+        String targetFolder = resolveFolder(folder);
 
         Map<String, String> paramsToSign = new TreeMap<>();
-        paramsToSign.put("folder", folder);
+        paramsToSign.put("folder", targetFolder);
         paramsToSign.put("timestamp", String.valueOf(timestamp));
         paramsToSign.put("upload_preset", uploadPreset);
 
@@ -51,7 +53,17 @@ public class CloudinaryImageStorageService implements ImageStorageService {
                 timestamp,
                 signature,
                 uploadPreset,
-                folder
+                targetFolder
         );
+    }
+
+    private String resolveFolder(String folder) {
+        if (folder == null || folder.isBlank()) {
+            return "uploads";
+        }
+        if ("profile".equalsIgnoreCase(folder)) {
+            return "profiles";
+        }
+        return folder;
     }
 }

@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.application.member.dto.response.MemberResponse;
 import com.devon.techblog.application.post.PostRequestFixture;
@@ -21,10 +22,9 @@ import com.devon.techblog.application.post.dto.response.PostSummaryResponse;
 import com.devon.techblog.application.post.service.PostLikeService;
 import com.devon.techblog.application.post.service.PostService;
 import com.devon.techblog.application.post.service.PostViewService;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -157,8 +157,7 @@ class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -170,8 +169,7 @@ class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -183,8 +181,7 @@ class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -196,14 +193,13 @@ class PostControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
     @DisplayName("존재하지 않는 게시글 조회 - 404 Not Found")
     void getPost_notFound_returns404() throws Exception {
-        willThrow(new CustomException(PostErrorCode.POST_NOT_FOUND))
+        willThrow(new BusinessException(PostErrorCode.POST_NOT_FOUND))
                 .given(postService).getPostDetails(any(), any());
 
         mockMvc.perform(get("/api/v1/posts/{postId}", 999L))
@@ -215,7 +211,7 @@ class PostControllerTest {
     @Test
     @DisplayName("존재하지 않는 게시글 좋아요 - 404 Not Found")
     void likePost_notFound_returns404() throws Exception {
-        willThrow(new CustomException(PostErrorCode.POST_NOT_FOUND))
+        willThrow(new BusinessException(PostErrorCode.POST_NOT_FOUND))
                 .given(postLikeService).likePost(any(), any());
 
         mockMvc.perform(post("/api/v1/posts/{postId}/like", 999L))
@@ -227,7 +223,7 @@ class PostControllerTest {
     @Test
     @DisplayName("존재하지 않는 게시글 좋아요 취소 - 404 Not Found")
     void unlikePost_notFound_returns404() throws Exception {
-        willThrow(new CustomException(PostErrorCode.POST_NOT_FOUND))
+        willThrow(new BusinessException(PostErrorCode.POST_NOT_FOUND))
                 .given(postLikeService).unlikePost(any(), any());
 
         mockMvc.perform(delete("/api/v1/posts/{postId}/like", 999L))

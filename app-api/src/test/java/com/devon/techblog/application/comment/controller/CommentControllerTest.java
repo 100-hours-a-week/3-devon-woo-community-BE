@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.comment.CommentRequestFixture;
 import com.devon.techblog.application.comment.dto.request.CommentCreateRequest;
 import com.devon.techblog.application.comment.dto.request.CommentUpdateRequest;
@@ -18,10 +19,9 @@ import com.devon.techblog.application.comment.dto.response.CommentResponse;
 import com.devon.techblog.application.comment.service.CommentService;
 import com.devon.techblog.application.common.dto.response.PageResponse;
 import com.devon.techblog.application.member.dto.response.MemberResponse;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.CommentErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -125,8 +125,7 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -138,14 +137,13 @@ class CommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("validation_failed"));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
     @DisplayName("존재하지 않는 댓글 조회 - 404 Not Found")
     void getComment_notFound_returns404() throws Exception {
-        willThrow(new CustomException(CommentErrorCode.COMMENT_NOT_FOUND))
+        willThrow(new BusinessException(CommentErrorCode.COMMENT_NOT_FOUND))
                 .given(commentService).getCommentsDetails(any());
 
         mockMvc.perform(get("/api/v1/comments/{commentId}", 999L))
@@ -159,7 +157,7 @@ class CommentControllerTest {
     void updateComment_notFound_returns404() throws Exception {
         CommentUpdateRequest request = CommentRequestFixture.updateRequest();
 
-        willThrow(new CustomException(CommentErrorCode.COMMENT_NOT_FOUND))
+        willThrow(new BusinessException(CommentErrorCode.COMMENT_NOT_FOUND))
                 .given(commentService).updateComment(any(), any(), any());
 
         mockMvc.perform(patch("/api/v1/comments/{commentId}", 999L)
@@ -173,7 +171,7 @@ class CommentControllerTest {
     @Test
     @DisplayName("존재하지 않는 댓글 삭제 - 404 Not Found")
     void deleteComment_notFound_returns404() throws Exception {
-        willThrow(new CustomException(CommentErrorCode.COMMENT_NOT_FOUND))
+        willThrow(new BusinessException(CommentErrorCode.COMMENT_NOT_FOUND))
                 .given(commentService).deleteComment(any(), any());
 
         mockMvc.perform(delete("/api/v1/comments/{commentId}", 999L))

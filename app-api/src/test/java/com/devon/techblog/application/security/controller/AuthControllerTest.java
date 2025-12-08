@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.auth.SignupRequestFixture;
 import com.devon.techblog.application.member.dto.request.SignupRequest;
 import com.devon.techblog.application.security.dto.response.LoginResponse;
@@ -16,11 +17,10 @@ import com.devon.techblog.application.security.service.SignupService;
 import com.devon.techblog.application.security.service.TokenBlacklistService;
 import com.devon.techblog.application.security.service.TokenRefreshService;
 import com.devon.techblog.application.security.util.CookieProvider;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.config.annotation.ControllerWebMvcTest;
 import com.devon.techblog.domain.member.repository.MemberRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -91,7 +91,7 @@ class AuthControllerTest {
     void signup_duplicateEmail_returns409() throws Exception {
         SignupRequest request = SignupRequestFixture.createRequest();
 
-        willThrow(new CustomException(MemberErrorCode.DUPLICATE_EMAIL))
+        willThrow(new BusinessException(MemberErrorCode.DUPLICATE_EMAIL))
                 .given(signupService).signup(any());
 
         mockMvc.perform(post("/auth/signup")
@@ -107,7 +107,7 @@ class AuthControllerTest {
     void signup_duplicateNickname_returns409() throws Exception {
         SignupRequest request = SignupRequestFixture.createRequest();
 
-        willThrow(new CustomException(MemberErrorCode.DUPLICATE_NICKNAME))
+        willThrow(new BusinessException(MemberErrorCode.DUPLICATE_NICKNAME))
                 .given(signupService).signup(any());
 
         mockMvc.perform(post("/auth/signup")

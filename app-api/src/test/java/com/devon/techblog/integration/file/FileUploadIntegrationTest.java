@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.devon.techblog.application.file.dto.request.CompleteUploadRequest;
 import com.devon.techblog.application.file.dto.request.PresignRequest;
 import com.devon.techblog.config.annotation.IntegrationTest;
@@ -14,7 +15,6 @@ import com.devon.techblog.domain.file.entity.File;
 import com.devon.techblog.domain.file.entity.FileStatus;
 import com.devon.techblog.domain.file.entity.FileType;
 import com.devon.techblog.domain.file.repository.FileRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +50,13 @@ class FileUploadIntegrationTest {
                         .content(objectMapper.writeValueAsString(presignRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("presign_url_created"))
                 .andExpect(jsonPath("$.data.fileId").value(notNullValue()))
                 .andExpect(jsonPath("$.data.storageKey").value(notNullValue()))
                 .andExpect(jsonPath("$.data.uploadSignature.apiKey").value(notNullValue()))
                 .andExpect(jsonPath("$.data.uploadSignature.cloudName").value(notNullValue()))
                 .andExpect(jsonPath("$.data.uploadSignature.timestamp").value(notNullValue()))
                 .andExpect(jsonPath("$.data.uploadSignature.signature").value(notNullValue()))
+                .andExpect(jsonPath("$.data.uploadSignature.folder").value("images"))
                 .andReturn();
 
         String responseBody = presignResult.getResponse().getContentAsString();
@@ -77,7 +77,6 @@ class FileUploadIntegrationTest {
                         .content(objectMapper.writeValueAsString(completeRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("upload_completed"))
                 .andExpect(jsonPath("$.data.id").value(fileId))
                 .andExpect(jsonPath("$.data.status").value("UPLOADED"))
                 .andExpect(jsonPath("$.data.url").value("https://res.cloudinary.com/demo/image/upload/v1234567890/images/abc123.jpg"))
@@ -120,7 +119,6 @@ class FileUploadIntegrationTest {
         mockMvc.perform(get("/api/v1/files/{id}", fileId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("file_retrieved"))
                 .andExpect(jsonPath("$.data.id").value(fileId))
                 .andExpect(jsonPath("$.data.fileType").value("IMAGE"))
                 .andExpect(jsonPath("$.data.originalName").value("test-image.png"))

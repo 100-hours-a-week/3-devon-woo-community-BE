@@ -14,7 +14,7 @@ import com.devon.techblog.application.post.dto.request.PostCreateRequest;
 import com.devon.techblog.application.post.dto.request.PostUpdateRequest;
 import com.devon.techblog.application.post.dto.response.PostResponse;
 import com.devon.techblog.application.post.dto.response.PostSummaryResponse;
-import com.devon.techblog.common.exception.CustomException;
+import com.devon.techblog.common.exception.BusinessException;
 import com.devon.techblog.common.exception.code.MemberErrorCode;
 import com.devon.techblog.common.exception.code.PostErrorCode;
 import com.devon.techblog.config.annotation.UnitTest;
@@ -134,7 +134,7 @@ class PostServiceTest {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> postService.getPostDetails(1L, 1L))
-                .isInstanceOf(CustomException.class);
+                .isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -159,7 +159,7 @@ class PostServiceTest {
         given(memberRepository.findById(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> postService.createPost(request, 1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(MemberErrorCode.USER_NOT_FOUND.getMessage());
     }
 
@@ -170,7 +170,7 @@ class PostServiceTest {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> postService.updatePost(1L, request, 1L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(PostErrorCode.POST_NOT_FOUND.getMessage());
     }
 
@@ -181,11 +181,11 @@ class PostServiceTest {
         Member otherMember = MemberFixture.createWithId(2L);
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
         given(memberRepository.findById(2L)).willReturn(Optional.of(otherMember));
-        doThrow(new CustomException(PostErrorCode.NO_PERMISSION))
+        doThrow(new BusinessException(PostErrorCode.NO_PERMISSION))
                 .when(ownershipPolicy).validateOwnership(1L, 2L);
 
         assertThatThrownBy(() -> postService.updatePost(1L, request, 2L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(PostErrorCode.NO_PERMISSION.getMessage());
     }
 
@@ -193,11 +193,11 @@ class PostServiceTest {
     @DisplayName("게시글 삭제 시 소유자가 아니면 예외가 발생한다")
     void deletePost_notOwner_throwsException() {
         given(postRepository.findByIdWithMember(1L)).willReturn(Optional.of(post));
-        doThrow(new CustomException(PostErrorCode.NO_PERMISSION))
+        doThrow(new BusinessException(PostErrorCode.NO_PERMISSION))
                 .when(ownershipPolicy).validateOwnership(1L, 2L);
 
         assertThatThrownBy(() -> postService.deletePost(1L, 2L))
-                .isInstanceOf(CustomException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(PostErrorCode.NO_PERMISSION.getMessage());
     }
 
