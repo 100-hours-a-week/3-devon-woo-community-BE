@@ -2,6 +2,7 @@ package com.devon.techblog.config.annotation;
 
 import com.devon.techblog.config.ImageStorageMockConfig;
 import com.devon.techblog.config.JpaAuditingTestConfig;
+import com.devon.techblog.config.RedisMockConfig;
 import com.devon.techblog.config.TestSecurityConfig;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -17,13 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
  * 통합 테스트 공통 설정을 모아둔 메타 어노테이션입니다.
  * - @ActiveProfiles(\"test\") : 테스트 프로필 활성화
  * - @SpringBootTest + @AutoConfigureMockMvc : 전체 컨텍스트 + MockMvc 구동
- * - @Import(TestSecurityConfig, JpaAuditingTestConfig, ImageStorageMockConfig) :
- *   보안, JPA Auditing, 이미지 스토리지에 대한 테스트 전용 설정 주입
+ * - @Import(TestSecurityConfig, JpaAuditingTestConfig, ImageStorageMockConfig, RedisMockConfig) :
+ *   보안, JPA Auditing, 이미지 스토리지, Redis에 대한 테스트 전용 설정 주입
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
-@Import({TestSecurityConfig.class, JpaAuditingTestConfig.class, ImageStorageMockConfig.class})
+@Import({TestSecurityConfig.class, JpaAuditingTestConfig.class, ImageStorageMockConfig.class, RedisMockConfig.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 @Tag("integration")
